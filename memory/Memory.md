@@ -1,6 +1,6 @@
 # 🧠 全局记忆系统
 
-> **最后更新**：2026-04-03 12:38  
+> **最后更新**：2025-07-18  
 > **项目状态**：Y3游戏引擎项目  
 
 ## 📋 项目概览
@@ -23,10 +23,60 @@
 
 ## 📚 重要决策记录
 
+### 2025-07-18：optimize-decoration-pipeline（v3 纹理组驱动）
+- **决策**：装饰物系统从全局 style 升级为纹理组驱动 + 精确定位
+- **核心变更**：
+  - **废弃全局 `style`** → 纹理组驱动：每个采样点查脚下纹理 → 匹配纹理组 → 从该组模型池选模型
+  - **新增 `texture_group_catalog.json`**：8 纹理组 × 170+ 纹理 ID × 5+ 模型/组（grassland/autumn/desert/ice_snow/jungle/dirt/rock/road）
+  - **tree_cluster 精确定位**：fine_clusters（CV mask 优先）+ position+radius（圆形区域兜底）
+  - **mountain_chain 连绵山脉**：from/to 方位描述，沿连线均匀放置 + 法线偏移
+  - **6 步 Round 2 工作流**：2.0 前置准备 → 2.1 AI 标注 → 2.2 纹理组映射 → 2.3 采样分配 → 2.4 实体生成 → 2.5 统计自检
+  - **decoration_postprocess.py 重构**：v3 核心引擎
+  - **round2_decoration_prompt.md 重写**：引导 AI 产出 v3 JSON
+  - **文档全面更新**：SKILL.md、decoration-model-ids.md、废弃旧 decoration_catalog.json
+- **端到端验证**：68 实体产出，纹理匹配正确（C2→grassland, C3→autumn）
+- **OpenSpec change**: `optimize-decoration-pipeline`
+
+### 2026-04-28：optimize-decoration-generation 归档
+- **决策**：优化 y3-gen-terrain-from-image 技能的装饰物生成逻辑
+- **核心变更**：
+  - **CV 子区域分析** (`cv_subregion_analysis.py`): 分析大陆内 K=50 微簇，识别可分离区域
+  - **混合定位策略**: mask 模式(高精度 fine_clusters) + 方位模式(兜底 position 九宫格)
+  - **Prompt 重构**: 逐大陆标注 + 大陆裁剪放大图(continent_crops) + 自检机制(Step D)
+  - **密度控制**: sparse/normal/dense 三档泊松采样
+  - **山峰自动缩放**: 基于 pickbound 的 count-based 放置（解决"鹅卵石"问题）
+  - **大陆 Crops**: 九宫格标注的局部放大图，提升 AI 视觉精度
+- **新增 Specs**: `cv-subregion-analysis`、`decoration-hybrid-positioning`（已同步到 main specs）
+- **状态**: 16/18 tasks 完成，已归档
+- **OpenSpec change**: `optimize-decoration-generation`（归档至 `archive/2026-04-28-optimize-decoration-generation`）
+
+### 2026-04-27：optimize-terrain-gen-skill 实现
+- **决策**：优化 y3-gen-terrain-from-image 技能
+- **核心变更**：
+  - 水域后处理（连通区分析填回孤立水域）
+  - 装饰物后处理（泊松采样树木、桥梁水域吸附+yaw推算、山石散布）
+  - MCP entity_create_block rotation bug 修复（rotation → yaw/pitch/roll）
+- **关键原则**：不做 AI 无法做好的事（高度/多纹理/道路），用确定性后处理兜底
+- **状态**：13/16 tasks 完成，3 个测试任务待验证
+- **OpenSpec change**：`optimize-terrain-gen-skill`
+
 ### 2026-03-26：建立记忆系统
 - **决策**：采用基于文件的记忆系统
 - **原因**：确保跨会话工作连续性
 - **结构**：全局Memory.md + sessions目录
+
+### 2026-04-20：y3-game-spec 可行性审查机制改造
+- **决策**：把可行性审查从 Step 9 单点检查改为「Step 1.5 + 每步实时审查」+ 严格化引擎能力红线
+- **背景**：用户测试塔防生成时发现 ① 审查太晚导致 8 步白问 ② 审查太松导致兽人必须死(3D)被判通过
+- **落地**：
+  - 新建 `.codemaker/skills/y3-game-spec/feasibility-redlines.md`（176 行红线清单）
+  - 改造 `game-design-guide.md`（673→1025 行）：移除模板体系、新增 Step 1.5 红线校验、新增「实时红线审查模板」、Step 9 改为跨步冲突+复审、补齐策划案模板章节
+  - 改造 `SKILL.md`：新增红线机制相关核心禁令
+- **重要纪律**（新增到经验沉淀）：
+  - 改写超过 200 行的文件**必须**用 `replace_in_file`，**禁止**用 `edit_file`（本次发生过 edit_file 把整个 912 行文件清空的事故）
+  - 引擎能力红线（视角/操作/物理类）一律不允许"勉强凑活"，命中即驳回并提供 ≥2 个 Y3 可行替代方案
+- **救场记录**：edit_file 清空文件后，通过 `svn revert` 还原到 r752168 版本（673 行），再通过 10 次 replace_in_file 增量重建到 1025 行
+- **session 报告**：`.codemaker/memory/sessions/session-2026.04.20-17.03-spec流程红线机制改造/report.md`
 
 ### 2026-03-26：制定变更记录规则
 - **决策**：所有重要变更必须记录到记忆系统
@@ -85,6 +135,18 @@
 - **新增 Specs**：`unified-lua-pipeline`、`api-whitelist-enforcement`（已同步到 main specs）
 - **OpenSpec 变更**：refactor-lua-pipeline (12/12 任务完成，已归档)
 - **关键规则**：所有 Lua 代码必须通过 `y3-lua-pipeline` 编写，API 使用必须可追溯到 SKILL.md 或 references
+
+### 2026-04-14：MCP Server Timer 链修复 (mcp-terrain-timer-chain)
+- **决策**：将 terrain_handlers.py 中所有 `_do_cmd` 调用从 HTTP 工作线程调度到引擎主线程
+- **根因**：`ThreadingMixIn` + 高频请求导致引擎 API 并发调用，概率性崩溃（10054/10061/JSON 截断）
+- **核心变更**：
+  - 新增 `_execute_cells_via_timer()` 通用 Timer 回调链执行器
+  - 19 个地形/实体函数的 `for cell` 循环改为 Timer 回调链（每 cell 间隔 0.05s）
+  - `BATCH_SIZE` 50→300，HTTP 请求减少 ~83%
+  - 所有 return 值和 errors 改为英文
+- **改动文件**：`terrain_handlers.py`（Server 端）、`mcp_batch_writer.py`（Client 端）
+- **OpenSpec 变更**：mcp-terrain-timer-chain（24/24 任务完成）
+- **排查教训**：先排除了 UTF-8 编码假设和 flush 假设，最终通过对比分析确认是线程安全问题
 
 ### 2026-04-03：RPG 游戏核心功能实现
 - **决策**：基于 `Y3AgentRoadMap.md` 策划案实现完整 RPG 游戏逻辑

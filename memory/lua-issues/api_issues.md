@@ -187,41 +187,83 @@ local abilities = hero:get_abilities_by_type(y3.const.AbilityType['英雄'])
 
 ---
 
-## 11. 获取玩家的所有单位
+## [2026-04-20] 点/单位移动 API 名误用
 
-### ❌ 错误用法
-```lua
-local units = y3.unit_group.get_all_units_of_player(player):pick()
-```
-**错误**: `attempt to call a nil value (field 'get_all_units_of_player')`
+**现象**：执行案预检阶段使用了 `y3.point.create_point(x,y,z)` 和 `unit:move_to(point)`，运行/审阅时发现 API 不存在。
 
-### ✅ 正确用法
-```lua
-local units = player:get_all_units()
-for _, unit in pairs(units) do
-    -- 处理单位
-end
-```
-**说明**: 使用 `player:get_all_units()` 方法获取玩家的所有单位，直接返回单位表，不需要 `:pick()`  
-**源码位置**: `y3/object/runtime_object/player.lua:560`
+**根因**：未在 `y3/` 源码中 grep 验证，凭"看起来合理"的命名直接写入。
+
+**正解**：
+- 创建点：`y3.point.create(x, y, z)`  — `y3/object/scene_object/point.lua`
+- 单位移动：`unit:move_to_pos(point, range)`  — `y3/object/editable_object/unit.lua`（`range` 为停止半径，常用 50~100）
+
+**预防**：编写 y3 API 调用前必须 `grep_search` 在 `maps/EntryMap/script/y3/` 中确认函数签名。
 
 ---
 
-## 12. 计时器循环指定次数
+## [2026-04-20] 玩家资源 API 不存在
 
-### ❌ 错误用法
-```lua
-y3.timer.loop_count(timeout, times, callback)
-```
-**错误**: `attempt to call a nil value (field 'loop_count')`
+**现象**：尝试用 `player:get_res_num(...)` 读取金币，源码中无此方法。
 
-### ✅ 正确用法
-```lua
-y3.timer.count_loop(timeout, times, callback)
-```
-**说明**: 方法名是 `count_loop` 不是 `loop_count`，参数顺序相同：(超时时间, 执行次数, 回调)  
-**源码位置**: `y3/object/runtime_object/timer.lua:158`
+**正解**（任选其一）：
+- 引擎属性：`player:get_attr("gold")` / `player:set_attr("gold", v)`
+- 自定义状态表：在 Lua 模块（如 `td_state`）中维护 `state.gold` 字段，由 Lua 完全管控读写
+
+**选用建议**：纯 Lua 玩法（塔防/肉鸽）推荐自定义表，便于跨模块访问与测试 mock。
 
 ---
 
-*最后更新: 2026-04-14*
+---
+
+## [2026-04-20] `unit:is_removed()` 不存在
+
+**现象**：检查单位是否已被移除时调用 `unit:is_removed()`，运行时报 nil。
+
+**正解**：使用 `unit:is_exist()`（取反判断）或 `unit:is_destroyed()`。
+- `is_exist()` — `y3/object/editable_object/unit.lua:116`
+- `is_destroyed()` — `y3/object/editable_object/unit.lua:2111`
+
+**典型 bug 代码**：`if unit:is_removed() then return end` → 改为 `if not unit:is_exist() then return end`
+
+---
+
+## [2026-04-20] 键盘抬起事件名是「抬起」不是「弹起」
+
+**现象**：`y3.game:event('键盘-弹起', key, cb)` 触发 `param-type-mismatch` 警告，事件不会响应。
+
+**正解**：事件名为 `'键盘-抬起'`。同样 `'本地-键盘-抬起'`。
+**源码**：`y3/meta/event.lua:6945-6951`
+
+---
+
+## [2026-04-20] Unit 没有 add_attribute / set_attribute（那是 Item 的）
+
+**现象**：照执行案预检写 `unit:add_attribute('atk', 20)`，运行时 nil。
+
+**正解**：单位增减属性使用 `unit:add_attr(attr_name, value, attr_type)` / `unit:set_attr(...)`，
+其中 `attr_type` 为 `'基础'|'加成'|'升级'|...` 等中文名（自动通过 `y3.const.UnitAttrType` 映射）。
+- 攻击力的属性名为 `'atk_base'`（基础攻击）
+- `unit:add_attr('atk_base', 20, '基础')`
+
+**源码**：`y3/object/editable_object/unit.lua:698 / 724`
+
+**易混淆**：`Item:add_attribute` 是另一回事，仅用于物品。
+
+---
+
+## [2026-04-20] State 模块自定义回调字段需用 `---@field` 声明
+
+**现象**：在状态模块上挂自定义回调（如 `State.on_gold_changed = ...`）触发 `undefined-field` 警告。
+
+**正解**：在模块的 `---@class` 注解上补 `---@field on_xxx? fun(...)` 声明可选字段，可消除警告。
+
+**示例**：
+```lua
+---@class TD.State
+---@field on_gold_changed? fun(gold: integer)
+local M = {}
+```
+
+---
+
+*最后更新: 2026-04-20*

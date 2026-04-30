@@ -73,12 +73,53 @@ ui:set_skill_btn_func_meta_key(key)     -- 智能施法组合键
 ui:set_skill_btn_action_effect(true)    -- 激活动效
 ```
 
-## 进度条与滑动条
+## 进度条 (type 41)
+
+⚠️ **必须同时设置三个值**：最大值、当前值、文本子节点
 
 ```lua
-ui:set_max_progress_bar_value(max)              -- 进度条最大值
-ui:set_current_progress_bar_value(value, time)  -- 进度条当前值（time=渐变时间）
-ui:set_slider_value(0-100)                      -- 滑动条百分比
+-- 1. 设置进度条最大值（必须）
+ui:set_max_progress_bar_value(max)
+
+-- 2. 设置进度条当前值（必须）
+ui:set_current_progress_bar_value(value, time)  -- time=渐变时间，0=立即更新
+
+-- 3. 设置文本子节点显示数值（必须）
+local text_node = ui:get_child('TextNodeName')
+text_node:set_text(string.format("%d/%d", current, max))
+```
+
+### 示例：血条/能量条
+
+```lua
+local hp_bar = y3.ui.get_ui(player, "GameHUD.HP_ProgressBar")
+
+local function update_hp_bar(hero)
+    if not hero or not hero:is_alive() then return end
+    
+    local hp = hero:get_hp()
+    local hp_max = hero:get_attr('最大生命')
+    if not hp_max or hp_max <= 0 then return end
+    
+    -- 1. 设置进度条最大值（必须）
+    hp_bar:set_max_progress_bar_value(hp_max)
+    
+    -- 2. 设置进度条当前值（必须）
+    hp_bar:set_current_progress_bar_value(hp, 0)
+    
+    -- 3. 设置文本子节点显示数值（必须）
+    local hp_text = hp_bar:get_child('HP_Text')
+    if hp_text then
+        hp_text:set_text(string.format("%d/%d", math.floor(hp), math.floor(hp_max)))
+    end
+end
+```
+
+## 滑动条
+
+```lua
+ui:set_slider_value(0-100)                      -- 设置滑动条百分比
+ui:get_slider_current_value()                   -- 获取滑动条当前值
 ui:set_list_view_percent(0-100)                 -- 列表滚动位置
 ```
 
@@ -175,3 +216,221 @@ ui:get_checkbox_selected()      -- 复选框状态
 ui:remove()      -- 删除控件
 ui:is_removed()  -- 是否已删除
 ```
+
+## 模型控件 (type 6)
+
+```lua
+-- 从物编设置单位模型
+GameAPI.set_ui_model_id_from_object_editor(role, comp_uid, unit_id)    -- unit_id: 物编单位ID
+```
+
+### 示例：显示物编单位模型
+
+```lua
+local player = y3.player.get_by_id(1)
+local model_comp = y3.ui.get_ui(player, "HeroSelect.Panel_Hero.Model_Hero")
+
+-- 使用物编单位ID（player.handle 就是 role）
+GameAPI.set_ui_model_id_from_object_editor(player.handle, model_comp.handle, 100001)
+
+-- 设置镜头模式为智能头像（推荐）
+GameAPI.set_model_comp_camera_mod(player.handle, model_comp.handle, 2)
+```
+
+## 特效控件
+
+```lua
+ui:play_ui_effect(effect_id, is_loop)               -- 播放特效
+ui:set_effect_background_color(r, g, b, a)          -- 背景色
+ui:set_effect_camera_fov(fov)                       -- 镜头视口
+ui:set_effect_camera_pos(x, y, z)                   -- 镜头坐标
+ui:set_effect_camera_rotation(pitch, roll, yaw)     -- 镜头旋转
+ui:set_effect_focus_pos(x, y, z)                    -- 焦点位置
+ui:set_effect_play_speed(speed)                     -- 播放速度
+ui:set_effect_camera_mode('智能模式'|'自动'|'手动') -- 镜头模式（推荐使用'智能模式'）
+```
+
+## 技能按钮 (type 17)
+
+```lua
+-- 设置智能施法快捷键（快捷施法，无需点击确认）
+ui:set_skill_btn_smart_cast_key(key)                        -- key: y3.Const.KeyboardKey
+
+-- 设置施法快捷键（按键后需点击确认）
+ui:set_button_shortcut(key)                                 -- key: y3.Const.KeyboardKey
+
+-- 绑定技能到按钮
+GameAPI.set_skill_on_ui_comp(role, ability, comp_uid)       -- ability: 技能对象, comp_uid: 按钮UID
+
+-- 解绑技能
+GameAPI.unbind_skill_on_ui_comp(role, ability, comp_uid)    -- 从按钮解绑技能
+```
+
+### 示例：技能按钮配置
+
+```lua
+local player = y3.player.get_by_id(1)
+-- 获取玩家选中的英雄单位
+local hero = player:get_selecting_unit()
+
+-- 或者通过其他方式获取英雄单位，例如：
+-- local hero = y3.unit.get_by_id(unit_id)
+
+if hero then
+    local skill_btn = y3.ui.get_ui(player, "GameHUD.Panel_Skills.Btn_Skill1")
+    
+    -- 获取英雄技能（技能类型：'英雄', 技能位：1）
+    local ability = hero:get_ability_by_slot('英雄', 1)
+    
+    if ability then
+        -- 绑定技能到按钮（player.handle 就是 role）
+        GameAPI.set_skill_on_ui_comp(player.handle, ability.handle, skill_btn.handle)
+        
+        -- 设置智能施法快捷键为 Q（按Q键直接释放）
+        skill_btn:set_skill_btn_smart_cast_key(y3.const.KeyboardKey['KEY_Q'])
+        
+        -- 或设置普通施法快捷键为 Q（按Q后需要点击目标）
+        -- skill_btn:set_button_shortcut(y3.const.KeyboardKey['KEY_Q'])
+    end
+end
+```
+
+## 序列帧
+
+```lua
+ui:set_sequence_image(image_id)                             -- 设置序列帧图片
+ui:play_ui_sequence(loop, space, start_frame, end_frame)    -- 播放
+ui:stop_ui_sequence()                                       -- 停止
+```
+
+## 网格/列表控件 (GridView type 25 / ScrollView type 10)
+
+⚠️ **重要**：网格控件和列表控件本身都只是空容器，**必须先创建 prefab 子节点才能显示内容**。单纯的控件没有任何作用！
+
+两种控件的使用方式完全相同：通过 `y3.ui_prefab.create` 动态创建子节点，然后操控子节点内容。
+
+### 核心 API
+
+```lua
+-- 创建 prefab 子节点（必须）
+-- player: 玩家对象
+-- prefab_name: prefab 名称（命名规则见下方）
+-- container: 网格/列表控件
+local child = y3.ui_prefab.create(player, prefab_name, container)
+
+-- 移除子节点
+child:remove()
+
+-- 设置列表滚动位置（仅 ScrollView）
+ui:set_list_view_percent(0-100)  -- 0=顶部, 100=底部
+```
+
+### Prefab 命名规则
+
+Prefab 名称格式：`<PanelName>-<节点路径（.替换为-）>-template`
+
+| 组成部分 | 说明 | 示例 |
+|----------|------|------|
+| `PanelName` | 画板名称 | `HeroSelectPanel` |
+| `节点路径` | 控件在 UI 中的路径，`.` 替换为 `-` | `block.item_grid` → `block-item_grid` |
+| `template` | 固定后缀 | `template` |
+
+**完整示例**：`HeroSelectPanel-block-item_grid-template`
+
+### 示例：排行榜列表 (ScrollView)
+
+```lua
+local player = y3.player.get_by_id(1)
+
+-- 获取列表控件
+local rank_list = y3.ui.get_ui(player, "RankPanel.block.rank_list")
+
+-- Prefab 名称（对应 prefab 文件：RankPanel-block-rank_list-template.json）
+local prefab_name = "RankPanel-block-rank_list-template"
+
+-- 排行榜数据
+local rank_data = {
+    { name = "玩家1", score = 1000 },
+    { name = "玩家2", score = 800 },
+    { name = "玩家3", score = 600 },
+}
+
+-- 为每条数据创建一个列表项
+for i, data in ipairs(rank_data) do
+    -- 创建 prefab 子节点
+    local item = y3.ui_prefab.create(player, prefab_name, rank_list)
+    
+    -- 修改子节点内容（根据 prefab 内部结构）
+    local name_label = item:get_child("label_name")
+    local score_label = item:get_child("label_score")
+    local rank_label = item:get_child("label_rank")
+    
+    if name_label then name_label:set_text(data.name) end
+    if score_label then score_label:set_text(tostring(data.score)) end
+    if rank_label then rank_label:set_text("#" .. i) end
+end
+```
+
+## 聊天控件
+
+```lua
+ui:enable_chat(enable)                  -- 启用/禁用发送
+ui:show_chat(player, enable)            -- 显示/隐藏聊天框
+ui:clear_chat()                         -- 清空聊天
+ui:send_chat(player, msg)               -- 发送私聊
+ui:set_nearby_micro_switch(switch)      -- 聊天频道
+```
+
+## 物品槽控件 (type 20)
+
+```lua
+-- 绑定物品对象到物品槽
+ui:set_item_on_ui(item)                                     -- item: 物品对象
+
+-- 绑定单位的物品槽位
+ui:set_ui_unit_slot(unit, slot_type, index)                -- slot_type: y3.const.SlotType, index: 槽位索引(从0开始)
+
+-- 设置使用物品操作方式
+ui:set_equip_slot_use_operation(operation)                 -- operation: '无'|'左键单击'|'右键单击'|'左键双击'
+
+-- 设置拖拽物品操作方式
+ui:set_equip_slot_drag_operation(operation)                -- operation: '无'|'左键'|'右键'
+```
+
+### 示例：绑定物品栏和背包栏
+
+```lua
+local player = y3.player.get_by_id(1)
+local hero = player:get_selecting_unit()
+
+if hero then
+    -- 绑定 6 格物品栏（装备位）
+    for i = 1, 6 do
+        local slot = y3.ui.get_ui(player, 'GameHUD.Panel_Items.Slot_' .. i)
+        slot:set_ui_unit_slot(hero, y3.const.SlotType.BAR, i - 1)
+        
+        -- 设置操作方式（可选）
+        slot:set_equip_slot_use_operation('右键单击')
+        slot:set_equip_slot_drag_operation('左键')
+    end
+    
+    -- 绑定 6 格背包栏（仓库位）
+    for i = 1, 6 do
+        local bag_slot = y3.ui.get_ui(player, 'GameHUD.Panel_Bag.Slot_' .. i)
+        bag_slot:set_ui_unit_slot(hero, y3.const.SlotType.PKG, i - 1)
+    end
+end
+```
+
+### 示例：手动绑定物品到槽位
+
+```lua
+local player = y3.player.get_by_id(1)
+local item = y3.item.get_by_id(item_id)
+local item_slot = y3.ui.get_ui(player, "GameHUD.Panel_Items.Slot_1")
+
+-- 直接绑定物品对象
+item_slot:set_item_on_ui(item)
+```
+
+---

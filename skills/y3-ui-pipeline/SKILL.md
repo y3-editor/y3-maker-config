@@ -1,14 +1,23 @@
 ---
 name: y3-ui-pipeline
 description: |
-  Y3 UI 完整工作流管理技能。当用户需要创建 UI 时自动触发此流程。
-  触发词：生成UI、创建界面、做个UI、UI面板、HUD、英雄选择界面、商店界面、技能栏、背包界面等。
-  工作流程：1. 调用 y3-ui-generator 生成 UI JSON → 2. 调用 gen_ui_tree.py 生成节点树（供 Lua 查询）
+  ⭐ Y3 UI 开发的【唯一用户入口】。所有 UI 相关需求统一走本流程，不要直接调用 y3-ui-generator。
+
+  ALWAYS use this skill when user mentions: 生成UI、创建UI、做个UI、UI面板、做个界面、
+  创建界面、HUD、英雄选择界面、商店界面、技能栏、背包界面、血条、小地图、装备栏、登录界面、
+  结算界面、主菜单、设置面板、create panel、generate UI、make HUD。
+
+  工作流程（两环节自动串联）：
+  1. 生成 UI JSON（内部调用 y3-ui-generator）
+  2. 生成 UI 节点树（供 Lua 查询，内部调用 gen_ui_tree.py）
+
+  若用户请求中还包含 UI 交互逻辑（按钮点击、数据绑定等 Lua 代码），
+  本流程完成后由 y3-lua-pipeline 衔接。
 ---
 
-# Y3 UI Pipeline（UI 完整工作流）
+# Y3 UI Pipeline（UI 完整工作流 - 唯一入口）
 
-当用户需求涉及 UI 生成时，**必须使用此工作流**，而非直接调用子技能。
+> ⭐ **UI 开发的唯一入口**。当用户需求涉及 UI 生成时，**必须使用此工作流**，而非直接调用子技能（`y3-ui-generator` 已降级为内部实现）。
 
 ## 🔄 工作流程
 
@@ -65,7 +74,7 @@ description: |
 ### 执行命令
 
 ```bash
-python ".codemaker/skills/y3-ui-pipeline/gen_ui_tree.py" "."
+python "<agent>/skills/y3-ui-pipeline/gen_ui_tree.py" "."
 ```
 
 ### 输出位置
@@ -125,7 +134,7 @@ local hero1 = y3.ui.get_ui(player, "HeroSelectPanel.block.main_frame.hero_1")
 ## 📁 目录结构
 
 ```
-.codemaker/skills/y3-ui-pipeline/
+<agent>/skills/y3-ui-pipeline/
 ├── SKILL.md              # 本文件（工作流说明）
 └── gen_ui_tree.py        # 节点树生成脚本
 

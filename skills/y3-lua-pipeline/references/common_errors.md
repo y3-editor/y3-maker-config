@@ -6,15 +6,10 @@
 
 ## 🔴 致命错误（编辑器崩溃/地图打不开）
 
-### 修改物编模板文件
-| 错误做法 | 后果 | 正确做法 |
-|----------|------|----------|
-| 直接修改 `data_template/*.json` | 模板污染，后续生成全部异常 | 只修改输出文件 `editor_table/` |
-
 ### 物编 JSON 格式错误
 | 错误做法 | 后果 | 正确做法 |
 |----------|------|----------|
-| 手动编写物编 JSON | `AttributeError: 'str' object has no attribute 'get'` | 使用 `y3-obj-gen` 技能生成 |
+| 手动编写物编 JSON | `AttributeError: 'str' object has no attribute 'get'` | 使用 `y3-obj-edit` 技能生成 |
 | kv 字段存自定义数据 | 编辑器崩溃 | kv 保持空对象 `{}` |
 
 ### UI JSON 格式错误

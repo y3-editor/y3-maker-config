@@ -21,9 +21,9 @@ description: >
 **本技能激活后，执行审查之前，必须先读取以下文件：**
 
 ```
-1. .codemaker/rules/api-safety.mdc          ← API 安全规则 + 常见错误速查
-2. .codemaker/memory/lua-issues/api_issues.md ← 已知 API 错误模式（当前 10 条）
-3. .codemaker/memory/lua-issues/trace_issues.md ← 运行时 trace 错误（如存在）
+1. <agent>/rules/api-safety.mdc          ← API 安全规则 + 常见错误速查
+2. <agent>/memory/lua-issues/api_issues.md ← 已知 API 错误模式（当前 10 条）
+3. <agent>/memory/lua-issues/trace_issues.md ← 运行时 trace 错误（如存在）
 ```
 
 > 这些文件是审查的**核心知识库**，包含所有已知错误模式，必须在 Phase 3 中逐一比对。
@@ -404,13 +404,13 @@ description: >
 
 | 数据源 | 路径 | 用途 |
 |--------|------|------|
-| API 白名单 | `.codemaker/skills/y3-lua-pipeline/references/*.md` (22 文件) | API 存在性校验 |
-| API 快速参考 | `.codemaker/skills/y3-lua-pipeline/SKILL.md` Part 3 | API 签名速查 |
-| 已知错误库 | `.codemaker/memory/lua-issues/api_issues.md` | 错误模式匹配 |
-| Trace 错误库 | `.codemaker/memory/lua-issues/trace_issues.md` | Trace 模式匹配 |
+| API 白名单 | `skills/y3-lua-pipeline/references/*.md` (22 文件) | API 存在性校验 |
+| API 快速参考 | `skills/y3-lua-pipeline/SKILL.md` Part 3 | API 签名速查 |
+| 已知错误库 | `memory/lua-issues/api_issues.md` | 错误模式匹配 |
+| Trace 错误库 | `memory/lua-issues/trace_issues.md` | Trace 模式匹配 |
 | 事件参数大全 | `y3/meta/event.lua` | 事件名+参数名校验 |
 | 常量枚举 | `y3/game/const.lua` | 枚举值校验 |
-| API 安全规则 | `.codemaker/rules/api-safety.mdc` | 常见错误速查 |
+| API 安全规则 | `rules/api-safety.mdc` | 常见错误速查 |
 
 ---
 

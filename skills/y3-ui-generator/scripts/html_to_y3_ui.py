@@ -16,6 +16,7 @@ Supported node types:
     - div[data-type="label"]   -> type 3 (文本)
     - div[data-type="image"]   -> type 4 (图片)
     - div[data-type="button"]  -> type 1 (按钮)
+    - div[data-type="3dmodel"] -> type 6 (模型控件)
     - div[data-type="grid"]    -> type 25 (GridView 网格)
     - div[data-type="list"]    -> type 10 (ScrollView 滚动列表)
 
@@ -43,6 +44,7 @@ TYPE_MAP = {
     "panel": 2,
     "label": 3,
     "image": 4,
+    "3dmodel": 6,  # 模型控件
     "layout": 7,
     "grid": 25,    # GridView
     "list": 10,    # ScrollView
@@ -368,9 +370,11 @@ class Y3UIHTMLParser(HTMLParser):
         # div_depth counts how many nested <div> tags each stack frame owns.
         # A frame is only popped when its own outermost </div> is seen.
 
-        # For structural verification: record every HTML node as (name, parent_name)
-        self.html_nodes = []          # list of (name, parent_name_or_None)
+        # For structural verification: record every HTML node as (full_path, name, parent_name)
+        # Uses full path (e.g., "panel.card_1.icon") to support duplicate node names under different parents
+        self.html_nodes = []          # list of (full_path, name, parent_name_or_None)
         self._name_stack = []         # parallel stack of names for parent tracking
+        self._path_stack = []         # parallel stack of full paths for path tracking
 
     def handle_starttag(self, tag, attrs):
         if tag != 'div':
@@ -384,14 +388,18 @@ class Y3UIHTMLParser(HTMLParser):
             node = self._build_template_node(attr_dict, template_name)
             node_name = attr_dict.get('data-name', f'template_{template_name}')
             parent_name = self._name_stack[-1] if self._name_stack else None
+            parent_path = self._path_stack[-1] if self._path_stack else ''
             if node is None:
                 # Still need to track depth so handle_endtag stays in sync
                 # Push a sentinel (None) so the matching </div> is consumed
                 self.stack.append((None, [], 1))
                 self._name_stack.append(None)
+                self._path_stack.append(None)
                 return
+            # Build full path for this node
+            full_path = f"{parent_path}.{node_name}" if parent_path else node_name
             # Record in html_nodes for structural verification
-            self.html_nodes.append((node_name, parent_name))
+            self.html_nodes.append((full_path, node_name, parent_name))
             if self.stack:
                 parent_node, _, _ = self.stack[-1]
                 if parent_node is not None:
@@ -403,6 +411,7 @@ class Y3UIHTMLParser(HTMLParser):
             # counter instead of pushing a new frame.
             self.stack.append((node, node.get('children', []), 1))
             self._name_stack.append(node_name)
+            self._path_stack.append(full_path)
             return
 
         data_type = attr_dict.get('data-type', '')
@@ -415,21 +424,14 @@ class Y3UIHTMLParser(HTMLParser):
                 self.stack[-1] = (node, children, depth + 1)
             return
 
-        # If current parent is a grid/list node, skip child parsing
-        # (grid/list children are managed by engine via prefab, not static HTML)
-        if self.stack:
-            parent_node, _, _ = self.stack[-1]
-            if parent_node is not None and parent_node.get('_skip_children'):
-                # Absorb this div as a depth increment so </div> stays balanced
-                node_frame, children_frame, depth_frame = self.stack[-1]
-                self.stack[-1] = (node_frame, children_frame, depth_frame + 1)
-                return
-
         node = self._build_node(attr_dict, data_type)
         node_name = node['name']
         parent_name = self._name_stack[-1] if self._name_stack else None
+        parent_path = self._path_stack[-1] if self._path_stack else ''
+        # Build full path for this node
+        full_path = f"{parent_path}.{node_name}" if parent_path else node_name
         # Record in html_nodes for structural verification
-        self.html_nodes.append((node_name, parent_name))
+        self.html_nodes.append((full_path, node_name, parent_name))
 
         if self.stack:
             # Append to parent's children
@@ -441,6 +443,7 @@ class Y3UIHTMLParser(HTMLParser):
 
         self.stack.append((node, node.get('children', []), 1))
         self._name_stack.append(node_name)
+        self._path_stack.append(full_path)
 
     def handle_endtag(self, tag):
         if tag != 'div' or not self.stack:
@@ -454,6 +457,8 @@ class Y3UIHTMLParser(HTMLParser):
             self.stack.pop()
             if self._name_stack:
                 self._name_stack.pop()
+            if self._path_stack:
+                self._path_stack.pop()
 
     def _build_node(self, attrs, data_type):
         """Build a Y3 UI node from HTML data attributes."""
@@ -506,7 +511,7 @@ class Y3UIHTMLParser(HTMLParser):
             "children": [],
             "event_list": [],
             "name": name,
-            "open_adapter": True,
+            "open_adapter": any([adapt_top, adapt_bottom, adapt_left, adapt_right]),
             "adapter_option": [
                 adapt_top, adapt_bottom, adapt_left, adapt_right,
                 top_margin, bottom_margin, left_margin, right_margin
@@ -556,6 +561,8 @@ class Y3UIHTMLParser(HTMLParser):
             self._add_grid_fields(node, attrs)
         elif data_type == "list":
             self._add_list_fields(node, attrs)
+        elif data_type == "3dmodel":
+            self._add_3dmodel_fields(node, attrs)
 
         return node
 
@@ -700,6 +707,25 @@ class Y3UIHTMLParser(HTMLParser):
         if attrs.get('data-block', '').lower() == 'true':
             node["swallow_touches"] = True
 
+    def _add_3dmodel_fields(self, node, attrs):
+        """Add 3D model control-specific fields (type=6).
+        
+        Supported attributes:
+          - data-camera-mode: 镜头模式，1=智能全身模式，2=智能头像模式
+                              只允许合法值 1 和 2，不合法或缺失时默认为 2
+        """
+        # Parse camera mode with validation
+        camera_mode_str = attrs.get('data-camera-mode', '')
+        try:
+            camera_mode = int(camera_mode_str)
+            # Only allow valid values: 1 (智能全身) or 2 (智能头像)
+            if camera_mode not in (1, 2):
+                camera_mode = 2  # Default to 智能头像模式
+        except (ValueError, TypeError):
+            camera_mode = 2  # Default to 智能头像模式 if invalid or missing
+        
+        node["camera_mode"] = camera_mode
+
     def _validate_required_attrs(self, attrs, data_type, required_list):
         """Validate required attributes for a node. Exits on error."""
         missing = [a for a in required_list if not attrs.get(a)]
@@ -742,7 +768,7 @@ class Y3UIHTMLParser(HTMLParser):
         """Add GridView-specific fields (type=25).
 
         Real field names from EditorUICompMeta.py (UIComponentType.GridView = 25):
-          - layout_type: Horizontal=1 (default), Vertical=0
+          - layout_type: Horizontal=2 (default), Vertical=1
           - grid_count: (rows, cols), default (0, 2)
           - grid_size: (w, h), default (100, 100)
           - grid_space: (vertical_gap, horizontal_gap), default (0, 0)
@@ -752,7 +778,6 @@ class Y3UIHTMLParser(HTMLParser):
           - skip_invisible: bool, default False
           - bg_image: int, default 106397
           - bg_color: (r, g, b, a), default (255,255,255,255)
-          - comp_type: 'GridView'
         """
         self._validate_required_attrs(attrs, 'grid', _GRID_REQUIRED)
 
@@ -763,9 +788,8 @@ class Y3UIHTMLParser(HTMLParser):
         gap_x = int(attrs.get('data-gap-x', '0'))
         gap_y = int(attrs.get('data-gap-y', '0'))
 
-        # layout_type: 1=Horizontal (default in engine)
-        layout_type = 1 if attrs.get('data-direction', 'horizontal') == 'horizontal' else 0
-        node["layout_type"] = layout_type
+        # layout_type: 2=Horizontal (default in engine)
+        node["layout_type"] = 2
         # grid_count: (rows, cols) — both must be >= 1 to avoid ZeroDivisionError in engine
         # For Horizontal layout: rows auto-grows, but must start at >= 1
         # For Vertical layout: cols auto-grows, but must start at >= 1
@@ -787,28 +811,23 @@ class Y3UIHTMLParser(HTMLParser):
         node["grid_align"] = {"__tuple__": True, "items": [2, 8]}
         node["block_scrolling"] = False
         node["skip_invisible"] = attrs.get('data-skip-invisible', 'false').lower() == 'true'
-        node["comp_type"] = "GridView"
 
-        # Background
+        # Background: use explicit data-bg-image if provided, otherwise auto-select based on size
         bg_image = attrs.get('data-bg-image', '')
         if bg_image:
             node["bg_image"] = int(bg_image)
+        else:
+            # Auto-select background image based on list dimensions (same rules as layout bg)
+            w = float(attrs.get('data-w', '100'))
+            h = float(attrs.get('data-h', '100'))
+            node["bg_image"] = _get_bg_image_id(w, h)
         node["bg_color"] = {"__tuple__": True, "items": [255, 255, 255, 255]}
-
-        # GridView children are managed dynamically, but not via prefab_key.
-        # Children are added via Lua at runtime. HTML children are parsed normally
-        # as static placeholder items (or ignored if data-prefab is set).
-        prefab_name = attrs.get('data-prefab', '')
-        if prefab_name:
-            node["_prefab_name"] = prefab_name  # temp, used by skill workflow
-            node["children"] = []
-            node["_skip_children"] = True
 
     def _add_list_fields(self, node, attrs):
         """Add ScrollView-specific fields (type=10).
 
         Real field names from EditorUICompMeta.py (UIComponentType.ScrollView = 10):
-          - layout_type: HORIZONTAL=1 (default), VERTICAL=0
+          - layout_type: HORIZONTAL=2 (default), VERTICAL=1
           - layout_reverse: bool, default False
           - skip_invisible: bool, default True
           - bg_image: int, default 106397
@@ -817,36 +836,31 @@ class Y3UIHTMLParser(HTMLParser):
           - margin: int (child spacing), default 0
           - bounce_enabled: bool, default False
           - size_change_according_children: bool, default False
-          - comp_type: 'ScrollView'
         """
         # No strictly required attrs for ScrollView beyond standard size
 
         # ScrollView-specific properties (real field names from engine source)
         direction = attrs.get('data-direction', 'vertical')
         # layout_type: 0=VERTICAL, 1=HORIZONTAL
-        node["layout_type"] = 1 if direction == 'horizontal' else 0
+        node["layout_type"] = 2 if direction == 'horizontal' else 1
         node["layout_reverse"] = attrs.get('data-reverse', 'false').lower() == 'true'
         node["skip_invisible"] = True
         node["block_scrolling"] = False
         node["bounce_enabled"] = attrs.get('data-bounce', 'false').lower() == 'true'
         # margin: child node spacing (single int, not tuple)
-        node["margin"] = int(attrs.get('data-gap-y', '0'))
+        node["margin"] = int(attrs.get('data-gap', '0'))
         node["size_change_according_children"] = False
-        node["comp_type"] = "ScrollView"
 
-        # Background
+        # Background: use explicit data-bg-image if provided, otherwise auto-select based on size
         bg_image = attrs.get('data-bg-image', '')
         if bg_image:
             node["bg_image"] = int(bg_image)
+        else:
+            # Auto-select background image based on list dimensions (same rules as layout bg)
+            w = float(attrs.get('data-w', '100'))
+            h = float(attrs.get('data-h', '100'))
+            node["bg_image"] = _get_bg_image_id(w, h)
         node["bg_color"] = {"__tuple__": True, "items": [255, 255, 255, 255]}
-
-        # ScrollView children are the actual list items (added as children).
-        # If data-prefab is set, children will be added via Lua at runtime.
-        prefab_name = attrs.get('data-prefab', '')
-        if prefab_name:
-            node["_prefab_name"] = prefab_name  # temp, used by skill workflow
-            node["children"] = []
-            node["_skip_children"] = True
 
     def _parse_alignment(self, align_str):
         """
@@ -1379,7 +1393,12 @@ def _create_bg_image_node(layout_node):
 
     layout_name = layout_node.get('name', 'layout')
     bg_name = layout_name + '_bg'
-    image_id = _get_bg_image_id(w, h)
+    
+    # If parent layout has explicit bg_image, use it; otherwise select by size rules
+    if 'bg_image' in layout_node:
+        image_id = layout_node['bg_image']
+    else:
+        image_id = _get_bg_image_id(w, h)
 
     cx = w / 2.0
     cy = h / 2.0
@@ -1611,35 +1630,39 @@ def _verify_structure(html_nodes, json_nodes, panel_name):
     """
     Compare the HTML-declared node structure against the generated JSON tree.
     
-    html_nodes: list of (name, parent_name) recorded during HTML parsing
-    json_nodes: dict of {name: parent_name} extracted from the output JSON
+    html_nodes: list of (full_path, name, parent_name) recorded during HTML parsing
+    json_nodes: dict of {full_path: (name, parent_name)} extracted from the output JSON
+    
+    Uses full path (e.g., "panel.card_1.icon") as key to support duplicate node names
+    under different parents.
     
     Prints a report showing:
       - Total counts (HTML declared vs JSON generated)
       - Nodes present in HTML but missing from JSON (lost nodes)
       - Nodes whose parent differs between HTML and JSON (wrong hierarchy)
     """
-    html_names = {name for name, _ in html_nodes}
-    json_names = set(json_nodes.keys())
+    # Build path sets for comparison
+    html_paths = {path for path, _, _ in html_nodes}
+    json_paths = set(json_nodes.keys())
 
     # Auto-injected background image nodes (name ends with _bg) are expected extras
-    auto_bg_names = {n for n in json_names if n not in html_names and n.endswith('_bg')}
-    extra_in_json = json_names - html_names - auto_bg_names
-    missing_in_json = html_names - json_names
+    auto_bg_paths = {p for p in json_paths if p not in html_paths and p.endswith('_bg')}
+    extra_in_json = json_paths - html_paths - auto_bg_paths
+    missing_in_json = html_paths - json_paths
 
     # Parent mismatch: nodes present in both but with different parents
     parent_mismatches = []
-    for name, html_parent in html_nodes:
-        if name in json_nodes:
-            json_parent = json_nodes[name]
+    for path, name, html_parent in html_nodes:
+        if path in json_nodes:
+            _, json_parent = json_nodes[path]
             # Normalize: None vs None is OK
             if html_parent != json_parent:
-                parent_mismatches.append((name, html_parent, json_parent))
+                parent_mismatches.append((path, name, html_parent, json_parent))
 
     # --- Print report ---
     total_html = len(html_nodes)
     total_json = len(json_nodes)
-    injected_bg = len(auto_bg_names)
+    injected_bg = len(auto_bg_paths)
 
     print()
     print("=" * 60)
@@ -1653,22 +1676,25 @@ def _verify_structure(html_nodes, json_nodes, panel_name):
     else:
         if missing_in_json:
             print(f"\n  ❌ MISSING in JSON ({len(missing_in_json)} nodes):")
-            for name in sorted(missing_in_json):
+            for path in sorted(missing_in_json):
                 # Find expected parent from html_nodes
-                exp_parent = next((p for n, p in html_nodes if n == name), '?')
-                print(f"       - {name}  (expected under: {exp_parent})")
+                exp_parent = next((p for pt, _, p in html_nodes if pt == path), '?')
+                # Extract node name from path
+                node_name = path.split('.')[-1] if '.' in path else path
+                print(f"       - {node_name}  (path: {path}, expected under: {exp_parent})")
 
         if parent_mismatches:
             print(f"\n  ⚠️  PARENT MISMATCH ({len(parent_mismatches)} nodes):")
-            for name, hp, jp in parent_mismatches:
-                print(f"       - {name}")
+            for path, name, hp, jp in parent_mismatches:
+                print(f"       - {name}  (path: {path})")
                 print(f"           HTML parent : {hp}")
                 print(f"           JSON parent : {jp}")
 
         if extra_in_json:
             print(f"\n  ℹ️  EXTRA in JSON ({len(extra_in_json)} nodes, non-bg):")
-            for name in sorted(extra_in_json):
-                print(f"       + {name}  (parent: {json_nodes[name]})")
+            for path in sorted(extra_in_json):
+                name, parent = json_nodes[path]
+                print(f"       + {name}  (path: {path}, parent: {parent})")
 
     print("=" * 60)
     print()
@@ -1703,8 +1729,6 @@ def convert(html_path, output_path, panel_name="NewPanel", zorder=300):
     def _strip_temp_fields(nodes):
         for n in nodes:
             n.pop('_is_template', None)
-            n.pop('_skip_children', None)
-            n.pop('_prefab_name', None)
             _strip_temp_fields(n.get('children', []))
     _strip_temp_fields(children)
 
@@ -1716,17 +1740,21 @@ def convert(html_path, output_path, panel_name="NewPanel", zorder=300):
     print(f"[OK] Generated: {output_path}")
     print(f"     Panel: {panel_name}, Children: {len(children)}, ZOrder: {zorder}")
 
-    # Count all nodes in JSON
+    # Count all nodes in JSON and build path-based lookup
+    # Use full path as key to support duplicate node names under different parents
     total = 0
-    json_nodes = {}  # name -> parent_name
-    json_stack = [(n, None) for n in children]
+    json_nodes = {}  # full_path -> (name, parent_name)
+    # Stack: (node, parent_name, parent_path)
+    json_stack = [(n, None, '') for n in children]
     while json_stack:
-        n, par = json_stack.pop()
+        n, par_name, par_path = json_stack.pop()
         total += 1
         n_name = n.get('name', '?')
-        json_nodes[n_name] = par
+        # Build full path: parent_path.name or just name if root
+        full_path = f"{par_path}.{n_name}" if par_path else n_name
+        json_nodes[full_path] = (n_name, par_name)
         for child in n.get('children', []):
-            json_stack.append((child, n_name))
+            json_stack.append((child, n_name, full_path))
     print(f"     Total nodes: {total}")
 
     # ==========================================================================
@@ -1796,8 +1824,6 @@ def convert_prefab(html_path, output_path, prefab_name="NewPrefab"):
         if 'anchor' not in node:
             node['anchor'] = {"__tuple__": True, "items": [0.5, 0.5]}
         # Strip temp fields
-        node.pop('_skip_children', None)
-        node.pop('_prefab_name', None)
         node.pop('_html_x', None)
         node.pop('_html_y', None)
         node.pop('_zindex', None)

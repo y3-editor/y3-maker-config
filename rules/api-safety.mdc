@@ -57,6 +57,6 @@
 
 ## 📚 参考资源
 
-- API 错题集：`.codemaker/memory/lua-issues/api_issues.md`
-- Lua 参考：`.codemaker/skills/y3-lua-pipeline/references/`
+- API 错题集：`../memory/lua-issues/api_issues.md`
+- Lua 参考：`../skills/y3-lua-pipeline/references/`
 - Y3 源码：`maps/EntryMap/script/y3/` 或 `global_script/y3/`

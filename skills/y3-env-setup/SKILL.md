@@ -5,12 +5,12 @@ description: >
   
   此 Skill 为一次性使用，完成后会创建标记文件，后续会话自动跳过。
   
-  检测条件：.codemaker/env_setup_done 文件不存在时自动触发
+  检测条件：<codemaker>/env_setup_done 文件不存在时自动触发
 ---
 
 # Y3 环境配置助手（一次性）
 
-> ⚠️ **一次性 Skill**：完成后创建 `.codemaker/env_setup_done` 标记，后续不再执行。
+> ⚠️ **一次性 Skill**：完成后创建 `<codemaker>/env_setup_done` 标记，后续不再执行。
 
 ## 🎯 功能说明
 
@@ -24,29 +24,58 @@ description: >
 ### Step 1: 智能检测环境状态
 
 ```
-1. 检查 .codemaker/env_setup_done 是否存在
+1. 检查 <codemaker>/env_setup_done 是否存在
    ├─ 存在 → ✅ 跳过，继续处理用户请求
    └─ 不存在 → 继续检查步骤 2
 
 2. 检查 y3-lualib 是否已存在（任一路径存在即可）
    - maps/EntryMap/script/y3/init.lua
    - global_script/y3/init.lua
-   ├─ 存在 → ✅ 老项目已配置，跳过（可选：为老项目自动创建标记文件）
-   └─ 不存在 → 继续执行 Step 2 询问用户
+   ├─ 存在 → ✅ 老项目已配置，自动创建标记文件并跳过
+   └─ 不存在 → 继续执行 Step 2 预告+授权
 ```
 
 > 💡 此逻辑确保老项目不会被误触发环境配置。
 
-### Step 2: 询问用户
+### Step 2: 预告 + 授权（用户可见）⭐
 
-**首次检测到环境未配置时，询问用户：**
+**首次检测到环境未配置时，必须先用 `ask_user_question` 告知用户以下全部信息，再询问是否继续。**
+
+#### 2.1 必须告知用户的"知情卡"
+
+呈现给用户的消息格式如下（可根据实际情况细化版本号）：
 
 ```
-🔧 检测到 Y3 开发环境尚未配置，是否现在配置？
+🔧 检测到你是第一次使用本 Agent，需要先配置 Y3 开发环境。
+   这个过程只发生一次，完成后以后的会话不会再问你。
+
+📋 我将检查并（如缺失）协助安装以下 3 样东西：
+
+  ① Python 3        → 用于运行 UI JSON 生成、节点树提取等辅助脚本
+                      检查命令：py -3 --version
+                      缺失时：通过 winget 或官网安装（约 3 分钟）
+
+  ② Git             → 用于拉取 y3-lualib 框架代码
+                      检查命令：git --version
+                      缺失时：通过 winget 或官网安装（约 2 分钟）
+
+  ③ y3-lualib 框架  → Y3 游戏开发的核心库（写 Lua 都要用它）
+                      检查路径：maps/EntryMap/script/y3/init.lua
+                      缺失时：从 GitHub / Gitee 克隆 + 运行初始化脚本（约 2-5 分钟）
+
+⏱️ 预计总耗时：最好情况 10 秒（都已装好），最坏情况 10 分钟（三样全新装）。
+🌐 网络要求：安装环节需要连接 winget 源 / GitHub / Gitee。
+🔐 权限要求：不需要管理员权限（winget 会自行处理）。
+```
+
+#### 2.2 授权选项
+
+```
+你希望怎么处理？
 
 选项：
-1. ✅ 是，开始配置（推荐）
-2. ⏭️ 跳过，不再提示（将创建跳过标记）
+1. ✅ 开始检查并配置（推荐）
+2. ⏭️ 我已自行配置好，跳过并记住（不再提示）
 3. ⏸️ 稍后再说（本次跳过，下次会话继续询问）
 ```
 
@@ -54,20 +83,37 @@ description: >
 
 | 用户选择 | 处理 |
 |----------|------|
-| 选择 1 | 继续执行 Step 3 环境检测 |
-| 选择 2 | 创建标记文件（标记为"跳过"），后续不再提示 |
+| 选择 1 | 继续执行 Step 3 环境检测；每一步开始前告知用户"正在检查 XX" |
+| 选择 2 | 创建标记文件（状态为 `SKIPPED_BY_USER`），后续不再提示 |
 | 选择 3 | 本次不执行，继续处理用户原始请求 |
+
+> ⚠️ **不允许跳过 Step 2 直接执行检查或安装**。用户必须明确授权后才能动手。
 
 **跳过标记内容：**
 
 ```bash
-echo Environment setup SKIPPED by user on %DATE% %TIME% > .codemaker\env_setup_done
-echo Status: SKIPPED >> .codemaker\env_setup_done
+echo Environment setup SKIPPED by user on %DATE% %TIME% > <codemaker>\env_setup_done
+echo Status: SKIPPED >> <codemaker>\env_setup_done
 ```
 
-> 💡 用户选择跳过后，如需重新配置，删除 `.codemaker/env_setup_done` 文件即可。
+> 💡 用户选择跳过后，如需重新配置，删除 `<codemaker>/env_setup_done` 文件即可。
 
-### Step 3: 环境检测
+### Step 3: 环境检测（每步向用户播报进度）⭐
+
+**每次进入一个子步骤前，必须先向用户播报"当前正在做什么"**（简短一行即可，不需要 `ask_user_question`，直接文字输出）。
+
+示例播报格式：
+
+```
+🔍 [1/3] 正在检查 Python 3...
+✅ Python 3.12.1 已安装
+
+🔍 [2/3] 正在检查 Git...
+✅ Git 2.44.0 已安装
+
+🔍 [3/3] 正在检查 y3-lualib 框架...
+❌ 未找到 y3-lualib，即将进入安装环节
+```
 
 执行以下终端命令检查环境：
 
@@ -81,6 +127,9 @@ git --version
 # 检查 y3-lualib（在项目目录）
 dir maps\EntryMap\script\y3 2>nul || dir global_script\y3 2>nul
 ```
+
+> 📘 **规则**：任何一个检查失败进入安装环节之前，必须再次用 `ask_user_question` 确认
+> "是否允许我尝试自动安装 XX？"，给用户 [自动安装 / 我手动装 / 跳过不装] 三个选项。
 
 ### Step 4: 缺失环境处理
 
@@ -179,18 +228,42 @@ git checkout 1.0
 - `maps/EntryMap/script/y3/debugger.lua` - 调试器配置
 - `.vscode/settings.json` - VSCode 配置（初始化脚本生成）
 
-### Step 5: 创建完成标记
+### Step 5: 关闭编辑器自动保存（重要！）
+
+**在创建完成标记之前，必须调用 MCP 工具关闭编辑器自动保存：**
+
+```
+调用 y3editor.modify_editor_config(config_type="close_auto_save")
+```
+
+| 项目 | 说明 |
+|------|------|
+| **为什么** | 避免 AI 修改文件时与编辑器自动保存冲突，导致数据丢失或覆盖 |
+| **是否永久** | 是，配置写入文件，编辑器重启后仍然生效 |
+| **如何恢复** | 用户可在编辑器设置中手动开启自动保存 |
+
+> ⚠️ **此步骤不可跳过**。即使用户选择跳过其他环境检查，也必须执行此步骤。
+
+### Step 6: 创建完成标记
 
 所有检查通过后，创建标记文件：
 
 ```bash
-echo Environment setup completed on %DATE% %TIME% > .codemaker\env_setup_done
-echo Python: OK >> .codemaker\env_setup_done
-echo Git: OK >> .codemaker\env_setup_done
-echo y3-lualib: OK >> .codemaker\env_setup_done
+echo Environment setup completed on %DATE% %TIME% > <codemaker>\env_setup_done
+echo Status: OK >> <codemaker>\env_setup_done
+echo Python: OK >> <codemaker>\env_setup_done
+echo Git: OK >> <codemaker>\env_setup_done
+echo y3-lualib: OK >> <codemaker>\env_setup_done
+echo AutoSave: DISABLED >> <codemaker>\env_setup_done
 ```
 
-### Step 6: 输出报告
+> ⚠️ **重要**：必须包含 `AutoSave: DISABLED` 标记，这是版本检查的依据。
+> 旧版本 env_setup_done 没有此标记时，rules.mdc 会触发一次性补丁操作。
+
+> 💡 如果用户在 Step 2 选择了"跳过"，或在 Step 3 中选择某项"跳过不装"，
+> 标记文件状态写为 `PARTIAL` 或 `SKIPPED_BY_USER`，并在后续使用相关功能时提示用户补装。
+
+### Step 7: 输出报告
 
 ```
 ╔══════════════════════════════════════════════════════════════╗
@@ -202,7 +275,7 @@ echo y3-lualib: OK >> .codemaker\env_setup_done
 ║    └─ 初始化脚本: ✅ 已执行                                   ║
 ║    └─ VSCode 插件: sumneko.y3-helper                         ║
 ╠══════════════════════════════════════════════════════════════╣
-║ 标记文件已创建：.codemaker/env_setup_done                     ║
+║ 标记文件已创建：<codemaker>/env_setup_done                     ║
 ║ 后续会话将跳过环境检查。                                       ║
 ╚══════════════════════════════════════════════════════════════╝
 ```
@@ -239,7 +312,7 @@ y3-lualib 提供了演示代码，可用于学习：
 如果需要重新执行环境配置，删除标记文件即可：
 
 ```bash
-del .codemaker\env_setup_done
+del <codemaker>\env_setup_done
 ```
 
 然后在新会话中 AI 会自动重新检查环境。

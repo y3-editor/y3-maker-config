@@ -1,35 +1,50 @@
-﻿# Y3 Skills 索引
+﻿# Y3 Skills 索引（进阶文档）
 
+> 📘 **本文档面向专业用户 / 开发者**，用于深入了解各子技能、直接调用单个技能、或做产品定制。
+> 🆕 **新手用户请从 [USER_GUIDE.md](../../USER_GUIDE.md) 开始**，只需要记住一个入口：`y3-game-spec`。
+>
 > AI 技能路由入口。按需加载 `SKILL.md`，避免 token 浪费。
 
-**最后更新**: 2026-04-03
+**最后更新**: 2026-04-21
 
 ## 🚀 一次性技能（自动触发）
 
 | 技能 | 触发条件 | 完成标记 | 说明 |
 |------|----------|----------|------|
-| **y3-env-setup** | `.codemaker/env_setup_done` 不存在 | 创建该文件 | 检查 Python/Git/y3-lualib 环境 |
+| **y3-env-setup** | `<agent>/env_setup_done` 不存在 | 创建该文件 | 检查 Python/Git/y3-lualib 环境 |
 
 > ⚠️ 一次性技能在新会话开始时自动检测，完成后不再触发。
 
-## 🎯 技能路由（增强版）
+## 🎯 技能路由（进阶用户参考）
+
+### 推荐路径（所有用户默认）
+
+| 用户表述 | 入口 | 输出 |
+|----------|------|------|
+| 任何游戏开发需求 | **`y3-game-spec`** ⭐（唯一推荐入口） | 完整项目 |
+
+### 直接调用子技能（仅限专业用户）
+
+> ⚠️ 绕过 `y3-game-spec` 直接调用子技能，会跳过全流程编排、文档一致性校验、Gate 准入等保护机制。
+> 仅在你明确知道自己在做什么、且只需要局部能力时使用。
 
 | 用户表述 | 技能 | 输出格式 | 依赖/子技能 | 关键命令/目录 |
 |----------|------|----------|-------------|---------------|
-| "做一个XX游戏" / "开发流程" | **y3-game-spec** | 规划文档 | → y3-obj-gen, y3-ui-pipeline, y3-lua-pipeline | - |
-| "生成单位/物品/技能/Buff/投射物" | **y3-obj-gen** (v5.2) | JSON | - | `editor_table/` |
-| "修改物编属性/技能属性/Buff属性" | **y3-obj-edit** | JSON | - | `editor_table/` |
+| "查询/生成/修改单位/物品/技能/Buff/投射物" | **y3-obj-edit** | JSON / MCP查询结果 | MCP y3editor | `editor_table/` |
 | "做个UI/面板/界面/HUD/血条/技能栏" | **y3-ui-pipeline** ⭐ | JSON + Lua | → y3-ui-generator, y3-lua-pipeline | - |
 | "写Lua逻辑代码" | **y3-lua-pipeline** | Lua | - | `script/` |
+| "审查/review 已有 Lua 代码" | **y3-lua-review** | 审查报告 + 自动修复 | - | `script/` |
 | "自动化测试/自动点击/UI自动化" | **y3-auto-test** 🖱️ | 坐标+操作 | MCP y3editor + desktop-automation | Editor MCP 获取控件坐标 |
+| "从图片生成地形" | **y3-gen-terrain-from-image** | 地形格子数据 | MCP y3editor | `maps/` |
 
 > ⭐ **UI 统一入口**：所有 UI 相关需求都走 `y3-ui-pipeline`，内部自动路由。
+> `y3-ui-generator` 为 UI JSON 生成的内部实现，不直接暴露给用户。
 
 ## ⚡ 常用命令速查
 
 ```bash
 # UI HTML → Y3 JSON
-cd .codemaker/skills/y3-ui-generator/scripts
+cd <agent>/skills/y3-ui-generator/scripts
 py -3 html_to_y3_ui.py <input.html> <output.json>
 
 # 提取 UI 树（减少 token）
@@ -46,12 +61,17 @@ py -3 gen_ui_tree.py <workspace_path>
 
 ```
 用户需求
-  ├─ "做一个XX游戏" → y3-game-spec（规划后分发）
-  ├─ 需要物编数据 → y3-obj-gen
-  ├─ 修改物编属性 → y3-obj-edit
-  ├─ UI/界面/面板 → y3-ui-pipeline（内部再路由）
-  ├─ Lua逻辑代码 → y3-lua-pipeline
-  └─ 自动化测试/点击 → y3-auto-test
+  │
+  ├─ 新手 / 完整游戏 / 不确定该用什么
+  │     → y3-game-spec（唯一推荐入口，内部自动分发）
+  │
+  └─ 专业用户明确只要单点能力
+        ├─ 物编 CRUD            → y3-obj-edit
+        ├─ UI 开发              → y3-ui-pipeline
+        ├─ Lua 代码             → y3-lua-pipeline
+        ├─ Lua 审查             → y3-lua-review
+        ├─ 自动化测试           → y3-auto-test
+        └─ 图片生成地形         → y3-gen-terrain-from-image
 ```
 
 ## �️ 技能依赖关系图
@@ -64,8 +84,8 @@ py -3 gen_ui_tree.py <workspace_path>
                 │               │               │
                 ▼               ▼               ▼
          ┌──────────┐    ┌──────────────┐    ┌──────────────┐
-         │y3-obj-gen│    │y3-ui-pipeline│    │y3-lua-pipeline│
-         │ (物编生成) │    │  (UI 入口)   │    │ (游戏逻辑)   │
+         │y3-obj-edit│   │y3-ui-pipeline│    │y3-lua-pipeline│
+         │(物编查询/操作)│   │  (UI 入口)   │    │ (游戏逻辑)   │
          └──────────┘    └───────┬──────┘    └──────────────┘
                                  │
                     ┌────────────┼────────────┐
@@ -75,10 +95,6 @@ py -3 gen_ui_tree.py <workspace_path>
             │ (生成 JSON)   │ │ (Lua API)    │ │
             └──────────────┘ └──────────────┘ │
                                               │
-         ┌──────────┐                         │
-         │y3-obj-edit│    独立技能            │
-         │(物编修改) │◄────────────────────────┘
-         └──────────┘
 
          ┌──────────────────┐    ┌────────────┐
          │ y3-auto-test  │    │y3-env-setup│
@@ -86,13 +102,12 @@ py -3 gen_ui_tree.py <workspace_path>
          └──────────────────┘    └────────────┘
 ```
 
-## �📂 目录结构
+## 📂 目录结构
 
 ```
-.codemaker/skills/          ← 用户功能技能
+<agent>/skills/             ← 用户功能技能
 ├── y3-game-spec/           ← 游戏开发指南
-├── y3-obj-gen/             ← 物编生成 v5.2
-├── y3-obj-edit/            ← 物编修改
+├── y3-obj-edit/            ← 物编查询/生成/修改（支持 MCP 查询）
 ├── y3-ui-pipeline/         ← UI 开发入口
 ├── y3-ui-generator/        ← UI JSON 生成（HTML → Y3 JSON）
 ├── y3-lua-pipeline/         ← UI Lua API
@@ -100,14 +115,14 @@ py -3 gen_ui_tree.py <workspace_path>
 ├── y3-env-setup/           ← 环境配置（一次性）
 └── y3-auto-test/           ← 自动化测试（桌面自动化+测试规则）
 
-.codemaker/tools/           ← 辅助工具
+<agent>/tools/              ← 辅助工具
 ├── screenshot_with_cursor.py  ← 截图并标记鼠标位置
 └── draw_grid.py               ← 在截图上绘制坐标网格
 ```
 
 ## ⚡ 核心规则速查
 
-> 详细规则见 `.codemaker/rules/rules.mdc`
+> 详细规则见 `<agent>/rules/rules.mdc`
 
 | 禁止 | 正确做法 |
 |------|----------|
@@ -177,8 +192,8 @@ y3.const.KeyboardKey['1']
 
 | 文档 | 路径 |
 |------|------|
-| 全局规则 | `.codemaker/rules/rules.mdc` |
-| 项目记忆 | `.codemaker/memory/Memory.md` |
+| 全局规则 | `<agent>/rules/rules.mdc` |
+| 项目记忆 | `<agent>/memory/Memory.md` |
 
 ---
 
@@ -190,5 +205,5 @@ y3.const.KeyboardKey['1']
 
 ---
 
-*最后更新: 2026-04-03*
+*最后更新: 2026-04-21（收敛为专业用户进阶文档；新手用户请看 USER_GUIDE.md）*
 

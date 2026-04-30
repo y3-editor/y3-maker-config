@@ -16,6 +16,49 @@ alwaysApply: false
 
 ---
 
+## 🔄 游戏启动后刷新 y3runtime MCP 连接（强制）
+
+**y3runtime 的 MCP Server 运行在游戏进程内，启动游戏后必须刷新连接才能使用。**
+
+### 启动游戏后的必须步骤
+
+```
+1. 调用 helper.launch_game 启动游戏
+2. 等待游戏进程就绪（轮询 helper.get_game_status 直到返回 running）
+3. 🔴 提示用户刷新 MCP 连接
+4. 等待用户确认「已刷新」
+5. 🔴 验证 y3runtime 可用（调用 get_ui_center_by_path 或 trigger_ui_touch_event_by_path 测试）
+6. ✅ 验证通过后，才能开启自动测试流程
+```
+
+### AI 行为规范
+
+当 AI 使用 `helper.launch_game` 或 `helper.quick_restart` 启动/重启游戏后：
+
+1. **必须提醒用户**：「游戏已启动，请刷新 y3runtime MCP 连接后告诉我『已刷新』」
+2. **等待用户确认**：在用户确认 MCP 已刷新前，不要调用 y3runtime 的任何工具
+3. **验证连接可用**：用户确认后，必须调用 y3runtime 工具验证连接正常（如 `get_ui_center_by_path`）
+4. **验证通过才能继续**：只有 y3runtime 验证成功后，才能开启自动测试流程
+5. **连接失败处理**：如果验证失败，提示用户重新刷新 MCP 连接
+
+### 自动测试启动前置条件（Gate 0）
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  自动测试启动前置条件（必须全部满足）：                                │
+│                                                                     │
+│  ✅ 游戏状态 = running（helper.get_game_status 返回 running）        │
+│  ✅ 用户已确认刷新 y3runtime MCP 连接                                │
+│  ✅ y3runtime 验证通过（调用任一 y3runtime 工具成功返回）             │
+│                                                                     │
+│  ❌ 任一条件不满足 → 禁止开启自动测试流程                             │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+> ⚠️ **quick_restart / stop_game 后也需要刷新**：游戏进程重启意味着新的 MCP Server 实例，需要重新连接并重新验证。
+
+---
+
 ## 🔴 核心原则：不停、不跳、不问、不磨、不记仇
 
 ```
@@ -52,7 +95,7 @@ alwaysApply: false
 ### 强制执行
 
 - 测试计划中的**每一个**测试用例（含子项如 T-27a、T-27b 等）都必须实际执行
-- 执行 = 调用工具（`execute_lua`、`bot_click`、`bot_hotkey`、`capture_screenshot` 等）并获取结果
+- 执行 = 调用工具（`execute_lua`、`trigger_ui_touch_event_by_path`、`capture_screenshot` 等）并获取结果
 - **禁止**仅凭推测标记结果，必须有工具调用的实际输出作为判定依据
 
 ### 结果判定标准
@@ -69,8 +112,7 @@ alwaysApply: false
 | ❌ 禁止 | 原因 |
 |---------|------|
 | 🔲 NOT_TESTED | 不存在"未测试"，要么测要么 BLOCKED |
-| "需要 bot_click" | 你有 bot_click 工具，直接用 |
-| "需要 bot_hotkey" | 你有 bot_hotkey 工具，直接用 |
+| "需要 trigger_ui_touch_event_by_path" | 你有 y3runtime 工具，直接用 |
 | "需要截图对比" | 你有 capture_screenshot，直接截 |
 | "依赖 T-XX" | 先去执行 T-XX，然后回来继续 |
 
@@ -198,7 +240,7 @@ alwaysApply: false
 | 主动停止游戏再生成报告 | 所有测试执行完毕后才能停止游戏 |
 | "差不多了"心态收尾 | 必须逐个执行到最后一个用例 |
 | 把可执行的测试标为"未测试" | 有工具就必须用 |
-| 批量跳过桌面交互类测试 | `bot_click`/`bot_hotkey` 都是可用工具 |
+| 批量跳过 UI 交互类测试 | `trigger_ui_touch_event_by_path` 是可用工具 |
 | 中途询问用户"要不要继续" | 除非遇到 Blocking 失败且 3 次修复无果 |
 | 因为"复杂"或"耗时"而跳过 | 复杂不是跳过的理由 |
 
@@ -254,7 +296,7 @@ alwaysApply: false
 | **截图按需** | 仅在必须视觉验证时截图，能用日志/数据验证的不截图 |
 | **不重复读文件** | 已读过的文件不再重读，依赖记忆 |
 | **输出紧凑** | 每个测试点的回复控制在 5 行以内 |
-| **bot_wait 最小化** | 只等必要的时间，不多等 |
+| **等待最小化** | 只等必要的时间，不多等（用 execute_lua 延时替代） |
 
 ### 🟡 精简模式规则
 
@@ -267,7 +309,7 @@ alwaysApply: false
 | **截图** | 按需截图 | 不截图，改用日志验证 |
 | **输出** | 详细描述 | 仅 `T-XX: ✅/❌ 一句话原因` |
 | **修复尝试** | 最多 3 轮 | 最多 1 轮，失败即 KNOWN ISSUE |
-| **等待** | bot_wait 按需 | 压缩等待时间 |
+| **等待** | execute_lua 延时按需 | 压缩等待时间 |
 
 **精简模式示例输出**：
 ```
@@ -311,7 +353,7 @@ T-01:✅ T-02:✅ T-03:✅ T-04:⚠(物品数0) T-05:❌(3次失败)
 ### 新会话续接
 
 新会话收到"继续执行测试"指令时：
-1. 读取 `.codemaker/memory/test-continuation.md`
+1. 读取 `../memory/test-continuation.md`
 2. 读取 `auto-test.mdc`（激活测试规则）
 3. 从上次中断的测试点继续执行（**不重复已完成的测试**）
 4. 最终报告合并所有会话的测试结果
