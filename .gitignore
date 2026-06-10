@@ -1,0 +1,10 @@
+# Local agent/session records
+memory/sessions/
+skills/y3-game-spec/report/
+
+# Runtime/cache artifacts
+.omx/state/
+.omx/logs/
+.codegraph/
+*.log
+*.tmp
