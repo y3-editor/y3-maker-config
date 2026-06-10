@@ -1,0 +1,252 @@
+{
+    "adapt_mode": 2,
+    "anim_data": {},
+    "auto_create": true,
+    "children": [
+        {
+            "children": [
+                {
+                    "name": "root_bg",
+                    "type": 4,
+                    "uid": "ed7248c4-49e3-4c0a-be95-1c758fea20bb",
+                    "size": [
+                        220.0,
+                        48.0
+                    ],
+                    "visible": true,
+                    "alpha": 100,
+                    "image": 134092,
+                    "is_scale9_enable": false,
+                    "children": [],
+                    "event_list": [],
+                    "open_adapter": true,
+                    "adapter_option": [
+                        true,
+                        true,
+                        true,
+                        true,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "pos_data": {
+                        "__tuple__": true,
+                        "items": [
+                            110.0,
+                            24.0,
+                            50.0,
+                            50.0,
+                            1,
+                            1
+                        ]
+                    }
+                },
+                {
+                    "children": [],
+                    "event_list": [],
+                    "name": "icon",
+                    "open_adapter": false,
+                    "adapter_option": [
+                        false,
+                        false,
+                        false,
+                        false,
+                        6.0,
+                        6.0,
+                        6.0,
+                        178.0
+                    ],
+                    "pos_data": {
+                        "__tuple__": true,
+                        "items": [
+                            24.0,
+                            24.0,
+                            10.9091,
+                            50.0,
+                            1,
+                            1
+                        ]
+                    },
+                    "prefab_sub_key": null,
+                    "scene_ui_name": null,
+                    "size": [
+                        36.0,
+                        36.0
+                    ],
+                    "type": 4,
+                    "uid": "3617988e-a01c-4bc8-8e90-3e4519e67c8b",
+                    "image": 906176
+                },
+                {
+                    "children": [],
+                    "event_list": [],
+                    "name": "count_TEXT",
+                    "open_adapter": false,
+                    "adapter_option": [
+                        false,
+                        false,
+                        false,
+                        false,
+                        24.0,
+                        6.0,
+                        48.0,
+                        6.0
+                    ],
+                    "pos_data": {
+                        "__tuple__": true,
+                        "items": [
+                            131.0,
+                            15.0,
+                            59.5455,
+                            31.25,
+                            1,
+                            1
+                        ]
+                    },
+                    "prefab_sub_key": null,
+                    "scene_ui_name": null,
+                    "size": [
+                        166.0,
+                        18.0
+                    ],
+                    "type": 3,
+                    "uid": "d1f26911-4863-48d9-901e-065bda95312e",
+                    "text": {
+                        "__tuple__": true,
+                        "items": [
+                            "0/4",
+                            false
+                        ]
+                    },
+                    "font": {
+                        "__tuple__": true,
+                        "items": [
+                            "",
+                            11
+                        ]
+                    },
+                    "font_color": [
+                        170,
+                        170,
+                        170,
+                        255
+                    ],
+                    "font_min_size": 10,
+                    "over_pattern": 2,
+                    "alignment": {
+                        "__tuple__": true,
+                        "items": [
+                            1,
+                            8
+                        ]
+                    }
+                },
+                {
+                    "children": [],
+                    "event_list": [],
+                    "name": "name_TEXT",
+                    "open_adapter": false,
+                    "adapter_option": [
+                        false,
+                        false,
+                        false,
+                        false,
+                        4.0,
+                        26.0,
+                        48.0,
+                        52.0
+                    ],
+                    "pos_data": {
+                        "__tuple__": true,
+                        "items": [
+                            108.0,
+                            35.0,
+                            49.0909,
+                            72.9167,
+                            1,
+                            1
+                        ]
+                    },
+                    "prefab_sub_key": null,
+                    "scene_ui_name": null,
+                    "size": [
+                        120.0,
+                        18.0
+                    ],
+                    "type": 3,
+                    "uid": "bbda9e68-0443-42b5-b8cf-53b1abf15119",
+                    "text": {
+                        "__tuple__": true,
+                        "items": [
+                            "标签名",
+                            false
+                        ]
+                    },
+                    "font": {
+                        "__tuple__": true,
+                        "items": [
+                            "",
+                            13
+                        ]
+                    },
+                    "font_color": [
+                        255,
+                        255,
+                        255,
+                        255
+                    ],
+                    "font_min_size": 10,
+                    "over_pattern": 2,
+                    "alignment": {
+                        "__tuple__": true,
+                        "items": [
+                            1,
+                            8
+                        ]
+                    }
+                }
+            ],
+            "event_list": [],
+            "name": "root",
+            "open_adapter": false,
+            "adapter_option": [
+                false,
+                false,
+                false,
+                false,
+                0.0,
+                1032.0,
+                0.0,
+                1700.0
+            ],
+            "pos_data": {
+                "__tuple__": true,
+                "items": [
+                    110.0,
+                    1056.0,
+                    5.7292,
+                    97.7778,
+                    1,
+                    1
+                ]
+            },
+            "prefab_sub_key": null,
+            "scene_ui_name": null,
+            "size": [
+                220.0,
+                48.0
+            ],
+            "type": 7,
+            "uid": "254ba5fa-81df-46ce-837a-022e0d1adfce"
+        }
+    ],
+    "name": "TagCounterItem",
+    "opacity": 1.0,
+    "script_name": "",
+    "type": 2,
+    "ui_anims": [],
+    "uid": "b4242ed6-8c35-49e3-8749-112bdf9f838d",
+    "visible": true,
+    "zorder": 100
+}

@@ -1,0 +1,984 @@
+--- =========================================================================
+--- Y3 功能模板 · logic.lua  (B 级 · 参数注入式)
+--- =========================================================================
+---
+--- @template-id   b-attribute-system
+--- @grade         B
+--- @version       v0.1.0
+--- @entry         M.setup(opts?) → Attribute.System
+--- @params        opts.default_formula?, opts.default_base_symbol?
+--- @source        global_script/client/tools/attribute.lua
+--- @description   通用属性系统：定义 + 公式编译 + 依赖联动 + 边界 + 变化事件
+---
+--- 核心能力：
+---   1. 属性定义：simple（直接存储）/ complex（公式合成）
+---   2. 公式 DSL：{!} 基础值、{%} 百分比加成、{其他属性} 引用
+---   3. 边界约束：min/max 可为数字或另一属性名
+---   4. 依赖联动：A 改变自动触发 B 重算（仅当 B 公式引用 A）
+---   5. 变化事件：仅监听的属性才进入脏列表，O(关注数)
+---   6. 编译期优化：所有属性方法在 compile() 时编译为闭包，运行期零反射
+---
+--- 融合契约：
+---   1. 调用 M.setup() 创建一个属性系统
+---   2. system:define(name, simple, min, max) 定义属性
+---   3. 全部定义完后调用 system:compile()（或首次 instance() 时自动）
+---   4. system:instance() 创建实例，instance:set/add/get/event
+---   5. 跨帧批量分发事件：每帧调用 system:updateEvent()
+---
+--- 已知限制：
+---   - 编译后不可再 define 新属性
+---   - 复杂属性（有公式）不支持 minKeepRate / maxKeepRate
+---   - 依赖 Lua `load`，需要 y3 运行时允许动态代码加载
+--- =========================================================================
+
+local M = {}
+
+---@class Attribute.API
+local API = {}
+
+---@class Attribute.System
+---@field package compiled? boolean
+---@field package supportUnknown? boolean
+---@field package defines table<string, Attribute.Define>
+---@field package methods table<string, Attribute.Method>
+---@field package links table<string, string[]>
+---@field package require table<string, string[]>
+---@field package touched table<Attribute.Instance, table<string, number>>
+---@field package dirtyMark table<Attribute.Instance, true>
+---@field package dirtyList Attribute.Instance[]
+local System = {}
+---@package
+System.__index = System
+
+System.defaultFormula = '{!} * (1 + 0.01 * {%})'
+System.defaultBaseSymbol = '!'
+
+---@package
+---@return Attribute.System
+function System:init()
+    self.defines   = {}
+    self.methods   = {}
+    self.links     = {}
+    self.require   = {}
+    self.touched   = {}
+    self.dirtyMark = {}
+    self.dirtyList = {}
+    return self
+end
+
+---@param name string
+---@param simple? boolean # 是否是个简易属性
+---@param min? number | string
+---@param max? number | string
+---@return Attribute.Define
+function System:define(name, simple, min, max)
+    if self.compiled then
+        error('Cannot define new attributes after compilation.')
+    end
+    local define = API.createDefine(self, name)
+    self.defines[name] = define
+    if simple then
+        define:setSimple(simple)
+    end
+    if min then
+        define:setMin(min)
+    end
+    if max then
+        define:setMax(max)
+    end
+    define:setFormula(self.defaultFormula)
+    define:setBaseSymbol(self.defaultBaseSymbol)
+    return define
+end
+
+---@param customData? any
+---@return Attribute.Instance
+function System:instance(customData)
+    self:compile()
+    local instance = API.createInstance(self)
+
+    return instance:init(self, customData)
+end
+
+function System:compile()
+    if self.compiled then
+        return
+    end
+    ---@type boolean?
+    self.compiled = true
+
+    ---@type table<string, table<string, true>>
+    local linkMap = {}
+    for name, define in pairs(self.defines) do
+        local requires = define:collectRequires()
+        for k in pairs(requires) do
+            if not linkMap[k] then
+                linkMap[k] = {}
+            end
+            linkMap[k][name] = true
+        end
+
+        self.require[name] = { name }
+    end
+
+    local function lookIntoLink(name, visited)
+        if visited[name] then
+            return visited
+        end
+        visited[name] = true
+        local targets = linkMap[name]
+        if not targets then
+            return visited
+        end
+        for target in pairs(targets) do
+            lookIntoLink(target, visited)
+        end
+        return visited
+    end
+
+    for name in pairs(linkMap) do
+        local result = lookIntoLink(name, {})
+        result[name] = nil
+        local links = {}
+        for k in pairs(result) do
+            links[#links+1] = k
+        end
+        table.sort(links)
+        self.links[name] = links
+
+        for _, link in ipairs(links) do
+            table.insert(self.require[link], name)
+        end
+    end
+
+    for _, define in pairs(self.defines) do
+        define:compile()
+    end
+end
+
+---@return table<Attribute.Instance, table<string, number>>? oldValues
+function System:getTouched()
+    local touched = self.touched
+    if not next(touched) then
+        return nil
+    end
+    self.touched = {}
+    return touched
+end
+
+function System:updateEvent()
+    local list = self.dirtyList
+    local len = #list
+    if len == 0 then
+        return
+    end
+
+    self.dirtyList = {}
+    self.dirtyMark = {}
+
+    for i = 1, len do
+        local instance = list[i]
+        local events = instance.events
+        if events then
+            for j = 1, #events do
+                events[j](instance)
+            end
+        end
+    end
+end
+
+function System:enableUnknown()
+    self.supportUnknown = true
+end
+
+---@class Attribute.Define
+---@field package formula string
+---@field package baseSymbol string
+---@field package simple? boolean # 是否是个简易属性
+---@field package min? number | string
+---@field package max? number | string
+---@field package minKeepRate? boolean
+---@field package maxKeepRate? boolean
+---@field package needRecordTouch? boolean
+---@field package compiled? boolean
+local Define = {}
+---@package
+Define.__index = Define
+
+---@package
+---@param system Attribute.System
+---@param name string
+---@return Attribute.Define
+function Define:init(system, name)
+    self.system = system
+    self.name = name
+    return self
+end
+
+---@param simple boolean
+---@return Attribute.Define
+function Define:setSimple(simple)
+    if self.compiled then
+        error('Cannot change simple status after compilation.')
+    end
+    self.simple = simple
+    return self
+end
+
+---@param min number | string
+---@param keepRate? boolean
+---@return Attribute.Define
+function Define:setMin(min, keepRate)
+    if self.compiled then
+        error('Cannot change min value after compilation.')
+    end
+    self.min = min
+    self.minKeepRate = keepRate
+    return self
+end
+
+---@param max number | string
+---@param keepRate? boolean
+---@return Attribute.Define
+function Define:setMax(max, keepRate)
+    if self.compiled then
+        error('Cannot change max value after compilation.')
+    end
+    self.max = max
+    self.maxKeepRate = keepRate
+    return self
+end
+
+---@param formula string
+---@return Attribute.Define
+function Define:setFormula(formula)
+    if self.compiled then
+        error('Cannot change formula after compilation.')
+    end
+    self.formula = formula
+    return self
+end
+
+---@param baseSymbol string
+---@return Attribute.Define
+function Define:setBaseSymbol(baseSymbol)
+    if self.compiled then
+        error('Cannot change base symbol after compilation.')
+    end
+    self.baseSymbol = baseSymbol
+    return self
+end
+
+---@return Attribute.Define
+function Define:recordTouch()
+    self.needRecordTouch = true
+    return self
+end
+
+---@class Attribute.Method
+---@field package set fun(instance: Attribute.Instance, value: number)
+---@field package add fun(instance: Attribute.Instance, value: number)
+---@field package get fun(instance: Attribute.Instance): number
+---@field package getMin fun(instance: Attribute.Instance): number
+---@field package getMax fun(instance: Attribute.Instance): number
+---@field package checkAttention fun(instance: Attribute.Instance)
+
+---@param str string
+---@param params table<string, any>
+---@return string
+local function tpl_format(str, params)
+    return (str:gsub('{(.-)}', function (symbol)
+        local left, right = symbol:match('^(.-):(.-)$')
+        local fmt = '%q'
+        if left and right then
+            symbol = left
+            if right and right ~= '' then
+                fmt = '%' .. right
+            end
+        end
+        local key = params[symbol]
+        if not key then
+            error('Unknown symbol: ' .. symbol)
+        end
+        return string.format(fmt, key)
+    end))
+end
+
+---@param code string
+---@return string
+local function tpl_simplifyCode(code)
+    ---@type string[]
+    local lines = {}
+    for line in code:gmatch('[^\n]+') do
+        lines[#lines+1] = line
+    end
+    local usedLocals = {}
+    for i = #lines, 1, -1 do
+        local line = lines[i]
+        local locDef, tails = line:match('^local%s+(.-)(=.*)$')
+        if locDef then
+            local locs = {}
+            for name in locDef:gmatch('[%w_]+') do
+                if usedLocals[name] then
+                    locs[#locs+1] = name
+                    usedLocals[name] = nil
+                end
+            end
+            if #locs == 0 then
+                table.remove(lines, i)
+                goto continue
+            end
+            line = 'local ' .. table.concat(locs, ', ') .. ' ' .. tails
+            lines[i] = line
+            for name in tails:gmatch '[%w_]+' do
+                usedLocals[name] = true
+            end
+        else
+            for name in line:gmatch '[%w_]+' do
+                usedLocals[name] = true
+            end
+        end
+        ::continue::
+    end
+    return table.concat(lines, '\n')
+end
+
+local function tpl_loadCode(str, params)
+    str = 'return function (instance, value)\n' .. str .. '\nend'
+    local code = tpl_simplifyCode(tpl_format(str, params))
+    return assert(load(code, code, 't'))()
+end
+
+---@package
+---@param name string
+---@return string
+function Define:getAttrCode(name)
+    local def = self.system.defines[name]
+    if not def then
+        error('Unknown attribute: ' .. name)
+    end
+    if def.simple then
+        return tpl_format('cache[{key}]', { key = name })
+    else
+        return tpl_format('methods[{key}].get(instance)', { key = name })
+    end
+end
+
+---@package
+---@return string
+function Define:compileSaveTouchCode()
+    local links = self.system.links[self.name]
+
+    local code = {}
+
+    ---@param def Attribute.Define
+    local function checkDef(def)
+        if not def.needRecordTouch then
+            return
+        end
+        code[#code+1] = tpl_format('if not record[{key}] then record[{key}] = {value:s} end', {
+            key = def.name,
+            value = self:getAttrCode(def.name)
+        })
+    end
+
+    checkDef(self)
+
+    if links then
+        for _, link in ipairs(links) do
+            local def = self.system.defines[link]
+            checkDef(def)
+        end
+    end
+
+    if #code == 0 then
+        return ''
+    end
+
+    table.insert(code, 1, [[
+local touched = instance.system.touched
+local record = touched[instance]
+if not record then
+    record = {}
+    touched[instance] = record
+end
+]])
+
+    return table.concat(code, '\n')
+end
+
+---@package
+---@return string
+function Define:compileSaveRateCode()
+    local links = self.system.links[self.name]
+    if not links then
+        return ''
+    end
+
+    local code = {}
+
+    for i, link in ipairs(links) do
+        local def = self.system.defines[link]
+        if def.minKeepRate or def.maxKeepRate then
+            if not def.simple then
+                error('Complex attributes "' .. link .. '" cannot keep rates.')
+            end
+        end
+
+        if def.minKeepRate then
+            if type(def.min) ~= 'string' then
+                error('Min value of "' .. link .. '" must be another attribute to keep rate.')
+            end
+            code[#code+1] = tpl_format([[
+	local other = {other:s} or 0
+	if other == 0 then
+	    other = 1
+	end
+	local rateMin{i} = (cache[{key}] or 0) / other
+]], {
+    i = i,
+    key = link,
+    other = self:getAttrCode(def.min --[[@as string]]),
+})
+        end
+        if def.maxKeepRate then
+            if type(def.max) ~= 'string' then
+                error('Max value of "' .. link .. '" must be another attribute to keep rate.')
+            end
+            code[#code+1] = tpl_format([[
+	local other = {other:s} or 0
+	if other == 0 then
+	    other = 1
+	end
+	local rateMax{i} = (cache[{key}] or 0) / other
+]], {
+    i = i,
+    key = link,
+    other = self:getAttrCode(def.max --[[@as string]]),
+})
+        end
+    end
+
+    return table.concat(code, '\n')
+end
+
+---@package
+---@return string
+function Define:compileUpdateLinkCode()
+    local links = self.system.links[self.name]
+    if not links then
+        return ''
+    end
+
+    local code = {}
+
+    for _, link in ipairs(links) do
+        local def = self.system.defines[link]
+        if def.simple then
+            if not def.minKeepRate and not def.maxKeepRate then
+                code[#code+1] = tpl_format('local method = methods[{key}]', { key = link })
+                code[#code+1] = tpl_format('method.set(instance, cache[{key}] or 0)', { key = link })
+            end
+        else
+            code[#code+1] = tpl_format('cache[{key}] = nil', { key = link })
+        end
+    end
+
+    for i, link in ipairs(links) do
+        local def = self.system.defines[link]
+        if def.minKeepRate then
+            code[#code+1] = tpl_format('cache[{key}] = {other:s} * rateMin{i}', {
+                key = link,
+                i = i,
+                other = self:getAttrCode(def.min --[[@as string]]),
+            })
+        end
+        if def.maxKeepRate then
+            code[#code+1] = tpl_format('cache[{key}] = {other:s} * rateMax{i}', {
+                key = link,
+                i = i,
+                other = self:getAttrCode(def.max --[[@as string]]),
+            })
+        end
+    end
+
+    return table.concat(code, '\n')
+end
+
+---@package
+---@return string
+function Define:compileGetMinCode()
+    local min = self.min
+    if not min then
+        return tpl_format('{min}', { min = -math.huge })
+    end
+    if type(min) == 'number' then
+        return tpl_format('{min}', { min = min })
+    end
+    return self:getAttrCode(min)
+end
+
+---@package
+---@return string
+function Define:compileGetMaxCode()
+    local max = self.max
+    if not max then
+        return tpl_format('{max}', { max = math.huge })
+    end
+    if type(max) == 'number' then
+        return tpl_format('{max}', { max = max })
+    end
+    return self:getAttrCode(max)
+end
+
+---@package
+---@return string
+function Define:compileCheckMinCode()
+    local min = self.min
+    if not min then
+        return ''
+    end
+    if type(min) == 'number' then
+        return tpl_format([[
+if value < {min} then
+    value = {min}
+end]], { min = min })
+    end
+    return tpl_format([[
+local min = {min:s}
+if value < min then
+    value = min
+end]], { min = self:getAttrCode(min) })
+end
+
+---@package
+---@return string
+function Define:compileCheckMaxCode()
+    local max = self.max
+    if not max then
+        return ''
+    end
+    if type(max) == 'number' then
+        return tpl_format([[
+if value > {max} then
+    value = {max}
+end]], { max = max })
+    end
+    return tpl_format([[
+local max = {max:s}
+if value > max then
+    value = max
+end]], { max = self:getAttrCode(max) })
+end
+
+---@package
+function Define:compileCheckAttention(name)
+    return tpl_loadCode([[
+if not instance.attention[{name}] then
+    return
+end
+local system = instance.system
+if system.dirtyMark[instance] then
+    return
+end
+system.dirtyMark[instance] = true
+system.dirtyList[#system.dirtyList+1] = instance
+]], { name = name })
+end
+
+---@package
+function Define:compileSimple()
+    local methods = self.system.methods
+    local name = self.name
+    local params = {
+        name = name,
+        saveTouch = self:compileSaveTouchCode(),
+        saveRate = self:compileSaveRateCode(),
+        getMin = self:compileGetMinCode(),
+        getMax = self:compileGetMaxCode(),
+        checkMin = self:compileCheckMinCode(),
+        checkMax = self:compileCheckMaxCode(),
+        updateLink = self:compileUpdateLinkCode(),
+    }
+    methods[name] = {
+        set = tpl_loadCode([[
+local cache = instance.cache
+local methods = instance.methods
+{saveTouch:s}
+{saveRate:s}
+{checkMin:s}
+{checkMax:s}
+cache[{name}] = value
+{updateLink:s}
+]], params),
+        add = tpl_loadCode([[
+local cache = instance.cache
+local methods = instance.methods
+if cache[{name}] then
+    value = cache[{name}] + value
+end
+{saveTouch:s}
+{saveRate:s}
+{checkMin:s}
+{checkMax:s}
+cache[{name}] = value
+{updateLink:s}
+]], params),
+        get = tpl_loadCode([[
+local cache = instance.cache
+return cache[{name}] or 0
+]], params),
+        getMin = tpl_loadCode([[
+local methods = instance.methods
+return {getMin:s}
+]], params),
+        getMax = tpl_loadCode([[
+local methods = instance.methods
+return {getMax:s}
+]], params),
+        checkAttention = self:compileCheckAttention(name)
+    }
+end
+
+---@package
+function Define:compileComplex()
+    local methods = self.system.methods
+    local name = self.name
+
+    local params = {
+        name = name,
+        saveTouch = self:compileSaveTouchCode(),
+        saveRate = self:compileSaveRateCode(),
+        updateLink = self:compileUpdateLinkCode(),
+    }
+
+    local code = self.formula:gsub('{(.-)}', function (symbol)
+        if self.system.defines[symbol] then
+            return self:getAttrCode(symbol)
+        end
+        local key = name .. symbol
+        if not methods[key] then
+            params.key = key
+            methods[key] = {
+                set = tpl_loadCode([[
+local cache = instance.cache
+local methods = instance.methods
+{saveTouch:s}
+{saveRate:s}
+cache[{key}] = value
+cache[{name}] = nil
+{updateLink:s}
+]], params),
+                add = tpl_loadCode([[
+local cache = instance.cache
+local methods = instance.methods
+{saveTouch:s}
+{saveRate:s}
+if cache[{key}] then
+    cache[{key}] = cache[{key}] + value
+else
+    cache[{key}] = value
+end
+cache[{name}] = nil
+{updateLink:s}
+]], params),
+                get = tpl_loadCode([[
+local cache = instance.cache
+return cache[{key}] or 0
+]], params),
+                getMin = function ()
+                    error('Cannot get min value of middle attribute: ' .. key)
+                end,
+                getMax = function ()
+                    error('Cannot get max value of middle attribute: ' .. key)
+                end,
+                checkAttention = self:compileCheckAttention(name)
+            }
+        end
+        return string.format('(cache[%q] or 0)', key)
+    end)
+
+    local params = {
+        name = name,
+        code = code,
+        getMin = self:compileGetMinCode(),
+        getMax = self:compileGetMaxCode(),
+        checkMin = self:compileCheckMinCode(),
+        checkMax = self:compileCheckMaxCode(),
+    }
+    local baseMethod = methods[name .. self.baseSymbol]
+    methods[name] = {
+        set = baseMethod and baseMethod.set or function ()
+            error('Attribute "' .. name .. '" is readonly.')
+        end,
+        add = baseMethod and baseMethod.add or function ()
+            error('Attribute "' .. name .. '" is readonly.')
+        end,
+        get = tpl_loadCode([[
+local cache = instance.cache
+local methods = instance.methods
+local value = cache[{name}]
+if value then
+    return value
+end
+value = {code:s}
+{checkMin:s}
+{checkMax:s}
+cache[{name}] = value
+return value
+]], params),
+        getMin = tpl_loadCode([[
+local methods = instance.methods
+return {getMin:s}
+]], params),
+        getMax = tpl_loadCode([[
+local methods = instance.methods
+return {getMax:s}
+]], params),
+        checkAttention = self:compileCheckAttention(name),
+    }
+end
+
+---@package
+function Define:compile()
+    if self.compiled then
+        return
+    end
+    self.compiled = true
+
+    if self.simple then
+        self:compileSimple()
+    else
+        self:compileComplex()
+    end
+end
+
+---@package
+---@return table<string, true>
+function Define:collectRequires()
+    local requires = {}
+
+    for name in self.formula:gmatch '{(.-)}' do
+        if self.system.defines[name] then
+            requires[name] = true
+        end
+    end
+    if type(self.min) == 'string' then
+        requires[self.min] = true
+    end
+    if type(self.max) == 'string' then
+        requires[self.max] = true
+    end
+
+    return requires
+end
+
+---@alias Attribute.EventCallback fun(instance: Attribute.Instance, newValue: number, oldValue: number)
+
+---@class Attribute.Instance
+---@field package system Attribute.System
+---@field package cache table<string, number>
+---@field package methods table<string, Attribute.Method>
+---@field package events? function[]
+---@field package attention? table<string, integer>
+local Instance = {}
+---@package
+Instance.__index = Instance
+
+---@package
+---@param system Attribute.System
+---@param customData? any
+---@return Attribute.Instance
+function Instance:init(system, customData)
+    self.system  = system
+    self.cache   = {}
+    self.methods = system.methods
+    self.customData = customData
+    return self
+end
+
+---@param name string
+---@param value number
+function Instance:set(name, value)
+    local method = self.methods[name]
+    if not method then
+        if self.system.supportUnknown then
+            self.cache[name] = value
+            return
+        end
+        error('Unknown attribute: ' .. name)
+    end
+    method.set(self, value)
+    if self.attention then
+        method.checkAttention(self)
+    end
+end
+
+---@param name string
+---@param value number
+function Instance:add(name, value)
+    local method = self.methods[name]
+    if not method then
+        if self.system.supportUnknown then
+            self.cache[name] = (self.cache[name] or 0) + value
+            return
+        end
+        error('Unknown attribute: ' .. name)
+    end
+    method.add(self, value)
+    if self.attention then
+        method.checkAttention(self)
+    end
+end
+
+---@param name string
+---@return number
+function Instance:get(name)
+    local value = self.cache[name]
+    if value then
+        return value
+    end
+    local method = self.methods[name]
+    if not method then
+        if self.system.supportUnknown then
+            return self.cache[name] or 0
+        end
+        error('Unknown attribute: ' .. name)
+    end
+    return method.get(self)
+end
+
+---@param name string
+---@return number
+function Instance:getMin(name)
+    local method = self.methods[name]
+    if not method then
+        error('Unknown attribute: ' .. name)
+    end
+    return method.getMin(self)
+end
+
+---@param name string
+---@return number
+function Instance:getMax(name)
+    local method = self.methods[name]
+    if not method then
+        error('Unknown attribute: ' .. name)
+    end
+    return method.getMax(self)
+end
+
+---@param name string
+---@param callback Attribute.EventCallback
+---@return function
+function Instance:event(name, callback)
+    local events = self.events
+    if not events then
+        events = {}
+        self.events = events
+    end
+
+    local oldValue = self:get(name)
+    local proxy = function ()
+        local newValue = self:get(name)
+        if newValue == oldValue then
+            return
+        end
+        callback(self, newValue, oldValue)
+        oldValue = newValue
+    end
+
+    events[#events+1] = proxy
+    local firstTry = #events
+
+    local requires = self.system.require[name]
+    local attention = self.attention
+    if not attention then
+        attention = {}
+        self.attention = attention
+    end
+
+    for _, attr in ipairs(requires) do
+        attention[attr] = (attention[attr] or 0) + 1
+    end
+
+    local disposed
+    return function ()
+        if disposed then
+            return
+        end
+        disposed = true
+
+        if events[firstTry] == proxy then
+            events[firstTry] = events[#events]
+            events[#events] = nil
+        else
+            for i = 1, #events do
+                if events[i] == proxy then
+                    events[i] = events[#events]
+                    events[#events] = nil
+                    break
+                end
+            end
+        end
+
+        if #events == 0 then
+            self.events = nil
+            self.attention = nil
+        else
+            for _, attr in ipairs(requires) do
+                attention[attr] = attention[attr] - 1
+                if attention[attr] <= 0 then
+                    attention[attr] = nil
+                end
+            end
+        end
+    end
+end
+
+---@package
+---@param system Attribute.System
+---@param name string
+---@return Attribute.Define
+function API.createDefine(system, name)
+    return setmetatable({}, Define):init(system, name)
+end
+
+---@package
+---@param system Attribute.System
+---@return Attribute.Instance
+function API.createInstance(system)
+    return setmetatable({}, Instance):init(system)
+end
+
+-- ============================================================================
+-- 模板入口
+-- ============================================================================
+
+---@class AttrSystemOpts
+---@field default_formula?     string  可选: 默认公式（用于 simple=false 的属性），缺省 '{!} * (1 + 0.01 * {%})'
+---@field default_base_symbol? string  可选: 基础符号，缺省 '!'
+
+--- 创建一个新的属性系统
+---@param opts? AttrSystemOpts
+---@return Attribute.System
+function M.setup(opts)
+    local system = setmetatable({}, System):init()
+    if opts then
+        if opts.default_formula then
+            system.defaultFormula = opts.default_formula
+        end
+        if opts.default_base_symbol then
+            system.defaultBaseSymbol = opts.default_base_symbol
+        end
+    end
+    return system
+end
+
+--- 别名：等价于 M.setup()，向旧用法兼容
+---@return Attribute.System
+function M.create()
+    return M.setup()
+end
+
+return M

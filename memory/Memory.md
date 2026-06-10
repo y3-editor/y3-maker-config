@@ -1,13 +1,13 @@
 # 🧠 全局记忆系统
 
-> **最后更新**：2025-07-18  
+> **最后更新**：2026-05-15  
 > **项目状态**：Y3游戏引擎项目  
 
 ## 📋 项目概览
 
 **项目名称**：agentmap  
 **项目类型**：Y3游戏引擎开发项目  
-**当前阶段**：RPG 游戏开发中
+**当前阶段**：塔防游戏已完成验证，Agent 框架持续迭代中
 
 ## 🎯 项目目标
 
@@ -20,6 +20,36 @@
 - **游戏引擎**：Y3
 - **开发环境**：CodeMaker AI
 - **记忆系统**：基于文件的会话管理
+
+### 2026-05-15：执行案多文档拆分机制
+
+- **决策**：大型项目执行案支持拆分为多个子文档，避免单文件过大
+- **核心变更**：
+  - **拆分触发**：F-ID > 30 / 3+ 独立模块 / 用户主动要求
+  - **命名规范**：`{gameName}执行案_主控.md` + `{gameName}执行案_{Phase/模块名}.md`
+  - **低耦合原则**：按 Phase 拆分优先、跨文档依赖显式声明、禁循环依赖、尾部章节归主控
+  - **一致性校验适配**：`doc-consistency.mdc` 支持多文档模式遍历合并
+- **涉及文件**：`phase-2-execution.md`(新增§3)、`doc-consistency.mdc`(规则1扩展)、`SKILL.md`(命名表)
+- **session**: `session-2026.05.15-11.19-执行案多文档拆分`
+
+### 2026-05-14：执行案 spec 优化（实战验证驱动）
+
+- **决策**：基于塔防实战验证成果，双向优化 `phase-2-execution.md` spec 规范
+- **核心变更**：
+  - **Phase 结构简化**：1A/1B/1C/2/2.a/2.b → Phase 1~6 直线序列（塔防验证更高效）
+  - **功能清单分层**：Phase 1(物编) 7列简化格式 / Phase 2~4(Lua/UI) 9列完整格式
+  - **功能模板降级**：从强制 Phase 1A~2.b 改为可选增强，有模板时才插入
+  - **新增固定章节**：Bug修复记录表、附录(关键实现参考) — 实战验证必需
+  - **已知风险与未决项**：从可选升级为强制
+- **涉及文件**：`phase-2-execution.md`(全面重写)、`SKILL.md`(Phase划分表+模板支持章节)
+- **session**: `session-2026.05.14-17.49-执行案spec优化`
+
+### 2026-05-15：塔防工程实战知识库导出
+
+- **决策**：将塔防工程（✅ 已验证可用）的全部实战知识导出为独立知识库
+- **文件**：`.codemaker/knowledge/实战工程参考/塔防工程实战知识库.md`
+- **内容**：工程架构(6模块) / 物编ID速查(15个) / 物编陷阱(4项) / Lua核心模式(8项) / Bug修复记录(7条) / 数值迭代工作流
+- **session**: `session-2026.05.14-17.49-执行案spec优化`
 
 ## 📚 重要决策记录
 
@@ -148,7 +178,24 @@
 - **OpenSpec 变更**：mcp-terrain-timer-chain（24/24 任务完成）
 - **排查教训**：先排除了 UTF-8 编码假设和 flush 假设，最终通过对比分析确认是线程安全问题
 
-### 2026-04-03：RPG 游戏核心功能实现
+### 2026-05-22：模板等级机制 + C 级三层架构 + c-pick-one-of-many 模板导出
+
+- **决策**：为 `y3-template-export` skill 引入 A/B/C/D 四级模板等级机制，C 级采用三层架构（DataSchema + Adapter + Pure Logic）
+- **核心变更**：
+  - **`templates/ReadMe.md`**：新增 §0 等级机制（4 级定义 + ID 前缀 + 选级仲裁）/ 13→14 字段表（加「等级」「入口签名」）/ §3 增 C 级三层架构约束 / §4 拆 4.1 通用 + 4.2 C 级强制三段（数据契约/Adapter 接口/MockAdapter）+ 4.3 C 级接入步骤要求
+  - **`skills/y3-template-export/SKILL.md`**：description 加等级说明 / 新增 §3 等级机制（判定速查 + 冲突仲裁 + 流程影响表）/ §4 首句加问等级 / §5 校验等级与前缀一致 / §6 C 级追加 Adapter 接口卡点 / §11 拆 11.1 A/B 级骨架 + 11.2 C 级三层骨架 + 11.3 C 级硬性约束 / §12 14 字段 + C 级强制段落 / §14 自检加 6 项 C 级特有 / 全文章节编号 +1
+  - **Demo 实战验证**（`test321321` 工程）：按 F 键→属性三选一弹窗→点击选中，完整跑通
+  - **lua-issues/api_issues.md 新增**：`y3.ui.get_ui` 路径格式 / 调用时机 / `get_child` 路径起点 / `sync.key` 设置位置 / KeyboardKey 字母键格式（共 5 条）
+  - **修复**：`refresh_pick` 的 `close_popup` 提前到 `on_refresh_requested` 后立即执行（UX 改进，先关旧 UI 再算新结果）
+  - **`templates/ReadMe.md §7`**：登记 c-pick-one-of-many 为 draft v0.1.0
+  - **`difficulty-select`**：补「等级=A」字段
+- **设计决策**：
+  - C 级不导出 `.upui`（ArtifactPickCmp Prefab export_ui 两次超时），模板为纯 Lua，ReadMe 截图替代参考
+  - Adapter 11 方法（10 必填 + 3 可选），random_fn 可注入用于单测
+  - group 字段支持"同 group 排他"的抽卡机制
+  - BondPickCardCmp 深度定制（393 行 / 品质背景 / 标签图标 / ConfigMgr 依赖），确认 C 级 UI 全由 Adapter 负责
+- **涉及文件**：`templates/ReadMe.md`, `skills/y3-template-export/SKILL.md`, `templates/c-pick-one-of-many/logic.lua`, `templates/c-pick-one-of-many/ReadMe.md`
+- **session**: `session-2026.05.22-11.01-C级模板机制与pick-one导出`
 - **决策**：基于 `Y3AgentRoadMap.md` 策划案实现完整 RPG 游戏逻辑
 - **技术方案**：y3-lua-pipeline + y3-ui-generator 技能组合
 - **核心成果**：

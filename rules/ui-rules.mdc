@@ -26,6 +26,23 @@
 | 19 | BuffItem | Buff单项 | - |
 | 20 | EquipSlot | 物品槽 | ❌ 手写物品栏 |
 
+## 👁️ UI 可见性默认规则
+
+**UI 默认 visible=true，游戏开始即显示。**
+
+如果某 UI 不应在开局显示（如结算面板、暂停菜单、商店、提示弹窗等）：
+
+| 做法 | 评价 |
+|------|------|
+| ✅ Lua 初始化代码里 `set_visible(false)` | **推荐**。逻辑可追溯，易维护 |
+| ❌ 手改 UI JSON 的 visible 字段 | **禁止**。绕过 `y3-ui-pipeline`，破坏 JSON 一致性，且初始隐藏意图不在代码里难追踪 |
+
+```lua
+-- 推荐：在 UI 初始化阶段统一控制
+local panel = y3.ui.get_ui(player, 'UI/SettlePanel')
+panel:set_visible(false)
+```
+
 ## ⚠️ 常见字段错误
 
 | 控件 | ❌ 错误字段 | ✅ 正确字段 |

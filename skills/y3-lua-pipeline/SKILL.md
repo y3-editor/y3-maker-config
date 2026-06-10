@@ -2,14 +2,15 @@
 name: y3-lua-pipeline
 description: >
   用于编写 Y3 游戏的所有 Lua 代码，包括游戏逻辑、系统开发、事件处理、技能效果实现，
-  以及 UI 交互代码（使用 y3.ui 和 GameAPI）。
+  UI 交互代码（使用 y3.ui 和 GameAPI），以及功能模板 `logic.lua` 的融合、适配与审查。
   
   ALWAYS use this skill when user mentions: 写Lua代码、游戏逻辑、事件处理、技能效果、
   Buff效果、伤害计算、死亡判定、单位创建、刷怪逻辑、AI行为、定时器、触发器、
   数据存储、存档读档、计分系统、关卡逻辑、胜负判定、玩家初始化、
   UI代码、UI事件绑定、UI交互、按钮点击、界面逻辑。
   
-  This skill handles ALL Lua code including game logic AND UI interaction code.
+  This skill handles ALL Lua code including game logic, UI interaction code,
+  and template `logic.lua` integration/adaptation.
 ---
 
 # Y3 Lua Pipeline
@@ -26,6 +27,27 @@ description: >
 > 这些文件包含 API 臆造预防规则和历史错误记录，可有效避免重复犯错。
 
 用于编写 Y3 游戏非 UI 相关的 Lua 代码，包括游戏逻辑、系统开发、事件处理。
+
+## 🧩 功能模板 Lua 集成规则
+
+当 `y3-game-spec` 将模块标记为 `template-backed` 并提供模板 `logic.lua` 时，本技能仍是唯一 Lua 入口，必须按以下规则融合模板 Lua：
+
+1. **禁止直接粘贴后跳过审查**：模板 `logic.lua` 必须经过本技能的 API 合规、事件合规、目录检测、静态检查与运行验证。
+2. **硬编码处理**：检查并处理对象 ID、UI 路径、玩家编号、地图路径、全局变量名、资源名等硬编码。
+   - 能参数化的必须参数化；
+   - 必须绑定项目值的，写入“项目级映射”；
+   - 无法确认的，暂停询问用户。
+3. **来源边界**：生成/融合后的 Lua 必须保留模块来源信息：
+   - `template-backed: <template-id>` 或 `custom-built`；
+   - 模板文件路径（如适用）；
+   - 对应的预留入口/模块槽位（例如 `modules.<module_id>.init()`）；
+   - 项目级适配点；
+   - 与其他模块的调用边界。
+4. **API 安全**：模板中任何 Y3 API 和事件都必须在 references 或 y3 源码中验证；未验证 API 必须拒绝、替换或标记为待用户确认。
+5. **UI 路径校验**：模板依赖 `.upui` 时，必须读取导入后的 UI 节点树，确认 `logic.lua` 使用的 UI 路径真实存在。
+6. **交付报告**：Completion Report 的“影响范围”和“变更文件”必须说明模板来源、适配内容、是否影响 `global_script/` 或 `maps/`。
+
+---
 
 ## 🔧 Lua 运行时环境
 
@@ -125,7 +147,8 @@ description: >
 
 > 以下清单为 Lua 任务硬门禁执行项。任何一项未完成，不得标记任务完成。
 
-- [ ] **路由确认**：当前任务已进入 `y3-lua-pipeline`（UI Lua 场景由 `y3-ui-pipeline` 子路由）
+- [ ] **路由确认**：当前任务已进入 `y3-lua-pipeline`（UI Lua 场景由 `y3-ui-pipeline` 子路由；模板 Lua 场景由 `y3-game-spec` 模板分支路由）
+- [ ] **模板来源确认**：若为 `template-backed` 模块，已记录模板 ID、模板路径、`logic.lua`、`.upui`、项目级适配点
 - [ ] **脚本目录确认**：已确认实际脚本根目录（`maps/EntryMap/script` 或 `global_script`）
 - [ ] **前置阅读完成**：已阅读 `memory/lua-issues/`（`api_issues.md`、`trace_issues.md`）与对应 `references/`
 - [ ] **API 合规验证**：新增/修改的每个 API 调用均已在 `y3/` 源码或 references 中验证存在性与参数

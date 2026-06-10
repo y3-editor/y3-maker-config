@@ -1,0 +1,24 @@
+{
+  "name": "easy-tower-defense-terrain",
+  "description": "easyTD 塔防关卡地编模板（地形+装饰物+资源摆件）",
+  "size": [
+    32,
+    32
+  ],
+  "source_map": "easyTD",
+  "exported_at": "2026-05-15T01:58:32+00:00",
+  "editor_version": "unknown",
+  "files": [
+    "terrain.json",
+    "texture.json",
+    "terrainedit.json",
+    "foliage.json",
+    "texturefoliage.json",
+    "decorationdata.data",
+    "resourceobjectdata.data",
+    "grid.data",
+    "editor_decoration.zip"
+  ],
+  "decoration_bundle": "editor_decoration.zip",
+  "format_version": 2
+}

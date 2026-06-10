@@ -66,11 +66,26 @@ Y3 游戏编辑器地图工程，使用 **y3-lualib** 框架。
 | `y3-lua-review` | Lua 代码审查 | y3-game-spec Phase 5 |
 | `y3-auto-test` | 自动化测试执行 | y3-game-spec Phase 6 |
 | `y3-gen-terrain-from-image` | 图片转地形（可选增强） | Phase 2 前置，如用户提供参考图 |
+| `y3-terrain-template` | 地编模板导出 / 导入（地形 + 装饰物 + 资源摆件 整体打包/还原） | y3-game-spec Phase 1（场景模板匹配）/ 用户直接调用 / Patch Mode 复用场景 |
+| `y3-template-export` | 功能模板导出：把现有模块打包为 `logic.lua` + `.upui` + `ReadMe.md` 三件套，追加到 `templates/ReadMe.md` 登记表，自动化 §6 制作模板流程，独立于 lua/ui pipeline | 用户直接调用（"导出模板 / 打包模块 / 做成模板 / 模块复用"等） |
 
 > ⚠️ **关键原则**：
 > 1. 终端用户一般只感知 `y3-game-spec` 一个入口
 > 2. 专业用户（L3）可直接调用单个子技能（如 "帮我只审查一下 Lua"），不强制走 y3-game-spec
 > 3. 所有 Lua 代码必须通过 `y3-lua-pipeline`，所有 UI 必须通过 `y3-ui-pipeline`，不可绕过
+
+## 🏭 编辑器预制系统信任原则
+
+> **在使用方法正确的前提下，Y3 编辑器的预制功能和系统都是可靠的。**
+
+| 规则 | 说明 |
+|------|------|
+| **默认信任** | 编辑器内置的物编字段、技能类型、UI 组件、事件系统等，方法正确即可正常工作 |
+| **不质疑引擎** | 出现问题时，首先检查使用方法（字段值、参数、调用顺序），不假设引擎有 bug |
+| **调整用法而非重新实现** | 引擎功能不生效时，排查方向是调整配置方式和调用参数，不是绕过引擎用 Lua 硬写替代 |
+| **禁止无据假设** | 对引擎功能的「不可用」判断，必须有实际测试验证，不得基于推测或未经验证的评估 |
+
+> 例：`ability_cast_type=4`（建造技能），正确配置 `build_list` + `common_ability_list` + `sight_type` 后即可正常使用指示器。之前被错误标注为"不可用"属于使用方式未经验证的推测，已被修正。
 
 ## 🔒 Lua 开发强制规则
 
@@ -98,6 +113,7 @@ Y3 游戏编辑器地图工程，使用 **y3-lualib** 框架。
 
 | 任务类型 | 必须先阅读 |
 |---------|-----------|
+| **任何功能实现** | **先查 `knowledge/` 知识库，确认 Y3 内置系统能否覆盖** |
 | Lua 代码 | `lua-issues/` + `references/` |
 | UI 开发 | `knowledge/UI系统/03-官方组件.md` |
 | 物编操作 | 物编知识 + 模板文件 |
@@ -108,13 +124,16 @@ Y3 游戏编辑器地图工程，使用 **y3-lualib** 框架。
 |------|----------|
 | 臆造 API | 查阅 `y3/` 源码验证 |
 | 手写大型 JSON | 使用脚本生成 |
+| **手动编辑物编/UI/工程 JSON 文件** | **必须用 `y3-obj-edit` 脚本或 MCP 工具操作。Y3 JSON 有特殊 tuple 嵌套格式（`__tuple__`/`items`），手写极易破坏字段读取，导致编辑器报"物编 xxx.json 错误"** |
 | Lua 实现引擎功能 | 使用物编配置 |
+| 用 Lua/Python 硬实现已有系统 | **先查知识库 `knowledge/`，确认 Y3 内置系统（建造、采集、科技等）能否覆盖需求** |
 | 手写技能栏/Buff/物品栏 | 使用官方组件 type:17/18/20 |
 | UI 坐标用左上角思维 | **Y3 原点在左下角** |
 | 物编/UI 生成后直接保存 | **必须先热更再保存** |
 | 测试清理时未经确认就删文件 | **必须先过 Gate 3 与用户确认清理范围** |
 | 有现成脚本还手写 | 先查 `skills/*/scripts/` 目录 |
 | M×N 格子/列表需求用手动 layout | **必须识别为 GridView/ScrollView，并向用户确认实现方式** |
+| **代码动态创建逻辑节点** | **场景逻辑节点必须通过专用 MCP 创建：点→`add_point`、路径→`add_point_path`、区域→`add_rect_area`/`add_circle_area`，代码仅通过 `get_xxx_by_res_id` 引用。禁止用 `entity_create_block`（那是装饰物用的）** |
 
 > 详细禁令说明见 `api-safety.mdc`、`ui-rules.mdc`、`mcp-rules.mdc`
 
@@ -160,4 +179,15 @@ y3.const.KeyboardKey['1']
 
 ---
 
-*最后更新: 2026-04-23*
+## 🔗 `.codemaker` 路径解析规则
+
+文档中出现的 `.codemaker/` 路径前缀**不代表硬编码目录名**，而是代指**当前配置目录**：
+- 默认目录名为 `.codemaker`，外放版本可能为 `.y3maker`
+- AI 在执行 Shell 命令时，**必须先通过 `list_files_top_level` 检查项目根目录，确认实际配置目录名**（`.codemaker` 或 `.y3maker`），再拼接路径
+- 文档内交叉引用（如 `skills/xxx/SKILL.md`）使用相对路径，不依赖 `.codemaker` 前缀
+
+> Python 脚本中已通过 `__file__` 相对解析或 `_find_config_dir()` 探测实现目录名无关。
+
+---
+
+*最后更新: 2026-05-25*

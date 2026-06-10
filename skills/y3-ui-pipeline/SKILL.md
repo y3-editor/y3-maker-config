@@ -54,8 +54,9 @@ description: |
 
 此环节负责：
 - 理解用户的 UI 需求描述
-- 生成 HTML布局预览 （不可跳过）
+- 生成 HTML 布局预览（**直接生成，无中间确认**）
 - 转换为 Y3 UI JSON 文件
+- HTML 预览后执行确认步骤
 
 详细指南见 `y3-ui-generator/SKILL.md`
 

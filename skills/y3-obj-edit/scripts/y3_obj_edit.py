@@ -67,6 +67,7 @@ UNIT_ATTRIBUTES = {
     "ori_speed": float,
     "turn_speed": float,
     "sight_range": float,
+    "attack_range": float,
     "reward_exp": float,
     "reward_official_res_1": float,
     "hero_ability_list": "tuple",
@@ -197,6 +198,7 @@ PROJECTILE_ATTRIBUTES = {
     # 特效ID（只修改 items[0]）
     "effect_foes": "effect_id",
     "effect_friend": "effect_id",
+    "effect_fly": "effect_id",
 }
 
 
@@ -362,6 +364,15 @@ def apply_unit_attributes(data: dict, args: argparse.Namespace, unit_id: int = N
                         data["description"] = desc_tid
             else:
                 data[attr_name] = attr_type(value)
+
+    # 特殊处理：common_atk_range 同步写入 simple_common_atk.attack_range（实际战斗射程）
+    common_atk_range = getattr(args, "common_atk_range", None)
+    if common_atk_range is not None:
+        rng = float(common_atk_range)
+        data["attack_range"] = rng  # 根级也同步
+        if "simple_common_atk" in data and isinstance(data["simple_common_atk"], dict):
+            data["simple_common_atk"]["attack_range"] = rng
+            print(f"   ↳ 同步更新 simple_common_atk.attack_range = {rng}")
 
 
 def create_unit(args: argparse.Namespace):
@@ -865,10 +876,16 @@ def apply_projectile_attributes(data: dict, args: argparse.Namespace, projectile
         value = getattr(args, attr_name, None)
         if value is not None:
             if attr_type == "effect_id":
-                # 特效ID：只修改 items[0]，保留其他结构
+                # 特效ID：支持两种格式
+                # 格式1: {"__tuple__": true, "items": [id, ...]} （旧格式 effect_foes/effect_friend）
+                # 格式2: [id, ...] 直接数组（新格式 effect_fly 等）
                 effect_id = int(value)
-                if attr_name in data and "items" in data[attr_name]:
-                    data[attr_name]["items"][0] = effect_id
+                if attr_name in data:
+                    field = data[attr_name]
+                    if isinstance(field, dict) and "items" in field:
+                        field["items"][0] = effect_id
+                    elif isinstance(field, list) and len(field) > 0:
+                        field[0] = effect_id
             elif attr_name in ("name", "description"):
                 # 名称和描述需要更新多语言文件
                 if map_path and projectile_id:
@@ -921,12 +938,16 @@ def create_projectile(args: argparse.Namespace):
         value = getattr(args, attr_name, None)
         if value is not None:
             if attr_type == "effect_id":
-                # 特效ID：只修改 items[0]，保留其他结构
+                # 特效ID：支持两种格式
+                # 格式1: {"__tuple__": true, "items": [id, ...]}
+                # 格式2: [id, ...] 直接数组
                 effect_id = int(value)
-                if attr_name in data and "items" in data[attr_name]:
-                    data[attr_name]["items"][0] = effect_id
-            elif attr_type == bool:
-                data[attr_name] = value.lower() in ("true", "1", "yes") if isinstance(value, str) else bool(value)
+                if attr_name in data:
+                    field = data[attr_name]
+                    if isinstance(field, dict) and "items" in field:
+                        field["items"][0] = effect_id
+                    elif isinstance(field, list) and len(field) > 0:
+                        field[0] = effect_id
             else:
                 data[attr_name] = attr_type(value)
     
@@ -981,6 +1002,10 @@ def main():
             parser.add_argument(f"-{attr_name}", type=int, help=f"[单位] {attr_name}")
         else:
             parser.add_argument(f"-{attr_name}", type=str, help=f"[单位] {attr_name}")
+
+    # 单位特殊参数：同时更新 simple_common_atk.attack_range（实际战斗射程）
+    parser.add_argument("-common_atk_range", type=float,
+                        help="[单位] 实际战斗射程，同步写入根级 attack_range 与 simple_common_atk.attack_range")
     
     # 技能可选属性参数
     for attr_name, attr_type in ABILITY_ATTRIBUTES.items():
