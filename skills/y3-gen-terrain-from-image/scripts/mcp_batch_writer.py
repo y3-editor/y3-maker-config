@@ -891,10 +891,11 @@ def discover_mcp_url(override_url=None):
     if override_url:
         return override_url
 
-    # 尝试从 mcp_settings.json 读取
+    # 尝试从 mcp_settings.json 读取（相对脚本自身位置解析，不依赖目录名）
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    cfg_dir = os.path.normpath(os.path.join(script_dir, "..", "..", ".."))
     candidates = [
-        os.path.join(".codemaker", "mcp_settings.json"),
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "mcp_settings.json"),
+        os.path.join(cfg_dir, "mcp_settings.json"),
     ]
     for settings_path in candidates:
         if os.path.exists(settings_path):

@@ -4,6 +4,56 @@
 
 ---
 
+## UI 相关
+
+### y3.ui.get_ui 路径格式
+
+| 项 | 说明 |
+|---|---|
+| **错误用法** | `y3.ui.get_ui(player, 'uuid-xxxx')` 直接传节点 UID |
+| **正确用法** | `y3.ui.get_ui(player, 'layer名.节点名')` |
+| **原因** | `GameAPI.get_comp_by_absolute_path` 需要 `layer名.节点名` 格式的绝对路径，不接受裸 UID |
+| **补充** | Layer 名本身可以获取，但拿到的是 Layer 对象不是节点，不能作为 `y3.ui_prefab.create` 的 parent |
+| **来源** | `y3/object/scene_object/ui.lua:104` |
+
+### y3.ui.get_ui 调用时机
+
+| 项 | 说明 |
+|---|---|
+| **错误用法** | 在 `游戏-初始化` 事件回调里同帧调用 `y3.ui.get_ui` |
+| **正确用法** | `y3.ltimer.wait_frame(1, function() ... y3.ui.get_ui(...) end)` |
+| **原因** | UI 节点在 `游戏-初始化` 触发时可能尚未完全注册到路径查找系统 |
+
+### y3.ui_prefab get_child 路径起点
+
+| 项 | 说明 |
+|---|---|
+| **错误用法** | `slot:get_child('bg')` 或 `slot:get_child('bg.descr_TEXT')` |
+| **正确用法** | `slot:get_child('root.bg')` 或 `slot:get_child('root.bg.descr_TEXT')` |
+| **原因** | `UIPrefab:get_child(path)` 先获取 prefab 根 UI 节点，再从该节点用 `path` 查找；`artifactPickCmp` 内有一层隐含 `root`，需带 `root.` 前缀 |
+| **来源** | DM42 `gamePlay/ui/hudPopup/artifact/ArtifactPickCmp.lua:25` `self._bg = self._ui:get_child("root.bg")` |
+
+## 键盘事件相关
+
+### y3.config.sync.key 设置位置
+
+| 项 | 说明 |
+|---|---|
+| **错误用法** | 在 `maps/EntryMap/script/main.lua` 的 `游戏-初始化` 回调里设置 `y3.config.sync.key = true` |
+| **正确用法** | 在 `global_script/global_main.lua` 的 `游戏-初始化` 回调里设置 |
+| **原因** | global_main.lua 优先于地图 main.lua 执行，键盘同步必须在全局初始化时开启 |
+
+### KeyboardKey 常量格式
+
+| 键类型 | 错误 | 正确 | 说明 |
+|--------|------|------|------|
+| 字母键 | `'KEY_F'` | `'F'`（单字母大写） | 字母键直接用大写字母 |
+| 数字键 | `'1'` | `'KEY_1'` | 数字键需 KEY_ 前缀 |
+| 功能键 | `'KEY_F9'` | `'F9'` | 功能键直接用 F+数字 |
+| 特殊键 | — | `'SPACE'` `'ENTER'` `'HOME'` | 直接用名字 |
+
+---
+
 ## 1. 玩家存活检测
 
 ### ❌ 错误用法

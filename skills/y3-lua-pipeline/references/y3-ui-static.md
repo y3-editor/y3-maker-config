@@ -64,6 +64,68 @@ y3.ui.set_screen_resolution(player, x, y)
 
 ---
 
+## y3.ui.get_ui 使用约束（实战验证）
+
+```lua
+---@param player Player
+---@param ui_path string  格式："layer名.节点名"
+---@return UI
+local ui = y3.ui.get_ui(player, 'panel_1.layout_1')
+```
+
+### ⚠️ 三条强制规则
+
+| 规则 | 说明 |
+|------|------|
+| **路径格式** | 必须是 `"layer名.节点名"` — 不接受裸节点 UID，不接受 `layer名/节点名` |
+| **调用时机** | `游戏-初始化` 同帧调用会失败（返回 error）；必须延迟至少 1 帧 |
+| **Layer vs 节点** | `y3.ui.get_ui(player, 'panel_1')` 可获取 Layer 对象，但 **不能作为 `y3.ui_prefab.create` 的 parent**，必须是 Layer 内的具体节点 |
+
+### 正确的初始化流程（含 1 帧延迟）
+
+```lua
+local cached_panel = nil
+
+y3.game:event('游戏-初始化', function()
+    y3.player.with_local(function(player)
+        -- ⚠️ wait_frame(1, ...) 必须，同帧获取会 error
+        y3.ltimer.wait_frame(1, function()
+            cached_panel = y3.ui.get_ui(player, 'panel_1.layout_1')
+        end)
+    end)
+end)
+```
+
+---
+
+## y3.ui_prefab.create 使用约束（实战验证）
+
+```lua
+---@param player Player
+---@param prefab_name string  Prefab 名称（不是 UID）
+---@param parent_ui UI        Layer 内的节点（不是 Layer 本身）
+---@return UIPrefab
+local slot = y3.ui_prefab.create(player, 'artifactPickCmp', cached_panel)
+```
+
+### UIPrefab:get_child 路径规则
+
+`UIPrefab:get_child(path)` 的路径起点是 prefab 的**根 UI 节点**（对应编辑器节点树的第一层）。
+Y3 Prefab 通常有一层隐含的 root，路径需要带 `root.` 前缀：
+
+```lua
+-- ⚠️ artifactPickCmp 的正确路径（有隐含 root 层）
+local bg   = slot:get_child('root.bg')          -- ✅
+local desc = slot:get_child('root.bg.descr_TEXT') -- ✅
+
+-- ❌ 错误写法
+local bg   = slot:get_child('bg')               -- ❌ 找不到
+```
+
+> 验证方式：查看编辑器节点树或源工程 `*Cmp.lua` 里 `self._ui:get_child("root.xxx")` 的调用方式
+
+---
+
 ## 未封装的 GameAPI
 
 > 以下 GameAPI 方法**没有被 y3.ui 封装**，需要直接调用

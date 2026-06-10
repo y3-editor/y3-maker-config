@@ -1,0 +1,24 @@
+{
+  "name": "roguelike-survival",
+  "description": "Survival game terrain 64x64, roguelike style",
+  "size": [
+    64,
+    64
+  ],
+  "source_map": "EntryMap",
+  "exported_at": "2026-05-18T10:02:22+00:00",
+  "editor_version": "unknown",
+  "files": [
+    "terrain.json",
+    "texture.json",
+    "terrainedit.json",
+    "foliage.json",
+    "texturefoliage.json",
+    "decorationdata.data",
+    "resourceobjectdata.data",
+    "grid.data",
+    "editor_decoration.zip"
+  ],
+  "decoration_bundle": "editor_decoration.zip",
+  "format_version": 2
+}

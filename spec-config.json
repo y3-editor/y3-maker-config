@@ -1,0 +1,45 @@
+{
+  "_comment": "Y3 游戏开发流程文档配置。修改此文件可自定义各阶段文档的存放路径和命名。",
+  
+  "gameName": "",
+  "_gameName_comment": "项目/游戏名称，策划案阶段确定后自动填写，用于生成文件名前缀。如：塔防、肉鸽RPG。当前目录存在多个项目（塔防、生存），此字段可保持为空，按需在使用时指定。",
+
+  "paths": {
+    "designDoc": "openspec/docs/",
+    "executionDoc": "openspec/docs/",
+    "testPlan": "openspec/docs/",
+    "testReport": "openspec/docs/",
+    "htmlReport": "openspec/reports/"
+  },
+  "_paths_comment": {
+    "designDoc": "策划案（设计案）输出目录",
+    "executionDoc": "执行案输出目录",
+    "testPlan": "测试案输出目录",
+    "testReport": "测试报告（.md）输出目录",
+    "htmlReport": "测试报告（.html）输出目录"
+  },
+
+  "fileNames": {
+    "designDoc": "{gameName}设计案.md",
+    "executionDoc": "{gameName}执行案.md",
+    "testPlan": "{gameName}测试案.md",
+    "testReport": "{gameName}测试报告-{timestamp}.md",
+    "htmlReport": "{gameName}测试报告-{timestamp}.html"
+  },
+  "_fileNames_comment": {
+    "placeholder_gameName": "替换为 gameName 字段值",
+    "placeholder_timestamp": "替换为生成时间，格式：2026年4月14日11时12分54秒"
+  },
+
+  "htmlReport": {
+    "autoOpen": true,
+    "_autoOpen_comment": "生成 HTML 报告后是否自动在浏览器中打开"
+  },
+
+  "svn": {
+    "autoUpload": false,
+    "commitMessage": "{gameName}测试报告-{timestamp}",
+    "_autoUpload_comment": "测试报告生成后是否自动提交到 SVN（需要本机已配置 svn 命令行工具）",
+    "_commitMessage_comment": "SVN 提交时的 commit message，支持 {gameName} 和 {timestamp} 占位符"
+  }
+}
