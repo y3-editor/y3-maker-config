@@ -306,7 +306,7 @@ function M.setup(adapter, params)
     --- 列出某 group 的所有进度（用于 UI 列表展示）
     ---@param playerId any
     ---@param group? string
-    ---@return { id, def: ProgressDef, progress: table }[]
+    ---@return { id: any, def: ProgressDef, progress: table }[]
     function instance:listByGroup(playerId, group)
         local g = group or 'default'
         local defs = defs_by_group[g]

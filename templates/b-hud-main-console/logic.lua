@@ -263,13 +263,13 @@ function M.refresh_hero_level_exp(unit)
     if not unit then return end
     local lv = params.get_unit_level(unit)
     local cur_exp = params.get_unit_exp(unit)
-    local next_exp = unit:get_upgrade_exp and unit:get_upgrade_exp() or 1
+    local next_exp = unit.get_upgrade_exp and unit:get_upgrade_exp() or 1
 
     local cbs = params.callbacks or {}
     local max_lv = cbs.get_max_lv and cbs.get_max_lv() or 999
 
     if ui.hero.lv_text then
-        ui.hero.lv_text:set_text(tostring(unit:storage_get and unit:storage_get('lv') or lv))
+        ui.hero.lv_text:set_text(tostring(unit.storage_get and unit:storage_get('lv') or lv))
     end
     if ui.hero.exp_prog then
         if lv >= max_lv then
@@ -407,7 +407,7 @@ function M.refresh_ability_icon(ability_ctrl, key)
     local btn = ui.ability[key]
     if not btn then return end
     if ability_ctrl then
-        local ab = ability_ctrl:getAbility and ability_ctrl:getAbility()
+        local ab = ability_ctrl.getAbility and ability_ctrl:getAbility()
         if ab then btn:bind_ability(ab) end
     else
         -- 清除
@@ -459,14 +459,14 @@ function M.bind_target_unit(unit)
 
     -- 图标
     local icon_id = unit:get_icon()
-    if unit:has_tag and unit:has_tag('hero') then
-        icon_id = unit:storage_get and unit:storage_get('icon') or icon_id
+    if unit.has_tag and unit:has_tag('hero') then
+        icon_id = unit.storage_get and unit:storage_get('icon') or icon_id
     end
     if ui.target.icon then ui.target.icon:set_image(icon_id) end
 
     -- 名称 + 怪物标签
-    local name = (unit:storage_get and unit:storage_get("oriName")) or unit:get_name()
-    local monster_type = unit:storage_get and unit:storage_get('monster_type')
+    local name = (unit.storage_get and unit:storage_get("oriName")) or unit:get_name()
+    local monster_type = unit.storage_get and unit:storage_get('monster_type')
     if ui.target.monster_tag then ui.target.monster_tag:set_visible(false) end
     if monster_type == 2 then -- Elite
         if ui.target.monster_tag then
