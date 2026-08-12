@@ -8,3 +8,5 @@ skills/y3-game-spec/report/
 .codegraph/
 *.log
 *.tmp
+**/__pycache__/
+*.py[cod]
