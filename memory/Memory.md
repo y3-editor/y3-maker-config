@@ -1,13 +1,125 @@
-# 🧠 全局记忆系统
+ # 🧠 全局记忆系统
 
-> **最后更新**：2026-05-15  
+> **最后更新**：2026-06-15  
 > **项目状态**：Y3游戏引擎项目  
 
 ## 📋 项目概览
 
 **项目名称**：agentmap  
 **项目类型**：Y3游戏引擎开发项目  
-**当前阶段**：塔防游戏已完成验证，Agent 框架持续迭代中
+**当前阶段**：Agent 健康检查 + Memory Distill 系统就绪，sessions 已蒸馏归零
+
+---
+
+## 🔖 编辑器表格系统源码验证 (2026-08-07)
+
+- **源码**：`E:\map\src\Server\server\engine\dm\editor\`（table_helper.py / table_editor_data.py / const.py / utils.py / table_editor_manager.py）
+- **核心机制**：`config_`/`kv_` 前缀命名（TypeConfig=0 多维 / TypeKV=1 一维）；JSON 0-based 布局 `[列名,类型,数据...]`，加载时 insert 空行对齐 1-based 导出格式（第2行列名/第3行类型/第4行key标识/第5行起数据）；主键最多 3 级 key1-3 仅 int/string，无主键自动 `__auto_gen_key`；空值补默认值（string/int/float/bool/angle/vector3）
+- **KV 表**：固定 4 列 Key/Type/Value/Des，`kv_key_type` 仅 int/str
+- **表目录**：地图 `tables/` + 项目 `archive/init_tables/`（随存档初始化）；支持 json/xlsx/xls/csv
+- **导出 Lua**：多维→嵌套表、KV→扁平表，float→Fix32
+- **产出**：重写 `knowledge/核心系统/13-编辑器表格系统.md`（9 章节全源码验证）
+
+## 🔖 编辑器表格系统知识库文档 (2026-08-07)
+
+- **背景**：用户新建一维表 `kv1` + 多维表 `config1`，定位到编辑器表格系统落盘格式
+- **落盘**：`maps/EntryMap/tables/{表名}.json`（`table_type` 1=一维 KV、0=多维）+ `editor/tableeditorgroupinfo.json`（uuid↔表名）
+- **运行时 API**：`y3.game.get_table(name, as_lua)` + `GameAPI.get_table_var(table, key1..key5, default, convert)` 等（`gameapi4.lua`）
+- **产出**：新建 `knowledge/核心系统/13-编辑器表格系统.md`，更新 knowledge README 索引
+- **已知坑**：`table_reader.py` 读多维表会把第 1 行类型行当数据行
+
+## 🔖 全量健康检查 + 修复 (2026-08-07)
+
+- **触发**：用户要求全量检查知识库/rules/skill
+- **修复 ①** `_health_check.py` 死链正则 bug：`\(([^)]*\.md[c]?)\)` → `\]\(([^)\s]+\.md[c]?)\)`（旧正则从链接文本括号起匹配，karpathy README 2 处误报）
+- **修复 ②** `knowledge/README.md` 索引补全：`12-ECA系统.md`、`存档系统架构设计指南.md` 缺失
+- **修复 ③** 创建项目根 `USER_GUIDE.md`（新手引导，消除 `skills/README.md` 死链）
+- **现存警告**：`y3-ui-instance.md` 436 行（接近 500，API 速查结构紧凑，保留基线）；`y3-obj-edit/reference/` 单数命名异于其它技能 `references/`
+- **session**: `session-healthcheck-2026.08.07-16.22-knowledge-rules-skills-audit`
+
+## 🔖 Agent 闭环增强 (2026-06-16)
+
+- **三件套落地**：① `_health_check.py` 7 项自检 ② `api_blacklist.json`(15 条) 反哺 review + auto-test ③ `apply_distill.py` 蒸馏自动落盘
+- **SKILL.md / auto-test.mdc 联动**：review 启动加载 blacklist；auto-test 分析失败原因时先扫 blacklist 正则拦截
+- **健康检查基线**：y3-ui-instance.md 436 行(接近500)、doc-consistency dead links (4 个占位文档)
+
+## 🔖 Session 蒸馏沉淀（2026-06-15，36 sessions 清空前提取）
+
+> 以下为历史 36 个 session 物理删除前提取的关键决策/经验，按主题归并。早期已沉淀的 ECA/terrain/decoration/UI-grid/模板等级条目见后文「重要决策记录」。
+
+### Agent 健康检查 + 流程修复（2026-06-15）
+- **配置目录无关**：`.codemaker/` 前缀代指当前配置目录（可能 `.y3maker`），脚本用 `__file__` 或 `_find_config_dir()` 探测
+- **本次修复**：① `auto-test.mdc` gen-test-plan 死引用（实际在 `y3-auto-test/` 非 `y3-game-spec/`）② 全库 17 处损坏 emoji（U+FFFD 替换字符，分布于 rules/skills/Memory/templates）③ `eca-json-builder/SKILL.md` 残缺重建（§11-14 误存为 SKILL，已合并回 `eca-json-builder.md` 并重建 frontmatter）④ `a-trace-report/logic.lua` 注释+1处 `string.format` 格式串损坏修复
+- **环境待办**：编辑器当前打开 `e:/DM42` 工程（非本工作区），缺 `env_setup_done` 标记（自动保存未关闭）
+
+### Memory Distill 系统 v0.2（2026-06-15）
+- **触发条件**：sessions ≥ 50 或距上次 distill ≥ 30 天（`memory.mdc` 规则 7）
+- **脚本**：`skills/y3-memory-distill/scripts/distill.py`（扫描+倒排索引+API聚类+报告）
+- **产物**：`sessions/INDEX.md`（关键词倒排）+ `memory/distill/distill-YYYYMMDD.md`（候选需用户逐条 accept/reject/defer）
+- **首次成果**：检出 `y3.ui.get_ui` 复现 4 次 → 注入 `references/api_errors.md`
+
+### HUD 模板三件套实战（2026-06-04/05）
+- **三模板**（B 级 draft）：`b-hud-top-info` / `b-hud-statistic` / `b-hud-main-console`，EntryMap 验证通过
+- **核心适配**：模板原版用 UUID 查 UI 节点 → Y3 工程下 UUID 会失效，必须改 `layer.节点名` 层级路径（用 `get_ui_canvas` 重取）
+- **关键 API 坑**（已入 lua-issues）：
+  - `y3.ui.get_ui(player, path)` 首参必须 **Player 对象**，非 player_id integer
+  - `y3.ui.get_ui` 在 `游戏-初始化` 同帧调用失败 → 必须 `y3.ltimer.wait_frame(1, fn)` 延迟
+  - type_17 技能 `slot:bind_ability()` **不自动赋图标** → 手动 `slot:get_child('icon'):set_image(ability:get_icon())`
+  - type_17 CD 遮罩：不要 `bind_unit`（就绪度驱动方向反），改定时器 `cd_prog:set_current_progress_bar_value(cd_rem/cd_max*100)`
+  - 动态技能列表用 `Bond_GRID + skill prefab`：`y3.ui_prefab.create(player,'skill',grid)`；新建 prefab 需热更+保存+**重启游戏**才注册到 `y3.ui.comp_id`
+  - prefab 与格子尺寸不一致致图标压扁 → **在 UI 编辑器**设格子尺寸，勿用 Lua 强覆盖
+  - 单位属性中文键：`unit:get_attr('生命'/'最大生命')`，见 `y3/game/const.lua` UnitAttr
+
+### DM32 ECA 大型项目审计（2026-06-12）
+- **背景**：DM32 纯 ECA Roguelike 射击，937 物编 + 1666 内嵌触发器 + 0 全局触发器
+- **eca-json-builder 增强**：ARG_TYPE_ID 21→60+ 项；变量三元作用域；裸列表+`__tuple__` 双格式；hex UUID 函数保留；数值 action_type；graceful fallback
+- **新增 4 脚本**：`plugin_eca.py`（插件函数库/触发器）/ `table_reader.py`（ECA 数据表）/ `project_event.py`（项目自定义事件）/ `archive_reader.py`（存档）
+- **往返测试**：全量 1666 条 **0 崩溃**
+
+### 模板库 ReadMe 审查（2026-06-05）
+- 修 6 问题：模板排序错位、§8 插表中间、总数 33→36、字段 14→15、C 级签名冲突
+- **遗留决策**：C 级 `M.setup(adapter, params)` 签名与 §3「C 级必须 M.setup(adapter)」规则冲突，待松绑规则或整改模板
+
+### TC04 背包 + GridView 强制识别（2026-04-07）
+- **规则缺陷**：M×N 格子需求被主观降级为手动 layout
+- **修复**：`y3-ui-generator/SKILL.md` Step 0.3 加「关键词命中=必须识别 GridView/ScrollView + 向用户确认」；`rules.mdc` 核心禁令同步加一条
+- **环境**：系统默认 python 是 2.7，转换脚本必须 `py -3`
+
+---
+
+### 2026-06-11：ECA 变量管理脚本 + 默认值类型陷阱
+
+- **触发**：用户问 AI 是否有 ECA 变量增删改查能力（全局/局部/物编组）→ 评估发现全局与组变量需手动改 JSON → 补脚本 → 编辑器崩溃 → 修默认值
+- **新增**：`.codemaker/skills/eca-json-builder/var_manager.py`
+  - `list/add/remove/show` × `--global` / `--unit KEY`
+  - 自动同步 `variable_dict` / `variable_group_info` / `variable_length_dict` 三字段
+  - `--bak` 备份；`show --global` 反扫描所有 trigger 列出引用
+- **关键 bug**：变量初值统一写 `0` → 编辑器 `var_widget.set_var_value` 调 `lineEditItem.setText(value)` 对 STRING 报 `TypeError: setText: argument 1 has unexpected type 'int'`
+- **修复表**：STRING→`""`、BOOLEAN→`false`、FLOAT/ANGLE→`0.0`、其余→`0`
+- **文档同步**：`SKILL.md §6` + `eca-json-builder.md` 全局变量章节均加默认值警示表
+- **session**: `session-eca-var-manager-2026.06.11-16.54-var-default-type-fix`
+
+### 2026-06-11：ECA 变量声明、可选参数、全局变量格式修复
+
+- **触发**：ECA 脚本卡顿 → 用户反馈变量引用标红、全局变量创建无效
+- **核心修复**（gen_trigger.py）：
+  - **`op_arg`/`op_arg_enable`**：4 个 builder（event/condition/action/build_arg）补全可选参数字段
+  - **变量 tuple scope**：`["TYPE","name"]` → `["TYPE","name","local"/"global"]`
+  - **`var_data` 自动生成**：`collect_variables()` 扫描 SET_VARIABLE → `build_var_data()` 生成；global 作用域跳过
+  - **瘦身索引**：`eca_index_slim.json`（271KB，p/t/s/o），gen/read/edit 自动使用
+  - **工作流优化**：跳过 `lookup.py`，用 `gen_trigger.py --dry-run` 一步校验
+- **全局变量格式**（`globaltriggervariable.json`）：需写三处——`variable_dict` + `variable_group_info` + `variable_length_dict`
+- **session**: `session-2026.06.11-16.37-eca-var-op-fix`
+
+### 2026-06-11：ECA Skill 测试用例建设与全量验证
+
+- **决策**：为 `eca-json-builder` skill 建立文档式测试用例集（20条），完成全量执行验证
+- **核心成果**：
+  - **测试用例**：`test-cases/` 下 20 条 TC，5 级递进（L1基础→L5边界）
+  - **执行结果**：20/20 PASS（100%）
+  - **产物**：13 个全局触发器 JSON + 1 个物编文件修改（追加 2 条 trigger_dict）
+  - **发现缺陷**：eca_index.json 缺少周期性定时事件、GENERIC_UNIT_EVENT arg_type 来源不清
+- **session**: `session-2026-06-11-1122-eca-test-run`
 
 ## 🎯 项目目标
 
@@ -221,7 +333,7 @@
 - Y3编辑器相关技能已可用
 - OpenSpec工作流已激活
 
-## � 记忆系统规则
+## 🧠 记忆系统规则
 
 ### 🔄 变更记录原则
 - **重要变更必须记录**：所有重要的代码变更、设计决策、架构调整都必须记录到记忆系统
@@ -243,6 +355,6 @@
 - **可追溯**：能够理解变更的来龙去脉
 - **actionable**：为后续工作提供明确指导
 
-## �📝 备注
+## 📝 备注
 
 用户希望建立持续的工作记忆，确保每次对话都能基于之前的上下文继续工作。

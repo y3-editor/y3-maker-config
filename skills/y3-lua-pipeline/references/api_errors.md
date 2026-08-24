@@ -72,6 +72,19 @@ comp:add_fast_event('左键-点击', player, function() end)
 
 ---
 
+## y3.ui.get_ui
+
+| 陷阱 | ❌ 错误 | ✅ 正确 |
+|------|---------|---------|
+| 参数类型 | `y3.ui.get_ui(player_id, path)` 传 integer | `y3.ui.get_ui(y3.player(player_id), path)` 传 Player 对象 |
+| 路径格式 | `y3.ui.get_ui(player, 'uuid-xxxx')` 传 UID | `y3.ui.get_ui(player, 'layer名.节点名')` 必须 layer.节点名 |
+| 调用时机 | `游戏-初始化` 事件同帧调用 | `y3.ltimer.wait_frame(1, function() ... end)` 延迟一帧 |
+| 路径层级 | `y3.ui.get_ui(player, "Panel.block.label")` 跳过中间节点 | 用 `ui_tree/*.json` 确认完整路径，包含所有中间节点 |
+
+> 来源: `y3/object/scene_object/ui.lua:104-105`
+
+---
+
 ## 坐标与角度
 
 ```lua

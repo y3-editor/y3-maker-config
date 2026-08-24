@@ -6,6 +6,75 @@
 
 ## UI 相关
 
+### [2026-06-04] resurgence 圆形进度条默认显示随机数字
+
+| 项 | 说明 |
+|---|---|
+| **现象** | 底部控制台英雄头像中间显示 "9.6"，位置不明 |
+| **根因** | `avatar.main.mask.resurgence [type_42]` 是复活倒计时圆形进度条，内部 `progress_percent_label` TextLabel 自动显示进度百分比，默认值非零 |
+| **解决** | `init_ui` 时获取该节点并 `set_visible(false)`，仅死亡时再显示 |
+
+### [2026-06-04] bind_ability 不会自动赋值技能图标
+
+| 项 | 说明 |
+|---|---|
+| **错误认知** | `slot:bind_ability(ability)` 会自动把技能图标设置到 slot 内的 `icon` 节点 |
+| **实际行为** | `bind_ability` 只绑定 CD 进度 / 技能层数 / 禁用状态，**不赋值图标** |
+| **正确做法** | 需手动获取图标并设置：`slot:get_child('icon'):set_image(ability:get_icon())` |
+| **完整写法** | `local ok, id = pcall(function() return ability:get_icon() end); if ok and id ~= 0 then icon_node:set_image(id) end` |
+
+
+
+| 项 | 说明 |
+|---|---|
+| **旧（错误）做法** | `slot:bind_unit(unit)` — 引擎以"就绪度"驱动 cd_prog（CD完成=100，冷却趋向0，遮罩方向反） |
+| **正确做法** | 不调用 `bind_unit`；定时器手动 `cd_prog:set_current_progress_bar_value(cd_rem/cd_max*100)` |
+| **相关API** | `ab:get_cd()` 剩余CD，`ab:get_max_cd()` 最大CD，`cd_prog:set_current_progress_bar_value(n)` |
+
+
+
+| 项 | 说明 |
+|---|---|
+| **场景** | 技能数量不固定，用 GridView + prefab 动态创建 |
+| **正确用法** | `local ins = y3.ui_prefab.create(player, 'prefab名', bond_grid_node)` |
+| **获取子节点** | `ins:get_child('slot')` — 注意 prefab 内部路径相对于根节点一层之后 |
+| **bind_ability** | `slot:bind_ability(ability)` 绑定技能到 type_17 官方控件 |
+| **注意** | prefab 必须热更保存后重启游戏才能在 `y3.ui.comp_id` 中注册；否则 `KeyError: 'prefab名'` |
+
+
+
+| 项 | 说明 |
+|---|---|
+| **正确用法** | `slot:bind_ability(ability)` — type_17 控件直接绑定 Ability 对象，自动显示图标/CD/层数 |
+| **技能获取** | `unit:get_ability_by_slot('英雄', index)` 优先；无英雄技能时 fallback `'普通'` |
+| **title_TEXT** | 技能槽的 `title_TEXT` 子节点默认硬编码文字，需手动 `ability:get_name()` 更新 |
+
+
+
+| 项 | 说明 |
+|---|---|
+| **错误做法** | 延迟 1 帧读 `mask:get_width()` 存为满血宽度 |
+| **错误现象** | 满血时进度条只显示约 9%（mask 已被第一次 set_ui_size 缩小） |
+| **正确做法** | 用**父容器** `heroHP_BAR:get_width()` 作为满血基准宽度，mask 是动态缩放节点不能作基准 |
+| **验证** | `bar_w=461 mask_w=461(满)` → 扣血后 `mask_w=461×ratio` ✅ |
+
+### [2026-06-04] Y3 单位属性名称（UnitAttr 枚举）
+
+| ❌ 错误 | ✅ 正确（见 y3/game/const.lua UnitAttr 表） |
+|---------|------|
+| `'攻击'` | `'物理攻击'` |
+| `'力量'` / `'敏捷'` / `'智力'` | 这三个属性 Y3 不存在，用 `'物理防御'`/`'法术攻击'`/`'法术防御'` 替代 |
+| `'护甲'` | `'物理防御'` |
+
+
+
+| 项 | 说明 |
+|---|---|
+| **错误用法** | `y3.ui.get_ui(player_id, path)` 传 integer |
+| **正确用法** | `y3.ui.get_ui(y3.player(player_id), path)` 传 Player 对象 |
+| **错误现象** | `attempt to index a number value (local 'player')` |
+| **来源** | `y3/object/scene_object/ui.lua:105` — `player.handle` |
+
 ### y3.ui.get_ui 路径格式
 
 | 项 | 说明 |

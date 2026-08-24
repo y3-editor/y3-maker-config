@@ -9,4 +9,5 @@ alwaysApply: true
 4.lua报错以及trace类归纳到trace_issues.md；api生成错误，错误的使用了y3库中不存在api，api参数类型，个数问题等归纳到api_issues.md
 5.lua问题的归纳要尽量精简，尽可能的包括产生原因和解决方案
 6.在每一次对话中，如果再次发生了lua的相关问题，请根据问题类别去lua-issues中寻找之前的记录，看能否帮助解决
+7.周期性蒸馏反哺（distill）：当 sessions ≥ 50 或距上次 distill ≥ 30 天时，运行 `skills/y3-memory-distill/scripts/distill.py` 生成 INDEX.md + distill 报告，把高频问题反哺到 skill 与 knowledge。蒸馏报告中的候选必须经用户逐条 accept/reject/defer 后落盘。
 </rule>

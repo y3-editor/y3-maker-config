@@ -1,0 +1,77 @@
+[
+  {
+    "pattern": "player:is_playing\\(",
+    "severity": "error",
+    "fix": "player:is_playing() 不存在，改用 player:is_alive() (player.lua:377-381)"
+  },
+  {
+    "pattern": "player:get_ui\\(",
+    "severity": "error",
+    "fix": "Player 对象无 get_ui 方法，改用全局函数 y3.ui.get_ui(player, 'Panel')"
+  },
+  {
+    "pattern": "player:get_res_num\\(",
+    "severity": "error",
+    "fix": "get_res_num 不存在，读金币等资源用 player:get_attr('gold') 或自定义状态表"
+  },
+  {
+    "pattern": ":get_distance\\(",
+    "severity": "error",
+    "fix": "get_distance 不存在，改用 point1:get_distance_with(point2) (point.lua:171-174)"
+  },
+  {
+    "pattern": ":revive\\(",
+    "severity": "error",
+    "fix": "unit:revive() 不存在，改用 unit:reborn(point) (unit.lua:408-414)"
+  },
+  {
+    "pattern": "unit:is_removed\\(",
+    "severity": "error",
+    "fix": "is_removed() 不存在，改用 not unit:is_exist() 或 unit:is_destroyed() (unit.lua:116/2111)"
+  },
+  {
+    "pattern": "unit:add_attribute\\(",
+    "severity": "error",
+    "fix": "add_attribute 是 Item 的方法，单位增减属性用 unit:add_attr(名称, 值, '基础') (unit.lua:698)"
+  },
+  {
+    "pattern": "unit:set_attribute\\(",
+    "severity": "error",
+    "fix": "set_attribute 是 Item 的方法，单位设置属性用 unit:set_attr(...) (unit.lua:724)"
+  },
+  {
+    "pattern": "get_abilities_by_type\\(['\"]",
+    "severity": "error",
+    "fix": "底层 C++ 要求 unsigned int，必须传 y3.const.AbilityType['英雄'] 整数，不接受字符串 (unit.lua:182)"
+  },
+  {
+    "pattern": "remove_ability\\([^,)]*['\"]",
+    "severity": "error",
+    "fix": "底层 C++ 要求 unsigned int，必须传 y3.const.AbilityType['英雄'] 整数，不接受字符串 (unit.lua:251)"
+  },
+  {
+    "pattern": "y3\\.ui\\.set_ui_event_callback\\(",
+    "severity": "error",
+    "fix": "事件绑定方式错误，先 y3.ui.get_ui 获取对象，再 btn:add_fast_event('左键-按下', fn) (ui.lua:115-155)"
+  },
+  {
+    "pattern": "y3\\.point\\.create_point\\(",
+    "severity": "error",
+    "fix": "create_point 不存在，改用 y3.point.create(x, y, z) (point.lua)"
+  },
+  {
+    "pattern": ":move_to\\(",
+    "severity": "warn",
+    "fix": "单位移动用 unit:move_to_pos(point, range)，range 为停止半径常用 50~100 (unit.lua)"
+  },
+  {
+    "pattern": "KeyboardKey\\['KEY_F[0-9]+'\\]",
+    "severity": "warn",
+    "fix": "功能键直接用名称不加 KEY_ 前缀，如 KeyboardKey['F5'] (const.lua:277-350)"
+  },
+  {
+    "pattern": "KeyboardKey\\['[0-9]+'\\]",
+    "severity": "warn",
+    "fix": "数字键必须加 KEY_ 前缀，如 KeyboardKey['KEY_1'] (const.lua:277-350)"
+  }
+]

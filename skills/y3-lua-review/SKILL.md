@@ -22,8 +22,9 @@ description: >
 
 ```
 1. <agent>/rules/api-safety.mdc          ← API 安全规则 + 常见错误速查
-2. <agent>/memory/lua-issues/api_issues.md ← 已知 API 错误模式（当前 10 条）
+2. <agent>/memory/lua-issues/api_issues.md ← 已知 API 错误模式
 3. <agent>/memory/lua-issues/trace_issues.md ← 运行时 trace 错误（如存在）
+4. <agent>/memory/lua-issues/api_blacklist.json ← API 黑名单（正则匹配，自动命中报警）
 ```
 
 > 这些文件是审查的**核心知识库**，包含所有已知错误模式，必须在 Phase 3 中逐一比对。
@@ -54,7 +55,7 @@ description: >
 │  ├── 事件名验证（对照 meta/event.lua）                         │
 │  ├── 事件参数名验证（data.xxx 对照 lua_name）                  │
 │  ├── 参数类型检查（已知类型陷阱）                              │
-│  └── 已知错误模式匹配（api_issues.md 10 条）                   │
+│  └── 已知错误模式匹配（api_issues.md + api_blacklist.json）    │
 │           │                                                     │
 │           ▼                                                     │
 │  Phase 4: 汇总报告 + 修复                                      │
@@ -247,16 +248,18 @@ description: >
 
 ### 3.5 已知错误模式匹配
 
-**逐一匹配 api_issues.md 中的全部错误模式**：
+**A. 黑名单正则扫描（自动，api_blacklist.json）**
 
-```
-对每条 api_issues 记录：
-    1. 提取错误 API 签名（如 "player:is_playing()"）
-    2. 在审查文件中搜索该签名
-    3. 如果匹配 → CRITICAL，引用 "api_issues #N"
-```
+加载 `<agent>/memory/lua-issues/api_blacklist.json`，对每个审查文件逐行正则匹配：
+- 命中 `severity=error` → CRITICAL
+- 命中 `severity=warn` → WARNING
+- 输出时附带 `fix` 建议
 
-**完整匹配表**（基于当前 10 条记录）：
+**B. 语义模式匹配（人工辅助，api_issues.md）**
+
+对 api_issues.md 中不适合正则化的条目（如"调用时机不对""需要 wait_frame"），由审查者读代码上下文判断
+
+**完整匹配表**（基于 blacklist 15 条 + md 补充）：
 
 | # | 搜索模式 | 分级 |
 |---|----------|------|

@@ -102,7 +102,7 @@ IndexError: list index out of range
 > 同样适用于 `import_object_editor`：每次导入后必须用户手动确认，再做后续。
 > 同样适用于任何"开启异步任务后立即同步操作"的 MCP 调用模式。
 
-## �️ Y3 Editor MCP 工具
+## 🛠️ Y3 Editor MCP 工具
 
 | 工具 | 功能 | 注意事项 |
 |------|------|----------|
@@ -112,7 +112,12 @@ IndexError: list index out of range
 | `import_ui` | 导入 .upui | **必须用户手动确认完成后才能继续，详见 §import_ui 串行约束** |
 | `import_object_editor` | 导入物编 | 同上，需用户确认 |
 | `get_editor_log` | 获取编辑器日志 | 调试用 |
-| `download_editor_*_resource` | 下载资源 | 模型/特效/图标/声音 |
+| `download_editor_*_resource` | 下载资源 | 模型/特效/图标/声音，批量 ID 列表 |
+| `import_editor_icon` | 导入本地图片为图标 | 支持 png/jpg/tga/bmp/dds/webp |
+| `import_editor_fbx_model` | 导入 FBX 模型 | 绝对路径 |
+| `import_mdx` | 导入 MDX 模型 | 需提供 war3_path |
+| `get_official_editor_*` | 查询官方资源 | 按 ID 查模型/特效/图标/声音详情 |
+| `get_official_resource_associate_match` | 素材联想 | 按 ID + 类型查配套资源 |
 
 ## 🔄 游戏启动后刷新 y3runtime MCP 连接
 
