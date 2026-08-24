@@ -18,6 +18,7 @@ description: >
 ```
 ../../rules/mcp-rules.mdc     ← MCP 熔断规则
 ../../rules/auto-test.mdc     ← 测试执行纪律（不停、不跳、不问）
+../../memory/lua-issues/api_blacklist.json ← API 黑名单 (15 条，测试执行 Lua 前先正则扫描)
 ```
 
 ---
