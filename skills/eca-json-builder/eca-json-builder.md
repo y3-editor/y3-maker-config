@@ -1,8 +1,8 @@
-# ECA 触发器 JSON 拼接技能
+# ECA 函数与触发器 JSON 拼接技能
 
 ## 概述
 
-在 Y3 编辑器中生成**可见可编辑的全局触发器实例**。
+在 Y3 编辑器中生成**可见可编辑的正式 ECA 函数和全局触发器实例**。
 
 > 不是 ECA 类型注册（那是 `custom_eca/custom_eca.json` 的职责），也不是 AI/NLP 映射修正（那是 `ExternalResource/readable_eca/*.json`）。
 
@@ -12,9 +12,12 @@
 |------|--------|------|
 | `eca_json_helper.py` | `template` / `validate` / `merge` / `normalize-desc` | 触发器生成与校验，零依赖 |
 | `lookup.py` | `--global-events` / `<eca_name>` | 基于内建 `eca_index.json` 查找，**零依赖** |
+| `gen_function.py` | 函数 DSL 文件 / `--dry-run` | 生成项目 ECA 函数并更新函数索引，零依赖 |
+| `gen_trigger.py` | 触发器 DSL 文件 / `--dry-run` | 生成项目全局触发器并更新触发器索引，零依赖 |
 
 ```bash
 py -3 .codemaker\skills\eca-json-builder\eca_json_helper.py template trigger_instance
+py -3 .codemaker\skills\eca-json-builder\eca_json_helper.py template function_instance
 py -3 .codemaker\skills\eca-json-builder\lookup.py <eca_name>
 ```
 
@@ -78,6 +81,150 @@ py -3 .codemaker\skills\eca-json-builder\lookup.py UNIT_DIE
 py -3 .codemaker\skills\eca-json-builder\lookup.py --global-events
 # 列出所有全局可用事件
 ```
+
+---
+
+## 项目正式 ECA 函数
+
+**路径**：`maps/<地图名>/global_trigger/function/<函数名>.json`
+
+项目 ECA 函数不是 `custom_eca/custom_eca.json` 中的类型注册。它是编辑器可见、可被
+`CALL_TRIGGER_FUNC` 调用的函数实例，必须同时满足：
+
+- `is_func=true`，`event=[]`，并声明 `func_id`、`func_name`、`func_category`。
+- 参数写入 `func_param_list`，参数类型由同名局部变量在 `var_data` 中的分组决定。
+- 每个参数名还必须在 `func_des` 中以 `{参数名}` 占位符出现，并放在调用文本的语义位置；
+  例如 `通过口令加入私人副本{副本口令}，返回请求受理结果`。生成器遇到缺失占位符时直接报错。
+- 返回值同时写入 `func_return`、`func_rtv_name_list`，并通过数值动作 `400342` 返回。
+- 文件名写入同目录 `index.txt`；调用方通过稳定的 32 位十六进制 `func_id` 关联。
+
+### 函数 DSL
+
+```json
+{
+  "map": "EntryMap",
+  "functions": [
+    {
+      "name": "大厅服务 - 设置匹配分数",
+      "description": "更新当前玩家的匹配分数为{分数}",
+      "params": [
+        {"name": "分数", "type": "INTEGER", "required": true}
+      ],
+      "returns": [
+        {"name": "result", "type": "TABLE", "var": "t"}
+      ],
+      "lua_bind": true
+    }
+  ]
+}
+```
+
+```bash
+# 只生成到标准输出，不写项目
+py -3 .codemaker\skills\eca-json-builder\gen_function.py <函数DSL.json> --dry-run
+
+# 写入 DSL 中指定的地图
+py -3 .codemaker\skills\eca-json-builder\gen_function.py <函数DSL.json>
+
+# 同一份函数定义写入另一张地图；自动 ID 在不同地图中保持一致
+py -3 .codemaker\skills\eca-json-builder\gen_function.py <函数DSL.json> --map MapName001
+
+# 校验生成结果
+py -3 .codemaker\skills\eca-json-builder\eca_json_helper.py validate \
+  "maps/EntryMap/global_trigger/function/大厅服务 - 设置匹配分数.json"
+```
+
+`lua_bind=true` 会生成以下函数体：
+
+1. `SET_VARIABLE` 把 `Eval_Lua_<返回类型>` 的结果写入局部返回变量。
+2. Lua 代码调用 `Bind['函数名'](args[1], ...)`。
+3. 函数参数按 ECA 类型写入 5 个 `op_arg` 槽并启用对应位置。
+4. 数值动作 `400342` 返回局部变量。
+
+当前 `lua_bind` 模式支持恰好一个返回值，参数最多 5 个；超出限制会直接报错，不生成
+可能被编辑器错误解释的 JSON。省略 `func_id`/`id` 时会按函数名生成稳定 ID；同名函数写入
+多张地图会得到相同 ID。已有调用方依赖某个历史 `func_id` 时，应在 DSL 中显式保留该 ID。
+
+### 在触发器 DSL 中调用函数
+
+```json
+{
+  "call_function": {
+    "func_id": "a1377fd18bfb11f1b9d919bc08ffd172",
+    "args": [
+      {"type": "INTEGER", "value": 1000}
+    ],
+    "returns": [
+      {"var": "立即结果", "type": "TABLE"}
+    ]
+  }
+}
+```
+
+生成器会自动创建 `CALL_TRIGGER_FUNC`、`call_rt_arg_idxes`、返回变量接收槽，以及触发器的
+局部 `var_data` 声明。可选参数放在 `optional_args`；用 `null` 表示该槽不启用。
+
+### TABLE 参数的编辑器兼容结构
+
+编辑器手写样本确认，`TABLE` 参数不能把普通 JSON 对象或列表直接写成
+`{"arg_type":100011,"sub_type":1,"args_list":[{...}]}`。这种结构虽然是合法 JSON，
+但编辑器无法反序列化，会导致触发器不显示并在保存时失败。
+
+生成器遇到函数调用中的一层 TABLE 字面量时，必须展开为以下动作序列：
+
+1. `SET_VARIABLE + GET_NEW_TABLE` 创建局部 TABLE。
+2. 使用 `SET_TABLE_VALUE_1D` 写入键值；列表使用编辑器样本支持的表插入动作。
+3. `CALL_TRIGGER_FUNC` 传入 `arg_type=100011, sub_type="VARIABLE"` 的局部 TABLE 变量。
+4. 临时 TABLE 和返回 TABLE 都必须登记在所属触发器的 `var_data` 中，包括嵌套 `ACTION_LIST` 内创建的变量。
+
+当前不推测嵌套 TABLE 字面量的序列化格式；需要嵌套表时，应先显式声明并构造子 TABLE，
+再把子 TABLE 变量写入父 TABLE。校验器会拒绝残留的普通 JSON 对象/列表 TABLE 字面量。
+
+---
+
+## 生成后加载到 Y3 编辑器
+
+项目函数是触发器的依赖，必须先进入编辑器函数表，再加载引用它们的触发器。当前
+Y3 Editor MCP 的 `import_eca` 只接受 `global_trigger/trigger/` 路径，因此函数加载需要通过
+重新打开地图完成。
+
+当前地图已在编辑器中打开时，使用以下顺序：
+
+1. 在生成任何新 JSON 前调用 `y3editor.save_editor()`，先保存用户当前编辑器修改。
+2. 运行 `gen_function.py`，写入并校验全部函数 JSON 和 `function/index.txt`；核对索引数、
+   文件数以及调用方使用的稳定 `func_id`。
+3. 函数写入后**不要再保存编辑器**。此时编辑器内存仍是旧函数表，调用 `save_editor` 会把
+   刚写入的函数文件和索引覆盖掉。
+4. 调用 `y3editor.restart_editor(save_before_restart=false)`，等待原地图重新打开。重启前的
+   保存必须已经在步骤 1 完成；这里禁止再次保存旧内存。
+5. 地图打开后重新核对函数文件和索引。此时函数加载完成；不含 `sub_trigger` 的普通触发器
+   再逐个、串行调用 `import_eca` 加载。
+6. 动态 `sub_trigger` 使用技能测试目录中的编辑器实际保存样本做整表回归比对，可以由
+   `gen_trigger.py` 写入。此类文件禁止用 `import_eca` 覆盖加载；写入后使用“不保存旧内存重启”，
+   重开后保存一次，并确认 `sub_trigger` 与裸整数注册 ID 仍完整。
+
+当前 MCP 没有独立的 `open_map` 工具。目标地图原本未打开时，不得臆造 MCP 调用；完成函数
+生成后，通过编辑器已有入口打开目标地图，然后从步骤 5 继续。
+
+```text
+y3editor.import_eca(
+  trigger_json_path="D:/.../maps/EntryMap/global_trigger/trigger/示例.json"
+)
+```
+
+触发器加载规则：
+
+1. 函数加载阶段完成后，再逐个、串行调用 `import_eca`，不要并发修改编辑器触发器树。
+2. 以返回值中的 `success=true` 作为编辑器受理依据，并保留 `mode`、`trigger_id`、
+   `hotfix_status` 作为验证证据。
+3. `hotfix_status=已推送` 表示已同步到当前运行时；若为
+   `未连接（仅编辑器侧已更新）`，编辑器加载仍成功，但新开或重启游戏后才会运行完整的新逻辑。
+4. 当前工具参数明确要求路径包含 `global_trigger/trigger/`，因此不能用它导入
+   `global_trigger/function/` 下的函数 JSON。不得使用路径跳转或把函数临时复制到触发器目录；
+   这会绕过工具边界并可能破坏函数分组或 `func_id`。
+5. 当前 `import_eca` 的覆盖路径只更新顶层触发器。若输入含 `sub_trigger`，工具虽然可能返回
+   `success=true`，但编辑器保存时会移除嵌套子触发，留下悬空的裸整数注册 ID。因此这类文件
+   必须使用上面的“不保存重启”流程，且以重启后再次保存仍能通过结构校验作为加载成功依据。
 
 ---
 
@@ -295,6 +442,7 @@ Action 级别示例（NEW_CAMERA_SET_FOLLOW_UNIT 有4个 op_param）：
 | sub_type | 含义 |
 |---|---|
 | `1` | 布尔常量，`args_list: [true]` |
+| `"VARIABLE"` | 布尔变量，`args_list: [{"__tuple__": true, "items": ["BOOLEAN", "变量名", "local"]}]`；编辑器保存的正式函数使用此格式 |
 
 ### ANGLE (100225)
 | sub_type | 含义 |
@@ -462,7 +610,7 @@ Action 级别示例（NEW_CAMERA_SET_FOLLOW_UNIT 有4个 op_param）：
 ]
 ```
 
-- `var_data[0]`: 按类型分组 `{ TYPE: { name: 0 } }`，`NEW_TIMER` 固定保留
+- `var_data[0]`: 按类型分组 `{ TYPE: { name: 0 } }`；只有实际声明计时器变量时才包含 `NEW_TIMER`
 - `var_data[1]`: 按名称索引 `{ name: 0 }`
 - `var_data[2]`: 有序名称列表 `[ name ]`
 
@@ -1064,6 +1212,11 @@ py -3 project_event.py read <project_root> --id <event_id>
 
 文件：`project_custom_event.json`，结构 `{"conf": {"event_id": {...}}, "group_info": [...]}`
 
+全局触发器中的 `RECEIVE_CUSTOM_EVENT` 使用关卡自己的
+`maps/<地图名>/customevent.json`。DSL 可以写事件名称，`gen_trigger.py` 会从
+`group_info` 查找并把最终 `CUS_EVENT` 参数写成整数事件 ID；目标关卡没有该事件或存在重名时，
+生成会直接失败。不要把事件名称字符串写入最终触发器 JSON。
+
 ## 存档系统
 
 ```bash
@@ -1074,3 +1227,72 @@ py -3 archive_reader.py read <project_root> --map <map> --storage --slot RANK
 ```
 
 文件：`maps/<map>/archive/{archive.json, archive_storage.json, mapscore.json}`
+
+---
+
+## 动态子触发 DSL
+
+`gen_trigger.py` 的 trigger DSL 可以构造并写入顶层 `sub_triggers` 数组，也可以用 `--dry-run` 预览；序列化结构以技能测试目录中的编辑器实际保存样本为回归基准，不依赖活动地图中的临时触发器。每个子触发项使用普通 trigger 的字段：`name`、`id`、`event`、`condition`、`action`、`sub_triggers` 等。`id` 建议显式提供；省略时生成器按直接父触发 ID 与子触发名称稳定派生 ID，因此同一 DSL 重跑会得到相同 ID。
+
+父触发或子触发的 action 中可以写：
+
+```json
+{"register_sub_trigger": "子触发名称或ID"}
+```
+
+注册引用只解析同一父触发器下的直接子触发名称或 ID。未知引用、同父级重复名称、同父级重复 ID 都会报错。输出 JSON 中注册 action 会被写成裸整数子触发 ID，与编辑器导出的动态子触发结构一致。
+
+```json
+{
+  "name": "父触发",
+  "id": 2000000001,
+  "event": [["INIT_FINISHED"]],
+  "action": [
+    {
+      "call_function": {
+        "func_id": "a1377fd18bfb11f1b9d919bc08ffd172",
+        "args": [],
+        "returns": [{"var": "T", "type": "TABLE"}]
+      }
+    },
+    {"register_sub_trigger": "按键回调"}
+  ],
+  "sub_triggers": [
+    {
+      "name": "按键回调",
+      "id": 2000000002,
+      "event": [["KEYBOARD_KEY_DOWN_EVENT", 18]],
+      "action": [
+        ["IF_THEN_ELSE",
+          [["STRING_COMPARE",
+            ["GET_STRING_TABLE_VAR_1D", {"var": "T", "type": "TABLE"}, "request_id"],
+            "==",
+            "abc"
+          ]],
+          [
+            ["UNREG_TRIGGER", ["CURRENT_DYNAMIC_TRIGGER_INSTANCE"]]
+          ],
+          []
+        ]
+      ]
+    }
+  ]
+}
+```
+
+生成结构：
+
+- 所有后代子触发递归扁平写入父 JSON 的 `sub_trigger` 字典，键为字符串化子触发 ID。
+- 子触发固定写成配置节点：`enabled=false`、`is_conf=true`、`p_trigger_id` 指向直接父触发 ID。
+- `CONDITION_LIST` 使用编辑器实测的 `arg_type=100021`；每个触发器的首个 `element_id` 从 `trigger_id * 1000000 + 1` 开始；未使用计时器时不自动声明 `NEW_TIMER`。
+- `CONDITION_LIST` 参数会构建 condition 节点，可用于 `IF_THEN_ELSE` 这类动作。
+- `IF_THEN_ELSE` 自动写入编辑器导出结构要求的分支布局标记 `fake_op=[2]`。
+- 生成器内置补齐 `GET_STRING_TABLE_VAR_1D` 定义：`p=["TABLE","STRING"]`、`t=["STRING"]`、`o=[]`，不修改巨大索引 JSON。
+- `STRING_COMPARE` 的 `BOOLEAN_OPERATOR` 参数按实测参考 JSON 使用 `arg_type=100035`。
+
+生命周期约束：
+
+- 动态子触发只由注册 action 激活动态实例，默认不直接启用。
+- 若调用方同步拒绝时不发送完成事件，只能在已受理分支内注册动态子触发（例如先判断立即结果的 `request_id != ""`），避免生成永远无法注销的实例。
+- 回调子触发需要读取父触发的立即结果局部变量时，变量 tuple 仍写 `["TYPE","name","local"]`；父触发 `var_data` 会覆盖子触发引用到的父局部变量，子触发自身 `var_data` 可为空。
+- 回调完成后如需一次性生命周期，使用 `UNREG_TRIGGER(CURRENT_DYNAMIC_TRIGGER_INSTANCE)` 注销当前动态触发实例。

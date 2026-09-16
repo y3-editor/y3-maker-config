@@ -9,6 +9,9 @@ Usage:
 """
 import json, os, sys
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
 INDEX = os.path.join(os.path.dirname(os.path.abspath(__file__)), "eca_index.json")
 
 def _load():

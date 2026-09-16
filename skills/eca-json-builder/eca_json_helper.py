@@ -9,7 +9,7 @@ Subcommands:
   normalize-desc <str>       Normalize describe-format string.
   lookup <eca_name>          Resolve eca_name via eca_index.json (prefer lookup.py).
 
-Stdlib only. Run: py -3 .codemaker\tools\eca_json_helper.py <subcmd> ...
+Stdlib only. Run: py -3 .codemaker\skills\eca-json-builder\eca_json_helper.py <subcmd> ...
 """
 from __future__ import annotations
 
@@ -128,6 +128,76 @@ TEMPLATES = {
         "var_data": [{}, {}, []]
     },
 
+    # --- project ECA function instance (global_trigger/function/*.json) ---
+    "function_instance": {
+        "action": [
+            {
+                "action_type": "SET_VARIABLE",
+                "args_list": [
+                    {
+                        "arg_type": 100030,
+                        "sub_type": 1,
+                        "args_list": [
+                            {"__tuple__": True, "items": ["TABLE", "result", "local"]}
+                        ],
+                    },
+                    {
+                        "arg_type": 100011,
+                        "sub_type": "Eval_Lua_TABLE",
+                        "args_list": [
+                            {"arg_type": 100003, "sub_type": 1, "args_list": ["Bind['示例函数']()"]}
+                        ],
+                        "op_arg": [None, None, None, None, None],
+                        "op_arg_enable": [False, False, False, False, False],
+                    },
+                ],
+                "bp": False,
+                "element_id": 1635176449000002,
+                "enable": True,
+            },
+            {
+                "action_type": 400342,
+                "args_list": [
+                    {
+                        "arg_type": 100011,
+                        "sub_type": "VARIABLE",
+                        "args_list": [
+                            {"__tuple__": True, "items": ["TABLE", "result", "local"]}
+                        ],
+                    }
+                ],
+                "bp": False,
+                "element_id": 1635176449000003,
+                "enable": True,
+            },
+        ],
+        "call_enabled": True,
+        "condition": [],
+        "enabled": True,
+        "event": [],
+        "func_category": "t_function",
+        "func_comment": "",
+        "func_des": "示例函数描述",
+        "func_id": "0123456789abcdef0123456789abcdef",
+        "func_name": "示例函数",
+        "func_return": True,
+        "func_rtv_name_list": [
+            {"__tuple__": True, "items": ["result", "TABLE"]}
+        ],
+        "group_id": 0,
+        "is_func": True,
+        "is_official_func": False,
+        "p_trigger_id": None,
+        "trigger_id": 1635176449,
+        "trigger_name": "示例函数",
+        "valid": True,
+        "var_data": [
+            {"NEW_TIMER": {}, "TABLE": {"result": None}},
+            {"result": 0},
+            ["result"],
+        ],
+    },
+
     # --- trigger element (单节点) ---
     "trigger_event": {
         "event_type": "EVENT_NAME",
@@ -171,7 +241,13 @@ REQUIRED = {
     },
     "trigger_event": {"event_type": str, "args_list": list},
     "trigger_condition": {"condition_type": str, "args_list": list},
-    "trigger_action": {"action_type": str, "args_list": list},
+    "function_instance": {
+        "trigger_name": str, "trigger_id": int,
+        "event": list, "condition": list, "action": list, "var_data": list,
+        "is_func": bool, "func_id": str, "func_name": str,
+        "func_category": str, "is_official_func": bool,
+    },
+    "trigger_action": {"action_type": (str, int), "args_list": list},
     "trigger_arg": {"arg_type": (int, str), "sub_type": (int, str), "args_list": list},
     "op_conf_entry": {
         "eca_name": str,
@@ -194,6 +270,8 @@ REQUIRED = {
 
 def _detect_kind(data):
     if isinstance(data, dict):
+        if data.get("is_func") is True:
+            return "function_instance"
         if "trigger_name" in data and "event" in data:
             return "trigger_instance"
         if "action_type" in data:
@@ -222,42 +300,225 @@ def _check_required(obj, schema, path, errors):
             )
 
 
-def _validate_trigger_element(node, path, errors):
+def _is_func_id(value):
+    return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{32}", value) is not None
+
+
+def _infer_function_dir(file_path):
+    parts = os.path.normpath(os.path.abspath(file_path)).split(os.sep)
+    tail = ["global_trigger", "trigger"]
+    for i in range(len(parts) - len(tail) + 1):
+        if parts[i:i + len(tail)] == tail:
+            return os.sep.join(parts[:i] + ["global_trigger", "function"])
+    return None
+
+
+def _load_map_function_ids(function_dir):
+    if not function_dir or not os.path.isdir(function_dir):
+        return None
+    ids = set()
+    for root, _, files in os.walk(function_dir):
+        for name in files:
+            if not name.lower().endswith(".json"):
+                continue
+            path = os.path.join(root, name)
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+            except (OSError, json.JSONDecodeError):
+                continue
+            func_id = data.get("func_id") if isinstance(data, dict) else None
+            if _is_func_id(func_id):
+                ids.add(func_id)
+    return ids
+
+
+def _collect_sub_trigger_ids(node, errors):
+    sub = node.get("sub_trigger", {})
+    if sub in (None, {}):
+        return set()
+    if not isinstance(sub, dict):
+        errors.append("$.sub_trigger: expect dict")
+        return set()
+    ids = set()
+    for key, child in sub.items():
+        try:
+            tid = int(key)
+        except (TypeError, ValueError):
+            errors.append(f"$.sub_trigger[{key!r}]: key must be integer string")
+            continue
+        if tid in ids:
+            errors.append(f"$.sub_trigger[{key!r}]: duplicate sub_trigger id")
+        ids.add(tid)
+        if isinstance(child, dict):
+            child_tid = child.get("trigger_id")
+            if child_tid is not None and child_tid != tid:
+                errors.append(f"$.sub_trigger[{key!r}].trigger_id: must match sub_trigger key")
+    return ids
+
+
+def _validate_custom_event_arg(node, path, errors):
+    if node.get("event_type") != "RECEIVE_CUSTOM_EVENT":
+        return
+    args = node.get("args_list", [])
+    if not args:
+        errors.append(f"{path}.args_list[0]: RECEIVE_CUSTOM_EVENT requires CUS_EVENT arg")
+        return
+    arg = args[0]
+    if not isinstance(arg, dict):
+        errors.append(f"{path}.args_list[0]: expect trigger_arg for CUS_EVENT")
+        return
+    if arg.get("arg_type") != 100238:
+        errors.append(f"{path}.args_list[0].arg_type: RECEIVE_CUSTOM_EVENT expects 100238")
+    values = arg.get("args_list", [])
+    if not values:
+        errors.append(f"{path}.args_list[0].args_list[0]: RECEIVE_CUSTOM_EVENT requires event id")
+        return
+    if type(values[0]) is not int:
+        errors.append(f"{path}.args_list[0].args_list[0]: RECEIVE_CUSTOM_EVENT event id must be int")
+
+
+def _validate_call_trigger_func(node, path, errors, ctx):
+    if node.get("action_type") != "CALL_TRIGGER_FUNC":
+        return
+    args = node.get("args_list", [])
+    if not args or not isinstance(args[0], dict):
+        errors.append(f"{path}.args_list[0]: CALL_TRIGGER_FUNC requires function arg")
+        return
+    func_arg = args[0]
+    func_id = func_arg.get("sub_type")
+    if not _is_func_id(func_id):
+        errors.append(f"{path}.args_list[0].sub_type: CALL_TRIGGER_FUNC expects 32 lowercase hex func_id string")
+        return
+    top_func_id = node.get("func_id")
+    if top_func_id is not None and not _is_func_id(top_func_id):
+        errors.append(f"{path}.func_id: CALL_TRIGGER_FUNC expects 32 lowercase hex func_id string")
+    if not isinstance(func_arg.get("sub_type"), str):
+        errors.append(f"{path}.args_list[0].sub_type: CALL_TRIGGER_FUNC expects string sub_type")
+    known = ctx.get("function_ids") if ctx else None
+    if known is not None and func_id not in known:
+        errors.append(f"{path}.args_list[0].sub_type: func_id not found in map function JSON: {func_id}")
+
+
+def _is_plain_json_table_literal(value):
+    if isinstance(value, list):
+        return True
+    if not isinstance(value, dict):
+        return False
+    if value.get("__tuple__") is True:
+        return False
+    eca_keys = {"arg_type", "action_type", "condition_type", "event_type"}
+    return not any(key in value for key in eca_keys)
+
+
+def _validate_table_literal_arg(node, path, errors):
+    if node.get("arg_type") != 100011 or node.get("sub_type") != 1:
+        return
+    for i, value in enumerate(node.get("args_list", [])):
+        if _is_plain_json_table_literal(value):
+            errors.append(
+                f"{path}.args_list[{i}]: TABLE literal JSON object/list is not editor-compatible; "
+                "build a TABLE variable with GET_NEW_TABLE/SET_TABLE_VALUE or use a TABLE-returning sub_type"
+            )
+
+
+def _validate_optional_args(node, path, errors):
+    op_args = node.get("op_arg")
+    enabled = node.get("op_arg_enable")
+    if op_args is None and enabled is None:
+        return
+    if not isinstance(op_args, list):
+        errors.append(f"{path}.op_arg: expect list")
+        return
+    if not isinstance(enabled, list):
+        errors.append(f"{path}.op_arg_enable: expect list")
+        return
+    if len(op_args) != len(enabled):
+        errors.append(f"{path}: op_arg and op_arg_enable lengths must match")
+    for i, is_enabled in enumerate(enabled):
+        if type(is_enabled) is not bool:
+            errors.append(f"{path}.op_arg_enable[{i}]: expect bool")
+        elif is_enabled and (i >= len(op_args) or op_args[i] is None):
+            errors.append(f"{path}.op_arg[{i}]: enabled optional argument must not be null")
+
+
+def _validate_trigger_element(node, path, errors, ctx=None):
     if not isinstance(node, dict):
         return
     kind = _detect_kind(node)
-    if kind == "trigger_instance":
-        _check_required(node, REQUIRED["trigger_instance"], path, errors)
-        for i, ev in enumerate(node.get("event", [])):
-            _validate_trigger_element(ev, f"{path}.event[{i}]", errors)
-        for i, cond in enumerate(node.get("condition", [])):
-            _validate_trigger_element(cond, f"{path}.condition[{i}]", errors)
+    if kind == "function_instance":
+        _check_required(node, REQUIRED["function_instance"], path, errors)
+        if node.get("event"):
+            errors.append(f"{path}.event: ECA function must not declare events")
+        func_id = node.get("func_id")
+        if isinstance(func_id, str) and not re.fullmatch(r"[0-9a-f]{32}", func_id):
+            errors.append(f"{path}.func_id: expect 32 lowercase hex characters")
+        if node.get("func_name") != node.get("trigger_name"):
+            errors.append(f"{path}: func_name and trigger_name must match")
+        returns = node.get("func_rtv_name_list", [])
+        if bool(returns) != bool(node.get("func_return", False)):
+            errors.append(f"{path}: func_return must match func_rtv_name_list")
+        if len(node.get("var_data", [])) != 3:
+            errors.append(f"{path}.var_data: expect [by_type, by_name, ordered_names]")
         for i, act in enumerate(node.get("action", [])):
-            _validate_trigger_element(act, f"{path}.action[{i}]", errors)
+            _validate_trigger_element(act, f"{path}.action[{i}]", errors, ctx)
+    elif kind == "trigger_instance":
+        _check_required(node, REQUIRED["trigger_instance"], path, errors)
+        if path == "$":
+            if ctx is None:
+                ctx = {}
+            ctx.setdefault("sub_trigger_ids", _collect_sub_trigger_ids(node, errors))
+        for i, ev in enumerate(node.get("event", [])):
+            _validate_trigger_element(ev, f"{path}.event[{i}]", errors, ctx)
+        for i, cond in enumerate(node.get("condition", [])):
+            _validate_trigger_element(cond, f"{path}.condition[{i}]", errors, ctx)
+        for i, act in enumerate(node.get("action", [])):
+            if type(act) is int:
+                refs = ctx.get("sub_trigger_ids", set()) if ctx else set()
+                if act not in refs:
+                    errors.append(f"{path}.action[{i}]: sub_trigger reference not found: {act}")
+            _validate_trigger_element(act, f"{path}.action[{i}]", errors, ctx)
+        sub = node.get("sub_trigger", {})
+        if isinstance(sub, dict):
+            for key, child in sub.items():
+                if isinstance(child, dict):
+                    parent_id = child.get("p_trigger_id")
+                    if parent_id is not None and parent_id != node.get("trigger_id"):
+                        refs = ctx.get("sub_trigger_ids", set()) if ctx else set()
+                        if parent_id not in refs:
+                            errors.append(f"{path}.sub_trigger[{key!r}].p_trigger_id: parent trigger not found")
+                    _validate_trigger_element(child, f"{path}.sub_trigger[{key!r}]", errors, ctx)
+                else:
+                    errors.append(f"{path}.sub_trigger[{key!r}]: expect trigger instance")
     elif kind == "trigger_action":
         _check_required(node, REQUIRED["trigger_action"], path, errors)
+        _validate_call_trigger_func(node, path, errors, ctx)
+        _validate_optional_args(node, path, errors)
         for i, a in enumerate(node.get("args_list", [])):
-            _validate_trigger_element(a, f"{path}.args_list[{i}]", errors)
+            _validate_trigger_element(a, f"{path}.args_list[{i}]", errors, ctx)
         for i, a in enumerate(node.get("op_arg", []) or []):
-            _validate_trigger_element(a, f"{path}.op_arg[{i}]", errors)
+            _validate_trigger_element(a, f"{path}.op_arg[{i}]", errors, ctx)
     elif kind == "trigger_condition":
         _check_required(node, REQUIRED["trigger_condition"], path, errors)
         for i, a in enumerate(node.get("args_list", [])):
-            _validate_trigger_element(a, f"{path}.args_list[{i}]", errors)
+            _validate_trigger_element(a, f"{path}.args_list[{i}]", errors, ctx)
     elif kind == "trigger_event":
         _check_required(node, REQUIRED["trigger_event"], path, errors)
+        _validate_custom_event_arg(node, path, errors)
         for i, a in enumerate(node.get("args_list", [])):
-            _validate_trigger_element(a, f"{path}.args_list[{i}]", errors)
+            _validate_trigger_element(a, f"{path}.args_list[{i}]", errors, ctx)
     elif kind == "trigger_arg":
         _check_required(node, REQUIRED["trigger_arg"], path, errors)
         if not isinstance(node.get("arg_type"), (int, str)):
             errors.append(f"{path}.arg_type: expect int|str")
         if not isinstance(node.get("sub_type"), (int, str)):
             errors.append(f"{path}.sub_type: expect int|str")
+        _validate_table_literal_arg(node, path, errors)
+        _validate_optional_args(node, path, errors)
         for i, a in enumerate(node.get("args_list", [])):
-            _validate_trigger_element(a, f"{path}.args_list[{i}]", errors)
+            _validate_trigger_element(a, f"{path}.args_list[{i}]", errors, ctx)
         for i, a in enumerate(node.get("op_arg", []) or []):
-            _validate_trigger_element(a, f"{path}.op_arg[{i}]", errors)
+            _validate_trigger_element(a, f"{path}.op_arg[{i}]", errors, ctx)
 
 
 def _validate_op_conf(data, errors):
@@ -334,10 +595,11 @@ def cmd_validate(args):
         data = json.load(f)
     errors = []
     kind = args.kind or _guess_file_kind(args.file, data)
-    if kind == "trigger_instance":
-        _validate_trigger_element(data, "$", errors)
+    ctx = {"function_ids": _load_map_function_ids(_infer_function_dir(args.file))}
+    if kind in ("trigger_instance", "function_instance"):
+        _validate_trigger_element(data, "$", errors, ctx)
     elif kind == "trigger_element":
-        _validate_trigger_element(data, "$", errors)
+        _validate_trigger_element(data, "$", errors, ctx)
     elif kind == "op_conf":
         _validate_op_conf(data, errors)
     elif kind == "func_dict":
@@ -368,6 +630,8 @@ def _guess_file_kind(path, data):
                "arg_type.json", "sub_type.json", "sub_type_prefab.json"):
         return "mapper"
     if isinstance(data, dict):
+        if data.get("is_func") is True:
+            return "function_instance"
         if "trigger_name" in data and "event" in data:
             return "trigger_instance"
         if (
@@ -477,7 +741,7 @@ def main(argv=None):
     p_v.add_argument("file")
     p_v.add_argument(
         "--kind",
-        choices=("trigger_instance", "trigger_element", "op_conf", "func_dict", "custom_eca", "mapper"),
+        choices=("trigger_instance", "function_instance", "trigger_element", "op_conf", "func_dict", "custom_eca", "mapper"),
     )
     p_v.set_defaults(func=cmd_validate)
 

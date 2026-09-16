@@ -23,12 +23,23 @@ Args are inferred from eca_index.json `param` field:
   - Nested list [func_name, *sub_args] → sub_type=func_name (functional sub_type)
   - {"var": "name", "type": "UNIT_ENTITY"} → variable reference
 
+Custom ECA functions use a structured action so return targets remain explicit:
+  {"call_function": {
+    "func_id": "32-char-hex-id",
+    "args": [{"type": "INTEGER", "value": 1000}],
+    "returns": [{"var": "result", "type": "TABLE"}]
+  }}
+
 Run:
   py -3 gen_trigger.py <dsl.json>            # write to maps/<map>/global_trigger/trigger/
   py -3 gen_trigger.py <dsl.json> --dry-run  # print to stdout
 """
 from __future__ import annotations
 import argparse, json, os, sys
+import zlib
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 SKILL_DIR = os.path.dirname(os.path.abspath(__file__))
 INDEX_PATH = os.path.join(SKILL_DIR, "eca_index.json")
@@ -66,7 +77,7 @@ ARG_TYPE_ID = {
     "PROJECTILE_ENTITY": 100010,
     "PROJECTILE": 100031,
     "NEW_TIMER": 100181,
-    "DAMAGE_TYPE": 100238,
+    "DAMAGE_TYPE": 100064,
     "ABILITY_NAME": 100046,   # shares same ID as MODIFIER_KEY
     "ITEM_ENTITY": 100021,
     "ITEM_NAME": 100116,       # shares with UNIT_NAME
@@ -80,13 +91,14 @@ ARG_TYPE_ID = {
     "UI_PREFAB_INSTANCE": 100301,
     "MODIFIER": 100046,
     "VARIABLE": 100077,
-    "CONDITION_LIST": 100023,
-    "CUS_EVENT": 100008,
+    "CONDITION_LIST": 100021,
+    "CUS_EVENT": 100238,
+    "CUS_PARAM": 100240,
     "ABILITY_FLOAT_ATTRS": 100042,
     "ABILITY_INT_ATTRS": 100042,
     "EVENT_UNIT": 100006,
     "UNIT_TYPE": 100116,
-    "BOOLEAN_OPERATOR": 100015,
+    "BOOLEAN_OPERATOR": 100035,
     "ABILITY_CAST_TYPE": 100042,
     "ABILITY_TYPE": 100014,
     "ABILITY_EVENT": 100008,
@@ -111,10 +123,23 @@ ARG_TYPE_ID = {
 
 SLIM_PATH = os.path.join(SKILL_DIR, "eca_index_slim.json")
 
+BUILTIN_INDEX_PATCH = {
+    "IF_THEN_ELSE": {"p": ["CONDITION_LIST", "ACTION_LIST", "ACTION_LIST"], "t": ["ACTION"], "s": "t_base", "o": []},
+    "STRING_COMPARE": {"p": ["STRING", "BOOLEAN_OPERATOR", "STRING"], "t": ["COND", "BOOLEAN"], "s": "t_base", "o": []},
+    "GET_STRING_TABLE_VAR_1D": {"p": ["TABLE", "STRING"], "t": ["STRING"], "s": "t_table", "o": []},
+    "GET_NEW_TABLE": {"p": [], "t": ["TABLE"], "s": "t_table", "o": []},
+    "SET_TABLE_VALUE_1D": {"p": ["TABLE", "[INTEGER,STRING]", "TABLE_VAR"], "t": ["ACTION"], "s": "t_table", "o": []},
+    "UNREG_TRIGGER": {"p": ["DYNAMIC_TRIGGER_INSTANCE"], "t": ["ACTION"], "s": "t_base", "o": []},
+    "CURRENT_DYNAMIC_TRIGGER_INSTANCE": {"p": [], "t": ["DYNAMIC_TRIGGER_INSTANCE"], "s": "t_base", "o": []},
+}
+
 def load_index():
     path = SLIM_PATH if os.path.isfile(SLIM_PATH) else INDEX_PATH
     with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
+        idx_data = json.load(f)
+    for name, entry in BUILTIN_INDEX_PATCH.items():
+        idx_data.setdefault(name, entry)
+    return idx_data
 
 
 def first_param_type(param_str):
@@ -126,6 +151,17 @@ def first_param_type(param_str):
         if sep in s:
             s = s.split(sep)[0].strip()
     return s
+
+
+def param_type_choices(param_str):
+    """Return all type alternatives from '[INTEGER,STRING]' / 'FLOAT,INTEGER'."""
+    s = param_str.strip()
+    if s.startswith("[") and s.endswith("]"):
+        s = s[1:-1]
+    for sep in (",", "/"):
+        if sep in s:
+            return [part.strip() for part in s.split(sep) if part.strip()]
+    return [s]
 
 
 # Generic types whose actual arg_type must be inferred from the value
@@ -154,9 +190,16 @@ def infer_type_from_value(value, idx_data):
 
 
 def arg_type_id_for(type_name, value=None, idx_data=None):
-    t = first_param_type(type_name)
-    if t in GENERIC_TYPES and value is not None and idx_data is not None:
-        t = first_param_type(infer_type_from_value(value, idx_data))
+    choices = param_type_choices(type_name)
+    t = choices[0]
+    if value is not None and idx_data is not None:
+        inferred = first_param_type(infer_type_from_value(value, idx_data))
+        if len(choices) > 1 and inferred in choices:
+            t = inferred
+        elif t == "TABLE_VAR":
+            t = inferred
+        elif t in GENERIC_TYPES:
+            t = inferred
     # VAR itself may be another generic resolution needed
     if t in GENERIC_TYPES:
         # Ultimate fallback: use value dict's "type" field if var ref
@@ -194,10 +237,10 @@ def _build_custom_func_arg(value, idx_data, eid_gen):
         "arg_type": 100177,
         "sub_type": func_name,
         "args_list": sub_args,
+        "op_arg": [],
+        "op_arg_enable": [],
     }
     if dsl_op and dsl_op.get("op_arg"):
-        node["op_arg"] = []
-        node["op_arg_enable"] = []
         for op_val in dsl_op["op_arg"]:
             node["op_arg"].append(build_arg(op_val, "VAR", idx_data, eid_gen))
             node["op_arg_enable"].append(True)
@@ -208,8 +251,52 @@ def _build_custom_func_arg(value, idx_data, eid_gen):
 # instead of their direct type code
 SIMPLE_VAR_TYPES = {"FLOAT", "INTEGER", "BOOLEAN", "STRING", "ANGLE"}
 
+VARIABLE_READ_SUBTYPE = {
+    "FLOAT": 2,
+    "BOOLEAN": 2,
+    "INTEGER": 6,
+    "STRING": 2,
+    "ANGLE": 2,
+    "TABLE": "VARIABLE",
+    "PLAYER": "VARIABLE",
+}
 
-def build_arg(value, expected_type, idx_data, eid_gen):
+
+def _variable_tuple(var_type, name, scope, use_tuple=True):
+    items = [var_type, name, scope]
+    if use_tuple:
+        return {"__tuple__": True, "items": items}
+    return items
+
+
+def build_variable_arg(value, expected_type, idx_data, write_target=False):
+    """Build a global-trigger variable reference using editor-compatible tuples."""
+    var_type = value.get("type", first_param_type(expected_type))
+    if var_type in GENERIC_TYPES or var_type not in ARG_TYPE_ID:
+        var_type = value.get("type", "UNIT_ENTITY")
+    scope = value.get("scope", "local")
+    use_tuple = value.get("tuple", True)
+    ref = _variable_tuple(var_type, value["var"], scope, use_tuple)
+
+    if write_target or value.get("write", False):
+        return {
+            "arg_type": 100030,
+            "sub_type": 1,
+            "args_list": [ref],
+        }
+
+    override_sub_type = value.get("sub_type", value.get("_sub_type"))
+    sub_type = override_sub_type
+    if sub_type is None:
+        sub_type = VARIABLE_READ_SUBTYPE.get(var_type, 11)
+    return {
+        "arg_type": ARG_TYPE_ID.get(var_type, arg_type_id_for(expected_type, value, idx_data)),
+        "sub_type": sub_type,
+        "args_list": [ref],
+    }
+
+
+def build_arg(value, expected_type, idx_data, eid_gen, sub_trigger_refs=None):
     """Build a single arg node from DSL value."""
     # Custom trigger function (hex UUID) — handle before expected_type inference
     if isinstance(value, list) and len(value) >= 1 and isinstance(value[0], str):
@@ -220,26 +307,17 @@ def build_arg(value, expected_type, idx_data, eid_gen):
 
     # Variable reference: {"var": "unit", "type": "UNIT_ENTITY"}
     if isinstance(value, dict) and "var" in value:
-        var_type = value.get("type", "UNIT_ENTITY")
-        scope = value.get("scope", "local")
-        override_sub_type = value.get("_sub_type")  # e.g. "VARIABLE"
-        if override_sub_type:
-            return {
-                "arg_type": arg_type,
-                "sub_type": override_sub_type,
-                "args_list": [[var_type, value["var"], scope]],
-            }
-        # Simple types use arg_type=100030 with sub_type=1 for write-target context
-        if var_type in SIMPLE_VAR_TYPES:
-            return {
-                "arg_type": 100030,
-                "sub_type": 1,
-                "args_list": [[var_type, value["var"], scope]],
-            }
+        return build_variable_arg(value, expected_type, idx_data)
+
+    # CONDITION_LIST: nested condition nodes
+    if expected_type == "CONDITION_LIST":
+        if not isinstance(value, list):
+            raise ValueError(f"CONDITION_LIST expects list, got {type(value)}")
+        nested = [build_condition(c, idx_data, eid_gen, sub_trigger_refs) for c in value]
         return {
             "arg_type": arg_type,
-            "sub_type": 11,
-            "args_list": [[var_type, value["var"], scope]],
+            "sub_type": 1,
+            "args_list": nested,
         }
 
     # Functional sub_type: ["FUNC_NAME", arg1, arg2, ..., OP_ARG_DICT?]
@@ -254,7 +332,7 @@ def build_arg(value, expected_type, idx_data, eid_gen):
         sub_args = []
         for i, sub_val in enumerate(raw_args):
             sub_type_name = func_def["p"][i] if i < len(func_def["p"]) else "STRING"
-            sub_args.append(build_arg(sub_val, sub_type_name, idx_data, eid_gen))
+            sub_args.append(build_arg(sub_val, sub_type_name, idx_data, eid_gen, sub_trigger_refs))
         node = {
             "arg_type": arg_type,
             "sub_type": func_name,
@@ -272,7 +350,7 @@ def build_arg(value, expected_type, idx_data, eid_gen):
             for i, op_val in enumerate(dsl_op["op_arg"]):
                 if i < len(node["op_arg"]):
                     if isinstance(op_val, list) and op_val and isinstance(op_val[0], str) and op_val[0] in idx_data:
-                        node["op_arg"][i] = build_arg(op_val, "VAR", idx_data, eid_gen)
+                        node["op_arg"][i] = build_arg(op_val, "VAR", idx_data, eid_gen, sub_trigger_refs)
                         node["op_arg_enable"][i] = True
         return node
 
@@ -280,12 +358,29 @@ def build_arg(value, expected_type, idx_data, eid_gen):
     if expected_type == "ACTION_LIST":
         if not isinstance(value, list):
             raise ValueError(f"ACTION_LIST expects list, got {type(value)}")
-        nested = [build_action(a, idx_data, eid_gen) for a in value]
+        nested = []
+        for action in value:
+            built = build_action(action, idx_data, eid_gen, sub_trigger_refs)
+            if isinstance(built, list):
+                nested.extend(built)
+            else:
+                nested.append(built)
         return {
             "arg_type": arg_type,
             "sub_type": 1,
             "args_list": nested,
         }
+
+    if isinstance(value, dict):
+        raise ValueError(
+            "dict literal cannot be serialized as an ECA argument directly; "
+            "use a variable reference or a call_function TABLE literal"
+        )
+    if isinstance(value, list):
+        raise ValueError(
+            "list literal cannot be serialized as an ECA argument directly; "
+            "use a supported ECA function expression or a variable reference"
+        )
 
     # Literal
     return {
@@ -295,11 +390,52 @@ def build_arg(value, expected_type, idx_data, eid_gen):
     }
 
 
+def load_custom_event_name_map(project_root, map_name):
+    path = os.path.join(project_root, "maps", map_name, "customevent.json")
+    if not os.path.isfile(path):
+        return {}
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    names = {}
+    for item in data.get("group_info", []):
+        if isinstance(item, dict) and item.get("__tuple__") and isinstance(item.get("items"), list):
+            values = item["items"]
+        elif isinstance(item, list):
+            values = item
+        else:
+            continue
+        if len(values) < 2:
+            continue
+        event_id, event_name = values[0], values[1]
+        if not isinstance(event_id, int) or not isinstance(event_name, str):
+            continue
+        names.setdefault(event_name, set()).add(event_id)
+    return {name: sorted(ids) for name, ids in names.items()}
+
+
+def resolve_custom_event_value(value, custom_event_ids):
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str) and value.isdigit():
+        return int(value)
+    if not isinstance(value, str):
+        return value
+    if custom_event_ids is None:
+        raise ValueError(f"custom event name requires map customevent.json: {value!r}")
+    matches = custom_event_ids.get(value, [])
+    if not matches:
+        raise ValueError(f"unknown custom event name: {value!r}")
+    if len(matches) > 1:
+        raise ValueError(f"ambiguous custom event name: {value!r} -> {matches}")
+    return matches[0]
+
+
 # ---------------------------------------------------------------------------
 # Element builders
 # ---------------------------------------------------------------------------
 
-def eid_factory(trigger_id, start=2):
+def eid_factory(trigger_id, start=1):
     counter = [start]
     def gen():
         v = trigger_id * 1000000 + counter[0]
@@ -308,7 +444,7 @@ def eid_factory(trigger_id, start=2):
     return gen
 
 
-def build_event(spec, idx_data, eid_gen):
+def build_event(spec, idx_data, eid_gen, custom_event_ids=None):
     if not isinstance(spec, list) or not spec:
         return {"event_type": "UNKNOWN", "element_id": eid_gen(), "enable": True, "args_list": []}
     name = spec[0]
@@ -319,6 +455,8 @@ def build_event(spec, idx_data, eid_gen):
     args = []
     for i, val in enumerate(spec[1:]):
         ft = params[i] if i < len(params) else "VAR"
+        if name == "RECEIVE_CUSTOM_EVENT" and first_param_type(ft) == "CUS_EVENT":
+            val = resolve_custom_event_value(val, custom_event_ids)
         args.append(build_arg(val, ft, idx_data, eid_gen))
     node = {
         "event_type": name,
@@ -333,7 +471,7 @@ def build_event(spec, idx_data, eid_gen):
     return node
 
 
-def build_condition(spec, idx_data, eid_gen):
+def build_condition(spec, idx_data, eid_gen, sub_trigger_refs=None):
     name = spec[0]
     if name not in idx_data:
         raise ValueError(f"unknown condition '{name}'")
@@ -342,7 +480,7 @@ def build_condition(spec, idx_data, eid_gen):
     args = []
     for i, val in enumerate(spec[1:]):
         ft = params[i] if i < len(params) else "VAR"
-        args.append(build_arg(val, ft, idx_data, eid_gen))
+        args.append(build_arg(val, ft, idx_data, eid_gen, sub_trigger_refs))
     node = {
         "condition_type": name,
         "element_id": eid_gen(),
@@ -356,7 +494,125 @@ def build_condition(spec, idx_data, eid_gen):
     return node
 
 
-def build_action(spec, idx_data, eid_gen):
+def _is_table_literal_arg(spec):
+    return (
+        isinstance(spec, dict)
+        and spec.get("type") == "TABLE"
+        and isinstance(spec.get("value"), dict)
+    )
+
+
+def _table_temp_var_name(func_id, arg_index, optional=False):
+    kind = "op" if optional else "arg"
+    return f"__table_{func_id[:8]}_{kind}_{arg_index + 1}"
+
+
+def _build_table_literal_actions(var_name, values, idx_data, eid_gen):
+    actions = [
+        build_action(
+            ["SET_VARIABLE", {"var": var_name, "type": "TABLE"}, ["GET_NEW_TABLE"]],
+            idx_data,
+            eid_gen,
+        )
+    ]
+    for key, value in values.items():
+        if isinstance(value, (dict, list)):
+            raise ValueError(
+                "nested TABLE literal is not supported; "
+                "use a predeclared TABLE variable or simplify the DSL"
+            )
+        actions.append(
+            build_action(
+                ["SET_TABLE_VALUE_1D", {"var": var_name, "type": "TABLE"}, key, value],
+                idx_data,
+                eid_gen,
+            )
+        )
+    return actions
+
+
+def _build_typed_call_arg(spec, idx_data, eid_gen):
+    if isinstance(spec, dict) and "value" in spec and "type" in spec:
+        if spec["type"] == "TABLE" and isinstance(spec["value"], (dict, list)):
+            raise ValueError("TABLE literal must be expanded before building CALL_TRIGGER_FUNC")
+        return build_arg(spec["value"], spec["type"], idx_data, eid_gen)
+    if isinstance(spec, dict) and "var" in spec and "type" in spec:
+        return build_arg(spec, spec["type"], idx_data, eid_gen)
+    return build_arg(spec, "VAR", idx_data, eid_gen)
+
+
+def build_function_call(spec, idx_data, eid_gen):
+    """Build CALL_TRIGGER_FUNC with typed inputs and explicit return targets."""
+    call = spec.get("call_function", spec)
+    func_id = call.get("func_id", call.get("id"))
+    if not isinstance(func_id, str) or not _is_hex_uuid(func_id):
+        raise ValueError("call_function.func_id must be a 32-character lowercase hex id")
+
+    prelude_actions = []
+    input_args = []
+    for i, value in enumerate(call.get("args", [])):
+        if _is_table_literal_arg(value):
+            var_name = _table_temp_var_name(func_id, i)
+            prelude_actions.extend(_build_table_literal_actions(var_name, value["value"], idx_data, eid_gen))
+            input_args.append(build_arg({"var": var_name, "type": "TABLE"}, "TABLE", idx_data, eid_gen))
+        else:
+            input_args.append(_build_typed_call_arg(value, idx_data, eid_gen))
+
+    call_arg = {
+        "arg_type": 100177,
+        "sub_type": func_id,
+        "args_list": input_args,
+        "op_arg": [],
+        "op_arg_enable": [],
+    }
+    for i, value in enumerate(call.get("optional_args", [])):
+        if value is None:
+            call_arg["op_arg"].append(None)
+            call_arg["op_arg_enable"].append(False)
+        elif _is_table_literal_arg(value):
+            var_name = _table_temp_var_name(func_id, i, optional=True)
+            prelude_actions.extend(_build_table_literal_actions(var_name, value["value"], idx_data, eid_gen))
+            call_arg["op_arg"].append(build_arg({"var": var_name, "type": "TABLE"}, "TABLE", idx_data, eid_gen))
+            call_arg["op_arg_enable"].append(True)
+        else:
+            call_arg["op_arg"].append(_build_typed_call_arg(value, idx_data, eid_gen))
+            call_arg["op_arg_enable"].append(True)
+
+    output_args = []
+    for target in call.get("returns", []):
+        if not isinstance(target, dict) or "var" not in target or "type" not in target:
+            raise ValueError("call_function.returns entries require 'var' and 'type'")
+        output_args.append(build_variable_arg(target, target["type"], idx_data, write_target=False))
+
+    call_action = {
+        "action_type": "CALL_TRIGGER_FUNC",
+        "args_list": [call_arg, *output_args],
+        "bp": call.get("bp", False),
+        "call_rt_arg_idxes": list(range(len(output_args))),
+        "element_id": eid_gen(),
+        "enable": call.get("enable", True),
+    }
+    if prelude_actions:
+        return [*prelude_actions, call_action]
+    return call_action
+
+
+def resolve_sub_trigger_ref(ref, sub_trigger_refs):
+    if sub_trigger_refs is None:
+        raise ValueError("register_sub_trigger is only valid inside build_trigger")
+    key = ref
+    if isinstance(ref, str) and ref.isdigit():
+        key = int(ref)
+    if key not in sub_trigger_refs:
+        raise ValueError(f"unknown sub_trigger reference: {ref!r}")
+    return sub_trigger_refs[key]
+
+
+def build_action(spec, idx_data, eid_gen, sub_trigger_refs=None):
+    if isinstance(spec, dict) and "call_function" in spec:
+        return build_function_call(spec, idx_data, eid_gen)
+    if isinstance(spec, dict) and "register_sub_trigger" in spec:
+        return resolve_sub_trigger_ref(spec["register_sub_trigger"], sub_trigger_refs)
     if not isinstance(spec, list) or not spec:
         return {"action_type": "UNKNOWN", "element_id": eid_gen(), "enable": True, "bp": False, "args_list": []}
     name = spec[0]
@@ -365,7 +621,7 @@ def build_action(spec, idx_data, eid_gen):
         node = {"action_type": name, "element_id": eid_gen(), "enable": True, "bp": False, "args_list": []}
         raw = list(spec[1:])
         for val in raw:
-            node["args_list"].append(build_arg(val, "VAR", idx_data, eid_gen))
+            node["args_list"].append(build_arg(val, "VAR", idx_data, eid_gen, sub_trigger_refs))
         return node
     if name not in idx_data:
         raise ValueError(f"unknown action '{name}'")
@@ -388,7 +644,10 @@ def build_action(spec, idx_data, eid_gen):
     args = []
     for i, val in enumerate(raw):
         fallback_type = params[i] if i < len(params) else "VAR"
-        args.append(build_arg(val, fallback_type, idx_data, eid_gen))
+        if name == "SET_VARIABLE" and i == 0 and isinstance(val, dict) and "var" in val:
+            args.append(build_variable_arg(val, fallback_type, idx_data, write_target=True))
+        else:
+            args.append(build_arg(val, fallback_type, idx_data, eid_gen, sub_trigger_refs))
     node = {
         "action_type": name,
         "element_id": eid_gen(),
@@ -396,6 +655,9 @@ def build_action(spec, idx_data, eid_gen):
         "bp": extra.get("bp", False),
         "args_list": args,
     }
+    if name == "IF_THEN_ELSE":
+        # Editor-authored IF nodes always carry this branch-layout marker.
+        node["fake_op"] = [2]
     if "call_rt_arg_idxes" in extra:
         node["call_rt_arg_idxes"] = extra["call_rt_arg_idxes"]
     op_params = entry.get("o", [])
@@ -405,32 +667,82 @@ def build_action(spec, idx_data, eid_gen):
     return node
 
 
+def build_action_list(actions, idx_data, eid_gen, sub_trigger_refs=None):
+    built_actions = []
+    for action in actions:
+        built = build_action(action, idx_data, eid_gen, sub_trigger_refs)
+        if isinstance(built, list):
+            built_actions.extend(built)
+        else:
+            built_actions.append(built)
+    return built_actions
+
+
 # ---------------------------------------------------------------------------
 # Trigger builder
 # ---------------------------------------------------------------------------
 
-def collect_variables(specs):
+def collect_variables(specs, include_sub_triggers=False, collect_reads=True):
     """Walk all event/condition/action specs and collect LOCAL variable declarations.
     Global-scoped variables are skipped (declared in globaltriggervariable.json)."""
     vars_found = {}  # name -> type
 
-    def walk(items):
-        for item in items:
-            if not isinstance(item, list) or not item:
-                continue
-            name = item[0]
-            if name == "SET_VARIABLE" and len(item) >= 2:
-                arg = item[1]
-                if isinstance(arg, dict) and "var" in arg:
-                    if arg.get("scope", "local") != "global":
-                        vars_found[arg["var"]] = arg.get("type", "UNIT_ENTITY")
-            for val in item[1:]:
-                if isinstance(val, list) and val and isinstance(val[0], str):
-                    walk(val)
+    def collect_var(value):
+        if isinstance(value, dict) and "var" in value and value.get("scope", "local") != "global":
+            vars_found[value["var"]] = value.get("type", "UNIT_ENTITY")
+
+    def collect_call_function(action, read_ok=True):
+        call = action["call_function"]
+        func_id = call.get("func_id", call.get("id", ""))
+        for i, value in enumerate(call.get("args", [])):
+            if _is_table_literal_arg(value):
+                vars_found[_table_temp_var_name(func_id, i)] = "TABLE"
+            walk(value, read_ok)
+        for i, value in enumerate(call.get("optional_args", [])):
+            if _is_table_literal_arg(value):
+                vars_found[_table_temp_var_name(func_id, i, optional=True)] = "TABLE"
+            walk(value, read_ok)
+        for target in call.get("returns", []):
+            collect_var(target)
+
+    def walk(value, read_ok=True):
+        if isinstance(value, dict):
+            if "call_function" in value:
+                collect_call_function(value, read_ok)
+                return
+            if "var" in value:
+                if read_ok or value.get("declare", False):
+                    collect_var(value)
+                return
+            for child in value.values():
+                walk(child, read_ok)
+        elif isinstance(value, list):
+            for child in value:
+                walk(child, read_ok)
+
+    def walk_action(action, read_ok=True):
+        if isinstance(action, dict) and "register_sub_trigger" in action:
+            return
+        if isinstance(action, dict) and "call_function" in action:
+            collect_call_function(action, read_ok)
+            return
+        if isinstance(action, list) and action:
+            if action[0] == "SET_VARIABLE" and len(action) > 1:
+                collect_var(action[1])
+                for child in action[2:]:
+                    walk(child, read_ok)
+            else:
+                walk(action, read_ok)
+            return
+        walk(action, read_ok)
 
     walk(specs.get("event", []))
     walk(specs.get("condition", []))
-    walk(specs.get("action", []))
+    for action in specs.get("action", []):
+        walk_action(action, collect_reads)
+    if include_sub_triggers:
+        for child in specs.get("sub_triggers", []):
+            vars_found.update(collect_variables(child, include_sub_triggers=True, collect_reads=True))
 
     return vars_found
 
@@ -441,35 +753,100 @@ def build_var_data(variables):
     var_data[1]: name -> 0
     var_data[2]: ordered name list
     """
-    by_type = {"NEW_TIMER": {}}
+    by_type = {}
     by_name = {}
     names = []
+    defaults = {
+        "STRING": "",
+        "BOOLEAN": False,
+        "FLOAT": 0.0,
+        "ANGLE": 0.0,
+        "TABLE": None,
+    }
     for name, vtype in variables.items():
-        by_type.setdefault(vtype, {})[name] = 0
+        by_type.setdefault(vtype, {})[name] = defaults.get(vtype, 0)
         by_name[name] = 0
         names.append(name)
     return [by_type, by_name, names]
 
 
-def build_trigger(spec, idx_data, default_id):
+def stable_sub_trigger_id(parent_id, name, used_ids):
+    seed = f"{parent_id}:{name}".encode("utf-8")
+    tid = 10000000 + (zlib.crc32(seed) % 900000000)
+    while tid in used_ids:
+        tid += 1
+    return tid
+
+
+def prepare_sub_trigger_refs(spec, parent_id):
+    refs = {}
+    used_ids = {parent_id}
+    for child in spec.get("sub_triggers", []):
+        if "name" not in child:
+            raise ValueError("sub_trigger spec missing 'name'")
+        if "id" not in child:
+            child["id"] = stable_sub_trigger_id(parent_id, child["name"], used_ids)
+        tid = child["id"]
+        if tid in used_ids or tid in refs:
+            raise ValueError(f"duplicate sub_trigger id: {tid}")
+        if child["name"] in refs:
+            raise ValueError(f"duplicate sub_trigger name: {child['name']}")
+        refs[child["name"]] = tid
+        refs[tid] = tid
+        refs[str(tid)] = tid
+        used_ids.add(tid)
+    return refs
+
+
+def build_sub_trigger_tree(spec, idx_data, parent_id, custom_event_ids=None):
+    result = {}
+    for child_spec in spec.get("sub_triggers", []):
+        child = build_trigger(child_spec, idx_data, child_spec["id"], parent_id=parent_id, is_sub_trigger=True, custom_event_ids=custom_event_ids)
+        descendants = child.pop("sub_trigger", {})
+        child_key = str(child["trigger_id"])
+        if child_key in result:
+            raise ValueError(f"duplicate sub_trigger id: {child['trigger_id']}")
+        result[child_key] = child
+        for desc_key, desc in descendants.items():
+            if desc_key in result:
+                raise ValueError(f"duplicate sub_trigger id: {desc_key}")
+            result[desc_key] = desc
+    return result
+
+
+def build_trigger(spec, idx_data, default_id, parent_id=None, is_sub_trigger=False, custom_event_ids=None):
     if "name" not in spec:
         raise ValueError("trigger spec missing 'name'")
     tid = spec.get("id", default_id)
+    spec["id"] = tid
     eid_gen = eid_factory(tid)
-    variables = collect_variables(spec)
-    return {
+    sub_trigger_refs = prepare_sub_trigger_refs(spec, tid)
+    variables = collect_variables(
+        spec,
+        include_sub_triggers=not is_sub_trigger,
+        collect_reads=not is_sub_trigger,
+    )
+    trigger = {
         "trigger_name": spec["name"],
         "trigger_id": tid,
-        "p_trigger_id": None,
+        "p_trigger_id": parent_id,
         "group_id": spec.get("group_id", 0),
-        "enabled": spec.get("enabled", True),
+        "enabled": spec.get("enabled", not is_sub_trigger),
         "valid": spec.get("valid", True),
         "call_enabled": spec.get("call_enabled", True),
-        "event": [build_event(e, idx_data, eid_gen) for e in spec.get("event", [])],
-        "condition": [build_condition(c, idx_data, eid_gen) for c in spec.get("condition", [])],
-        "action": [build_action(a, idx_data, eid_gen) for a in spec.get("action", [])],
+        "event": [build_event(e, idx_data, eid_gen, custom_event_ids) for e in spec.get("event", [])],
+        "condition": [build_condition(c, idx_data, eid_gen, sub_trigger_refs) for c in spec.get("condition", [])],
+        "action": build_action_list(spec.get("action", []), idx_data, eid_gen, sub_trigger_refs),
         "var_data": build_var_data(variables),
     }
+    if is_sub_trigger:
+        trigger["is_conf"] = spec.get("is_conf", True)
+    sub_triggers = build_sub_trigger_tree(spec, idx_data, tid, custom_event_ids)
+    if str(tid) in sub_triggers:
+        raise ValueError(f"sub_trigger id conflicts with parent trigger id: {tid}")
+    if sub_triggers:
+        trigger["sub_trigger"] = sub_triggers
+    return trigger
 
 
 # ---------------------------------------------------------------------------
@@ -504,16 +881,18 @@ def update_index(out_dir, fname):
 # CLI
 # ---------------------------------------------------------------------------
 
-def find_project_root():
-    """Walk up from cwd looking for a 'maps' directory."""
-    cur = os.getcwd()
-    for _ in range(8):
+def find_project_root(start=None):
+    """Walk up from a path looking for a project 'maps' directory."""
+    cur = os.path.abspath(start or os.getcwd())
+    if os.path.isfile(cur):
+        cur = os.path.dirname(cur)
+    while True:
         if os.path.isdir(os.path.join(cur, "maps")):
             return cur
         parent = os.path.dirname(cur)
-        if parent == cur: break
+        if parent == cur:
+            return None
         cur = parent
-    return os.getcwd()
 
 
 def main(argv=None):
@@ -533,7 +912,15 @@ def main(argv=None):
         return 1
 
     idx_data = load_index()
-    root = args.root or find_project_root()
+    if args.root:
+        root = os.path.abspath(args.root)
+        if not os.path.isdir(os.path.join(root, "maps")):
+            raise ValueError(f"project root has no maps directory: {root}")
+    else:
+        root = find_project_root(args.dsl) or find_project_root()
+        if root is None:
+            raise ValueError("project root not found; pass --root")
+    custom_event_ids = load_custom_event_name_map(root, map_name)
 
     # auto-id seed: 1718000001 + N
     base_id = 1718000001
@@ -549,7 +936,7 @@ def main(argv=None):
             auto_id += 1
             while auto_id in used_ids:
                 auto_id += 1
-        trig = build_trigger(t_spec, idx_data, t_spec["id"])
+        trig = build_trigger(t_spec, idx_data, t_spec["id"], custom_event_ids=custom_event_ids)
         if args.dry_run:
             print(json.dumps(trig, ensure_ascii=False, indent=2))
             results.append((trig["trigger_name"], None, None))
