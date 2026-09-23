@@ -592,13 +592,15 @@ Step 5  MCP y3editor.restart_editor               # 重启加载
 | 约束项 | 强制要求 | 禁止行为 |
 |-------|---------|---------|
 | **模板来源** | 必须使用 `.codemaker/skills/y3-terrain-template/library/<template-name>/` 原始模板 | ❌ 禁用其他模板，禁用 `y3-gen-terrain-from-image` 重生成 |
-| **导入方式** | 必须通过 `y3-terrain-template` skill 的 `import_terrain_template.py` 一次性导入完整 9 文件 | ❌ 禁止只导入部分文件，禁止 AI 手动摆放装饰物 |
+| **导入方式** | 必须通过 `y3-terrain-template` skill 的 `import_terrain_template.py` 一次性导入完整模板文件（8 文件 + 可选 `editor_decoration.zip`） | ❌ 禁止只导入部分文件，禁止 AI 手动摆放装饰物 |
 | **装饰物** | 完全沿用模板 `decorationdata.data` + `editor_decoration.zip` | ❌ 禁止 AI 调用 `entity_create_block` 增删任何装饰物 |
 | **资源摆件** | 完全沿用模板 `resourceobjectdata.data` | ❌ 禁止增删资源摆件 |
 | **地形/纹理/植被** | 完全沿用模板 `terrain.json` / `texture.json` / `terrainedit.json` / `foliage.json` / `texturefoliage.json` | ❌ 禁止 AI 调用任何 `terrain_*` MCP 修改 |
 | **路径航点** | 必须沿用模板的航点（编辑器 `res_id`），航点坐标由模板的 `editor_decoration.zip` 还原 | ❌ 禁止 AI 用 `add_point_path` 重新摆放，禁止微调任何航点坐标 |
 | **刷怪点/基地坐标** | 取路径首/末航点（`Config.PATH_POINTS[1]` / `[#PATH_POINTS]`），与模板自动对齐 | ❌ 禁止写死其它坐标 |
 | **地图尺寸** | 必须保留模板原尺寸 | ❌ 禁止 `resize_terrain` 改尺寸（改了路径会失配） |
+
+> ⚠️ **terrain-only 模板兼容**：模板若缺 `editor_decoration.zip`（体积过大被清理），`import_terrain_template.py` 返回 `decoration_zip: null` + warning，此时须**跳过** MCP `import_object_editor`；8 文件仍全量导入，但装饰物物编（模型 / 图标 / 属性）不还原，依赖物编还原的航点 / 脚本引用会失效。确需完整还原时，先按 `y3-terrain-template` §2 重跑 `export_object_editor` 补回 zip。
 
 **复现 SOP**：
 
@@ -1234,7 +1236,10 @@ Step 5  MCP y3editor.restart_editor               # 重启加载
 ---
 
 *拆分自 SKILL.md 阶段 2 | 创建时间: 2026-04-15*
-*最后更新: 2026-05-18 — 基于塔防/生存两组实战案沉淀经验，反哺流程文档：*
+*最后更新: 2026-09-23 — 场景模板匹配约束对齐 `y3-terrain-template`（装饰物 zip 改为可选）：*
+  - *🔓 「模板复用强制约束」表「导入方式」由「一次性导入完整 9 文件」改为「8 文件 + 可选 `editor_decoration.zip`」*
+  - *⚠️ 表下新增 terrain-only 模板兼容说明：缺 zip 时 `import_terrain_template.py` 返回 `decoration_zip: null`，须跳过 MCP `import_object_editor`；装饰物物编不还原，依赖物编还原的航点 / 脚本引用会失效*
+*2026-05-18 — 基于塔防/生存两组实战案沉淀经验，反哺流程文档：*
   - *🔧 修复尾部固定章节重复段落 bug（合并行 684/860 两份雷同章节为一份）*
   - *🔒 §🧩 场景模板匹配 新增「模板复用强制约束」子章节（8 项约束 + 复现 SOP）*
   - *🏗️ 修正 §🏗️ 建造技能小节：示例 `cast_type=1` → `cast_type=4` 真·建造（推荐）；加入「修正历史 / 编辑器预制系统信任原则」追溯，对齐根规则；保留 cast_type=1 作为备选并说明边界*

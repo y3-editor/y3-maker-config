@@ -1,0 +1,25 @@
+{
+  "base_path": "C:/Users/zhuyinhao01/Documents/我的POPO/testcase_output/batrider_test_output",
+  "model_name": "batrider",
+  "model_file": "batrider_combined.fbx",
+  "anim_path": "",
+  "meshes": [
+    {
+      "name": "ugc_dota_batrider_01",
+      "textures": {
+        "diffuse":  "ugc_dota_batrider_01_d_.tga",
+        "metallic": "ugc_dota_batrider_01_m_.tga",
+        "normal":   "ugc_dota_batrider_01_n_.tga"
+      }
+    },
+    {
+      "name": "ugc_dota_batrider_02",
+      "textures": {
+        "diffuse":  "ugc_dota_batrider_02_d_.tga",
+        "metallic": "ugc_dota_batrider_02_m_.tga",
+        "normal":   "ugc_dota_batrider_02_n_.tga"
+      }
+    }
+  ],
+  "animations": {}
+}

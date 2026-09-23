@@ -2,7 +2,7 @@
 description: 记忆系统
 alwaysApply: true
 ---
-<rule>
+	<rule>
 1.每一次对话结束，总结对话内容到记忆系统中，<worktree>/<codemaker>/memory/sessions/session-Ssessionid-SYYYY.MM.DD-SHH.MM-[Sbrief]/report.md. 必须！
 2.每次重要的 变更都需要记录session的核心内容到记忆系统，openspec流程中，调用了/archive归档后，也同理 <worktree>/<codemaker>/memory/Memory.md
 3.lua错题本机制：在步骤1和步骤2的总结过程中，如果识别到关于lua相关的问题，请额外把lua的相关问题帮我单独归纳总结到 `lua-issues` 文件夹中，具体规则见步骤4，步骤5

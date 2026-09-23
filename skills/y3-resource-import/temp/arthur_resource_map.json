@@ -1,0 +1,25 @@
+{
+  "base_path": "C:/Users/zhuyinhao01/Documents/我的POPO/testcase_output/arthur_test_output",
+  "model_name": "arthur",
+  "model_file": "arthur_combined.fbx",
+  "anim_path": "",
+  "meshes": [
+    {
+      "name": "ugc_dota_arthur_01",
+      "textures": {
+        "diffuse":  "ugc_dota_arthur_01_d.tga",
+        "metallic": "ugc_dota_arthur_01_m.tga",
+        "normal":   "ugc_dota_arthur_01_n.tga"
+      }
+    },
+    {
+      "name": "ugc_dota_arthur_02",
+      "textures": {
+        "diffuse":  "ugc_dota_arthur_02_d.tga",
+        "metallic": "ugc_dota_arthur_02_m.tga",
+        "normal":   "ugc_dota_arthur_02_n.tga"
+      }
+    }
+  ],
+  "animations": {}
+}

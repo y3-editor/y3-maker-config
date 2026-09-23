@@ -1,0 +1,51 @@
+{
+  "base_path": "C:/Users/zhuyinhao01/Documents/我的POPO/法杖+弓箭/法杖/青鳞守护者_初始版_高模",
+  "model_name": "qinglinshouhuzhe",
+  "model_file": "qinglinshouhuzhe.fbx",
+  "anim_path": "C:/Users/zhuyinhao01/Documents/我的POPO/法杖+弓箭/法杖/ani",
+  "meshes": [
+    {
+      "name": "qinglinshouhuzhe_01",
+      "textures": {
+        "diffuse":  "qinglinshouhuzhe_01_d.tga",
+        "metallic": "qinglinshouhuzhe_01_m.tga",
+        "normal":   "qinglinshouhuzhe_01_n.tga"
+      }
+    },
+    {
+      "name": "qinglinshouhuzhe_02",
+      "textures": {
+        "diffuse":  "qinglinshouhuzhe_02_d.tga",
+        "metallic": "qinglinshouhuzhe_02_m.tga",
+        "normal":   "qinglinshouhuzhe_02_n.tga"
+      }
+    }
+  ],
+  "animations": {
+    "idle": {
+      "desc": "待机",
+      "files": [
+        { "variant": "idle1", "file": "cm_idle.FBX" }
+      ]
+    },
+    "walk": {
+      "desc": "移动",
+      "files": [
+        { "variant": "walk", "file": "cm_run.FBX" }
+      ]
+    },
+    "die": {
+      "desc": "死亡",
+      "files": [
+        { "variant": "die", "file": "death.FBX" }
+      ]
+    },
+    "attack": {
+      "desc": "攻击",
+      "files": [
+        { "variant": "attack", "file": "cm_attack.FBX" },
+        { "variant": "attack2", "file": "cm_attack2.FBX" }
+      ]
+    }
+  }
+}

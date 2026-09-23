@@ -1,0 +1,17 @@
+{
+  "base_path": "C:/Users/zhuyinhao01/Documents/我的POPO/testcase_output/ursa_test_output",
+  "model_name": "ursa",
+  "model_file": "ursa_combined.fbx",
+  "anim_path": "",
+  "meshes": [
+    {
+      "name": "ugc_dota_ursa",
+      "textures": {
+        "diffuse":  "ugc_dota_ursa_d.tga",
+        "metallic": "ugc_dota_ursa_m.tga",
+        "normal":   "ugc_dota_ursa_n.tga"
+      }
+    }
+  ],
+  "animations": {}
+}

@@ -1,0 +1,53 @@
+{
+  "base_path": "C:/Users/zhuyinhao01/Documents/我的POPO/TEST_CASE_RIDER/TEST_CASE_RIDER/引魂使_初始版_低模",
+  "model_name": "yinhunshi",
+  "model_file": "yinhunshi.fbx",
+  "anim_path": "C:/Users/zhuyinhao01/Documents/我的POPO/TEST_CASE_RIDER/TEST_CASE_RIDER/引魂使_初始版_低模",
+  "meshes": [
+    {
+      "name": "yinhunshi_01",
+      "textures": {
+        "diffuse":  "yinhunshi_01_d.tga",
+        "metallic": "yinhunshi_01_m.tga",
+        "normal":   "yinhunshi_01_n.tga"
+      }
+    },
+    {
+      "name": "yinhunshi_02",
+      "textures": {
+        "diffuse":  "yinhunshi_02_d.tga",
+        "metallic": "yinhunshi_02_m.tga",
+        "normal":   "yinhunshi_02_n.tga"
+      }
+    },
+    {
+      "name": "yinhunshi_03",
+      "textures": {
+        "diffuse":  "yinhunshi_03_d.tga",
+        "metallic": "yinhunshi_03_m.tga",
+        "normal":   "yinhunshi_03_n.tga"
+      }
+    }
+  ],
+  "animations": {
+    "idle": {
+      "desc": "待机",
+      "files": [
+        { "variant": "idle1", "file": "Idle.FBX" }
+      ]
+    },
+    "walk": {
+      "desc": "跑步",
+      "files": [
+        { "variant": "walk", "file": "Run.FBX" }
+      ]
+    },
+    "attack": {
+      "desc": "攻击",
+      "files": [
+        { "variant": "attack", "file": "baseAttack.FBX" },
+        { "variant": "attack2", "file": "baseAttack2.FBX" }
+      ]
+    }
+  }
+}

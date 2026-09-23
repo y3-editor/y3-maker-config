@@ -1,0 +1,25 @@
+{
+  "base_path": "C:/Users/zhuyinhao01/Documents/我的POPO/testcase_output/marci_test_output",
+  "model_name": "marci",
+  "model_file": "marci_combined.fbx",
+  "anim_path": "",
+  "meshes": [
+    {
+      "name": "ugc_dota_marci_01",
+      "textures": {
+        "diffuse":  "ugc_dota_marci_01_d_.tga",
+        "metallic": "ugc_dota_marci_01_m_.tga",
+        "normal":   "ugc_dota_marci_01_n_.tga"
+      }
+    },
+    {
+      "name": "ugc_dota_marci_02",
+      "textures": {
+        "diffuse":  "ugc_dota_marci_02_d_.tga",
+        "metallic": "ugc_dota_marci_02_m_.tga",
+        "normal":   "ugc_dota_marci_02_n_.tga"
+      }
+    }
+  ],
+  "animations": {}
+}

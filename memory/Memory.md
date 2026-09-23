@@ -1,6 +1,6 @@
  # 🧠 全局记忆系统
 
-> **最后更新**：2026-06-15  
+> **最后更新**：2026-09-23  
 > **项目状态**：Y3游戏引擎项目  
 
 ## 📋 项目概览
@@ -10,6 +10,47 @@
 **当前阶段**：Agent 健康检查 + Memory Distill 系统就绪，sessions 已蒸馏归零
 
 ---
+
+---
+
+## 🔖 地编模板 zip 瘦身 → terrain-only 模式 (2026-09-23)
+
+- **触发**：`library/roguelike-survival/editor_decoration.zip` 达 **134 MB**（内含 `editor_model.kkres` 装饰物模型资源包；对比 `easy-tower-defense-terrain` 同款仅 12 KB，差异源自导出 `include_dependencies=true`）
+- **硬约束**：`_common.find_missing_template_entries()` 原把 zip 列为必检 → 直接删文件会让 `import_terrain_template.py` abort（`missing required entries in template`）
+- **决策**：用户选定「删 zip + 脚本支持 zip 可选」
+- **变更**：
+  - `_common.py`：`find_missing_template_entries()` 只检 8 文件；新增 `has_decoration_bundle()`
+  - `import_terrain_template.py`：无 zip → `decoration_zip: null` + warning，Skill 跳过 MCP `import_object_editor`
+  - `export_terrain_template.py`：三轮改为 `--decoration-zip` 可选（省略即 terrain-only）
+  - `SKILL.md` §1 框图 / §3.2 / §5、`references/file_manifest.md` 同步 zip 可选
+  - 模板实例：删 zip、`template_meta.json#decoration_bundle=null`、`readme.md` 顶部 TERRAIN-ONLY 警示块
+- **语义**：terrain-only 模板 = 地形/纹理/植被/装饰物布局/碰撞完整还原，装饰物**物编**（模型/图标/属性）不还原
+- **验证**：dry-run 双模板回归通过；`py_compile` 三脚本 OK；`_health_check.py` 死链/SKILL/模板/Lua Issues 全 PASS
+- **补漏复查 6 处**：`_common.py` 头注释 10→9 条目；`SKILL.md` §3.4（`| null` ×2）、§4 护栏（null 分支须告知用户物编不还原）、§1 框图 + §9 措辞；`import_terrain_template.py` docstring 修正既有矛盾（`import_object_editor` 应在文件覆盖**之前**，非 restart 之后）
+- **二次复查 2 处**：`file_manifest.md` 标题去掉「必含」→「8 必含 + 1 可选」；`SKILL.md` §2.2 补 `include_dependencies=true` 体积警示（134 MB 根因）
+- **三轮收尾（3 项全部落地）**：
+  - **导出侧对称**：`export_terrain_template.py --decoration-zip` 改为可选 → 省略即产出 terrain-only 模板（`file_count=8` / `decoration_bundle=null` / readme 自动带 TERRAIN-ONLY 警示块）；`SKILL.md` §2.1~2.4 同步
+  - **场景文档脚注**：`openspec/docs/生存设计案.md` §3.5、`生存执行案.md` Phase 1 + `roadmaps/` 两份副本各加 terrain-only 脚注 + 变更记录行 + 尾注日期
+  - **约束 caveat**：`塔防执行案.md:45`（+副本）、`phase-2-execution.md:595` 「完整 9 文件」→「8 文件 + 可选 zip」，表下各加 terrain-only 兼容警示；`phase-2-execution` 变更记录新增 2026-09-23 块
+  - **验证**：`py_compile` OK、导出双模式（8/9）+ 往返 import dry-run + 非法 zip 路径报错 全部符合预期、测试模板已清理、`_health_check.py` 死链/SKILL/模板/Lua Issues 全 PASS
+- **遗留**：`openspec/docs` 与 `y3-game-spec/roadmaps/` 双份维护（同一文档两处副本，改一处须同步另一处）
+- **四轮（外放链路，11:43~12:00）**：
+  - **发现**：134 MB zip 不止一份 —— `.codemaker`（已删）+ `.y3maker` 工作副本/LFS/pack ≈271 MB + `E:\y3-maker-config` 工作副本/LFS ≈257 MB + GitHub 远端 LFS 134 MB
+  - **配置目录身份**：`.codemaker` = 活跃（14 技能，非 git）；`.y3maker` = `github.com/y3-editor/y3-maker-config` 旧克隆；`E:\y3-maker-config` = 同仓库外放工作副本（8-24 同步/push 流程所用）
+  - **事故规避**：本地基线 `c5db92e` 落后真实远端 `af901ae` 2 提交（`eca-json-builder`、截图 skill），直接 force push 会删除它们 → 改为基于 `af901ae` 重建
+  - **执行**：备份两个 bundle → `filter-branch` 只作用于 `rebuild` 分支剔除 zip（11 提交）→ `lfs prune` → `branch -f main rebuild`；本地 `main=fdd463d`，工作树干净，历史无 zip，本地回收 256.6 MB
+  - **教训**：filter-branch 用 `-- --all` 会连 `refs/remotes/origin/main` 一起改写，导致 ahead/behind 判断失真；二次重写改用分支范围限定
+  - **已推送**（12:26 用户确认）：推送前发现仓库处于合并中间态（`MERGE_HEAD=af901ae`，7 文件 `both added`）——判断 `main` 引用仍为 `fdd463d`、推送不受影响，先 `git push --force-with-lease origin main`（`+ af901ae...fdd463d`），再 `merge --abort` + `fetch` + `lfs prune`；远端已验证无 zip、无 `.gitattributes`；`E:\y3-maker-config` 本地累计回收 ≈391 MB
+  - **遗留**：`.y3maker` 旧克隆 ≈271 MB 未处理（推送后已与远端分叉，无法 pull，除占盘外无价值）；公开仓库历史重写 → 其它克隆/fork 须重新 clone；回滚靠两个 15.4 MB bundle
+- **环境坑**：本机 `python` = Python 2.7.18 且无 `py` 启动器 → 跑 skill 脚本须用 `%LOCALAPPDATA%\Programs\Python\Python313\python.exe`，否则 `list[str]` 注解报 SyntaxError
+- **五轮（SVN 才是真实版本库，12:26~12:35）**：
+  - **根因**：`.codemaker` 里被我删掉的 zip 在 12:25 复活 —— `agentmap` 整个工作副本属 SVN（`https://svn-dm58.gz.netease.com/svn/up1_dev/y3_ai/agentmap/`，wc 根在 `E:\y3_ai\.svn`），该 zip **被 SVN 版本化**（r770049），别人 `svn revert/update` 即还原；本地 `del` 对版本化文件无效
+  - **提交约定**：pre-commit hook 强制提交日志带单号 → 消息必须以 **`#99341`** 开头（否则报「提交日志获取单号失败」）；本工作副本有 **305 处待提交改动**，提交必须显式列路径
+  - **已提交 r770050**：15 路径 = 删除该 zip + 7 个契约文件 + `phase-2-execution.md` + `roadmaps/*`(3) + `openspec/docs/*`(3)；未碰其余 ~290 处改动
+  - **`.y3maker` 也在 SVN 内**：本地删除后呈 242 条 `!`(missing)，`svn update` 会恢复 → 已 `svn delete --force` + commit（**r770051**）彻底移除，版本库与磁盘均已清除
+  - **`.svn/pristine`** 存有该 zip 的 pristine 缓存 128.3 MB，普通删文件回收不了（需清 `.svn/pristine`，代价是重新下载）
+  - **未提交**：`.codemaker/memory/Memory.md`（混有他人改动，需用户决定）；`memory/sessions/*` 与 `y3-game-spec/report/*` 为 SVN 未跟踪
+- **session**: `session-2026.09.23-11.28-terrain-template-zip-slim`
 
 ## 🔖 编辑器表格系统源码验证 (2026-08-07)
 

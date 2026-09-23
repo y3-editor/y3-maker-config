@@ -1,0 +1,192 @@
+{
+  "model_name": "男角色",
+  "base_path": "C:\\Users\\zhuyinhao01\\Documents\\我的POPO\\四种体型\\四种体型\\男角色",
+  "anim_path": "C:\\Users\\zhuyinhao01\\Documents\\我的POPO\\四种体型\\四种体型\\男角色_anim",
+
+  "model_file": "ugc_dota_arthur.fbx",
+
+  "meshes": [
+    {
+      "name": "mesh_01",
+      "textures": {
+        "diffuse":  "ugc_dota_arthur_01_d.tga",
+        "metallic": "ugc_dota_arthur_01_m.tga",
+        "normal":   "ugc_dota_arthur_01_n.tga"
+      }
+    },
+    {
+      "name": "mesh_02",
+      "textures": {
+        "diffuse":  "ugc_dota_arthur_02_d.tga",
+        "metallic": "ugc_dota_arthur_02_m.tga",
+        "normal":   "ugc_dota_arthur_02_n.tga"
+      }
+    }
+  ],
+
+  "animations": {
+    "idle": {
+      "desc": "待机",
+      "files": [
+        { "file": "idle.FBX", "variant": "默认待机" },
+        { "file": "idle_anim.FBX", "variant": "待机动画版" },
+        { "file": "idle_alt.FBX", "variant": "特殊待机" },
+        { "file": "idle_alt_anim.FBX", "variant": "特殊待机动画版" },
+        { "file": "idle_injured.FBX", "variant": "受伤待机" },
+        { "file": "idle_injured_anim.FBX", "variant": "受伤待机动画版" }
+      ]
+    },
+    "run": {
+      "desc": "跑步",
+      "files": [
+        { "file": "run.FBX", "variant": "默认跑步" },
+        { "file": "run_haste.FBX", "variant": "加速跑" },
+        { "file": "run_injured.FBX", "variant": "受伤跑" },
+        { "file": "idle_to_run.FBX", "variant": "待机→跑 过渡" },
+        { "file": "run_to_idle.FBX", "variant": "跑→待机 过渡" }
+      ]
+    },
+    "attack": {
+      "desc": "攻击",
+      "files": [
+        { "file": "attack.FBX", "variant": "攻击1" },
+        { "file": "attack_anim.FBX", "variant": "攻击1动画版" },
+        { "file": "attack_injured.FBX", "variant": "攻击1受伤版" },
+        { "file": "attack2.FBX", "variant": "攻击2" },
+        { "file": "attack2_anim.FBX", "variant": "攻击2动画版" },
+        { "file": "attack2_injured.FBX", "variant": "攻击2受伤版" },
+        { "file": "attack3.FBX", "variant": "攻击3" },
+        { "file": "attack3_anim.FBX", "variant": "攻击3动画版" },
+        { "file": "attack3_injured.FBX", "variant": "攻击3受伤版" }
+      ]
+    },
+    "attack_crit": {
+      "desc": "暴击攻击",
+      "files": [
+        { "file": "attack_crit.FBX", "variant": "暴击" },
+        { "file": "attack_crit_anim.FBX", "variant": "暴击动画版" },
+        { "file": "attack_crit_alt.FBX", "variant": "暴击变体" },
+        { "file": "attack_crit_alt_anim.FBX", "variant": "暴击变体动画版" },
+        { "file": "attack_crit_alt_injured.FBX", "variant": "暴击变体受伤版" },
+        { "file": "attack_crit_wraith_spin.FBX", "variant": "暴击幽魂旋转" },
+        { "file": "attack_crit_wraith_spin_anim.FBX", "variant": "暴击幽魂旋转动画版" }
+      ]
+    },
+    "cast": {
+      "desc": "施法",
+      "files": [
+        { "file": "cast1_hellfire_blast.FBX", "variant": "地狱火施法" },
+        { "file": "cast1_hellfire_blast_anim.FBX", "variant": "地狱火施法动画版" },
+        { "file": "cast1_hellfire_blast_injured.FBX", "variant": "地狱火施法受伤版" },
+        { "file": "cast1_hellfire_blast_frostivus.FBX", "variant": "地狱火施法寒冬版" },
+        { "file": "cast1_hellfire_blast_injured_frostivus.FBX", "variant": "地狱火施法受伤寒冬版" },
+        { "file": "cast_vampiric_spirit.FBX", "variant": "吸血之魂" },
+        { "file": "generic_channel.FBX", "variant": "通用引导" }
+      ]
+    },
+    "death": {
+      "desc": "死亡",
+      "files": [
+        { "file": "death.FBX", "variant": "死亡" },
+        { "file": "death_reincarnation.FBX", "variant": "死亡·重生" }
+      ]
+    },
+    "defeat": {
+      "desc": "战败",
+      "files": [
+        { "file": "defeat.FBX", "variant": "战败" },
+        { "file": "defeat_anim.FBX", "variant": "战败动画版" }
+      ]
+    },
+    "flail": {
+      "desc": "挣扎/受击",
+      "files": [
+        { "file": "flail.FBX", "variant": "挣扎" },
+        { "file": "flail_anim.FBX", "variant": "挣扎动画版" }
+      ]
+    },
+    "stun": {
+      "desc": "眩晕",
+      "files": [
+        { "file": "stun.FBX", "variant": "眩晕" },
+        { "file": "stun_anim.FBX", "variant": "眩晕动画版" }
+      ]
+    },
+    "spawn": {
+      "desc": "出生/重生",
+      "files": [
+        { "file": "spawn.FBX", "variant": "出生" },
+        { "file": "spawn_frostivus.FBX", "variant": "出生寒冬版" },
+        { "file": "spawn_loadout.FBX", "variant": "出生载入版" },
+        { "file": "spawn_loadout_ti8.FBX", "variant": "出生载入TI8版" },
+        { "file": "spawn_loadout_winterblight.FBX", "variant": "出生载入冬灾版" },
+        { "file": "spawn_reincarnation.FBX", "variant": "出生·复活" }
+      ]
+    },
+    "teleport": {
+      "desc": "传送",
+      "files": [
+        { "file": "teleport.FBX", "variant": "传送开始" },
+        { "file": "teleport_anim.FBX", "variant": "传送开始动画版" },
+        { "file": "teleport_end.FBX", "variant": "传送结束" },
+        { "file": "teleport_end_anim.FBX", "variant": "传送结束动画版" },
+        { "file": "teleport_end_injured.FBX", "variant": "传送结束受伤版" }
+      ]
+    },
+    "forcestaff": {
+      "desc": "推推棒效果",
+      "files": [
+        { "file": "forcestaff.FBX", "variant": "推推" },
+        { "file": "forcestaff_anim.FBX", "variant": "推推动画版" },
+        { "file": "forcestaff_end.FBX", "variant": "推推结束" },
+        { "file": "forcestaff_enemy.FBX", "variant": "对敌人推推" },
+        { "file": "forcestaff_injured_end.FBX", "variant": "受伤推推结束" }
+      ]
+    },
+    "loadout": {
+      "desc": "载入展示",
+      "files": [
+        { "file": "loadout.FBX", "variant": "载入" },
+        { "file": "loadout_anim.FBX", "variant": "载入动画版" },
+        { "file": "loadout_salvaged.FBX", "variant": "载入残破版" },
+        { "file": "loadout_salvaged_anim.FBX", "variant": "载入残破动画版" },
+        { "file": "loadout_winterblight.FBX", "variant": "载入冬灾版" }
+      ]
+    },
+    "portrait": {
+      "desc": "头像/选人",
+      "files": [
+        { "file": "portrait.FBX", "variant": "头像" },
+        { "file": "portrait_alt.FBX", "variant": "头像特殊版" }
+      ]
+    },
+    "shade": {
+      "desc": "暗影形态",
+      "files": [
+        { "file": "shade_loadout.FBX", "variant": "暗影载入" },
+        { "file": "shade_loadout_salvaged.FBX", "variant": "暗影载入残破版" },
+        { "file": "shade_loadout_winterblight.FBX", "variant": "暗影载入冬灾版" },
+        { "file": "shade_spawn_loadout.FBX", "variant": "暗影出生载入" }
+      ]
+    }
+  },
+
+  "texture_mapping_note": {
+    "d": "Diffuse / Albedo — 漫反射/基础色贴图",
+    "m": "Metallic-Specular — 金属度/高光贴图 (R=金属度, G=粗糙度, B=高光)",
+    "n": "Normal — 法线贴图",
+    "usage": "每套皮肤由 D/M/N 三元组组成。_01 和 _02 为两套不同配色/质感方案，引擎中按需要切换"
+  },
+
+  "anim_naming_convention": {
+    "_anim": "动画版本 — 通常带更完整的骨骼动画数据",
+    "_injured": "受伤状态变体",
+    "_alt": "替代/特殊变体",
+    "_frostivus": "寒冬节庆主题变体",
+    "_winterblight": "冬灾主题变体",
+    "_salvaged": "残破/战损变体",
+    "_ti8": "TI8 不朽物品关联变体",
+    "_reincarnation": "复活重生变体",
+    "_wraith_spin": "幽魂旋转变体"
+  }
+}

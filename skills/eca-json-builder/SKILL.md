@@ -10,8 +10,6 @@ description: >
   项目自定义事件、存档读取。
 
   内部脚本技能，零依赖（Python 3 标准库 + 内建 eca_index.json）。
-version: 1.1
-updated: 2026-09-16
 ---
 
 # ECA 函数与触发器 JSON 拼接技能

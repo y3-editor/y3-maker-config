@@ -1,0 +1,125 @@
+{
+  "source": "C:\\Users\\zhuyinhao01\\Documents\\我的POPO\\testcase_20260731",
+  "import_count": 9,
+
+  "models": [
+    {
+      "name": "archer",
+      "fbx": "archer_test_output\\archer_combined.fbx",
+      "meshes": [
+        {
+          "name": "mesh_01",
+          "textures": {
+            "diffuse":  "archer_test_output\\ugc_dota_archer_01_d_.tga",
+            "metallic": "archer_test_output\\ugc_dota_archer_01_m_.tga",
+            "normal":   "archer_test_output\\ugc_dota_archer_01_n_.tga"
+          }
+        },
+        {
+          "name": "mesh_02",
+          "textures": {
+            "diffuse":  "archer_test_output\\ugc_dota_archer_02_d_.tga",
+            "metallic": "archer_test_output\\ugc_dota_archer_02_m.tga",
+            "normal":   "archer_test_output\\ugc_dota_archer_02_n_.tga"
+          }
+        }
+      ],
+      "animations": [
+        { "file": "archer_test_output\\anim\\弓箭\\attack_fast.FBX", "type": "attack" },
+        { "file": "archer_test_output\\anim\\弓箭\\attack01.FBX",    "type": "attack" },
+        { "file": "archer_test_output\\anim\\弓箭\\idle.FBX",       "type": "idle" },
+        { "file": "archer_test_output\\anim\\弓箭\\run_anim.FBX",   "type": "run" }
+      ]
+    },
+    {
+      "name": "arthur",
+      "fbx": "arthur_test_output\\arthur_combined.fbx",
+      "meshes": [
+        {
+          "name": "mesh_01",
+          "textures": {
+            "diffuse":  "arthur_test_output\\ugc_dota_arthur_01_d.tga",
+            "metallic": "arthur_test_output\\ugc_dota_arthur_01_m.tga",
+            "normal":   "arthur_test_output\\ugc_dota_arthur_01_n.tga"
+          }
+        },
+        {
+          "name": "mesh_02",
+          "textures": {
+            "diffuse":  "arthur_test_output\\ugc_dota_arthur_02_d.tga",
+            "metallic": "arthur_test_output\\ugc_dota_arthur_02_m.tga",
+            "normal":   "arthur_test_output\\ugc_dota_arthur_02_n.tga"
+          }
+        }
+      ],
+      "animations": []
+    },
+    {
+      "name": "batrider",
+      "fbx": "batrider_test_output\\batrider_combined.fbx",
+      "meshes": [
+        {
+          "name": "mesh_01",
+          "textures": {
+            "diffuse":  "batrider_test_output\\ugc_dota_batrider_01_d_.tga",
+            "metallic": "batrider_test_output\\ugc_dota_batrider_01_m_.tga",
+            "normal":   "batrider_test_output\\ugc_dota_batrider_01_n_.tga"
+          }
+        },
+        {
+          "name": "mesh_02",
+          "textures": {
+            "diffuse":  "batrider_test_output\\ugc_dota_batrider_02_d_.tga",
+            "metallic": "batrider_test_output\\ugc_dota_batrider_02_m_.tga",
+            "normal":   "batrider_test_output\\ugc_dota_batrider_02_n_.tga"
+          }
+        }
+      ],
+      "animations": []
+    },
+    {
+      "name": "marci",
+      "fbx": "marci_test_output\\marci_combined.fbx",
+      "meshes": [
+        {
+          "name": "mesh_01",
+          "textures": {
+            "diffuse":  "marci_test_output\\ugc_dota_marci_01_d_.tga",
+            "metallic": "marci_test_output\\ugc_dota_marci_01_m_.tga",
+            "normal":   "marci_test_output\\ugc_dota_marci_01_n_.tga"
+          }
+        },
+        {
+          "name": "mesh_02",
+          "textures": {
+            "diffuse":  "marci_test_output\\ugc_dota_marci_02_d_.tga",
+            "metallic": "marci_test_output\\ugc_dota_marci_02_m_.tga",
+            "normal":   "marci_test_output\\ugc_dota_marci_02_n_.tga"
+          }
+        }
+      ],
+      "animations": []
+    },
+    {
+      "name": "ursa",
+      "fbx": "ursa_test_output\\ursa_combined.fbx",
+      "meshes": [
+        {
+          "name": "mesh_01",
+          "textures": {
+            "diffuse":  "ursa_test_output\\ugc_dota_ursa_d.tga",
+            "metallic": "ursa_test_output\\ugc_dota_ursa_m.tga",
+            "normal":   "ursa_test_output\\ugc_dota_ursa_n.tga"
+          }
+        }
+      ],
+      "animations": []
+    }
+  ],
+
+  "texture_channels": {
+    "d": "Diffuse / Albedo 漫反射",
+    "m": "Metallic-Specular 金属度/高光 (R=金属度, G=粗糙度, B=高光)",
+    "n": "Normal 法线"
+  }
+}

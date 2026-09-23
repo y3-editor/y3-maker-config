@@ -36,7 +36,6 @@
 | "审查/review 已有 Lua 代码" | **y3-lua-review** | 审查报告 + 自动修复 | - | `script/` |
 | "自动化测试/自动点击/UI自动化" | **y3-auto-test** 🖱️ | 坐标+操作 | MCP y3editor + desktop-automation | Editor MCP 获取控件坐标 |
 | "从图片生成地形" | **y3-gen-terrain-from-image** | 地形格子数据 | MCP y3editor | `maps/` |
-| "截图编辑器/物编/UI编辑器窗口" | **y3-editor-screenshot** 📸 | PNG 截图 | 无（纯 Python stdlib） | `skills/y3-editor-screenshot/result/` |
 
 > ⭐ **UI 统一入口**：所有 UI 相关需求都走 `y3-ui-pipeline`，内部自动路由。
 > `y3-ui-generator` 为 UI JSON 生成的内部实现，不直接暴露给用户。
@@ -56,10 +55,6 @@ py -3 gen_ui_tree.py <workspace_path>
 
 # 桌面自动化点击（管理员权限）
 # 1. bot_move_mouse 移动鼠标 → 2. mouse_clicker.ps1 点击
-
-# 编辑器窗口截图（主窗口/物编/UI编辑器等）
-py -3 skills/y3-editor-screenshot/scripts/editor_screenshot.py --target main
-# --target: main / object / ui / resource / trigger / scene / all
 ```
 
 ## 🔀 决策树
@@ -76,8 +71,7 @@ py -3 skills/y3-editor-screenshot/scripts/editor_screenshot.py --target main
         ├─ Lua 代码             → y3-lua-pipeline
         ├─ Lua 审查             → y3-lua-review
         ├─ 自动化测试           → y3-auto-test
-        ├─ 图片生成地形         → y3-gen-terrain-from-image
-        └─ 编辑器截图           → y3-editor-screenshot
+        └─ 图片生成地形         → y3-gen-terrain-from-image
 ```
 
 ## 🗺️ 技能依赖关系图
@@ -119,8 +113,7 @@ py -3 skills/y3-editor-screenshot/scripts/editor_screenshot.py --target main
 ├── y3-lua-pipeline/         ← UI Lua API
 ├── y3-lua-pipeline/        ← 非 UI Lua 代码
 ├── y3-env-setup/           ← 环境配置（一次性）
-├── y3-auto-test/           ← 自动化测试（桌面自动化+测试规则）
-└── y3-editor-screenshot/   ← 编辑器窗口截图（纯 Python，无需依赖）
+└── y3-auto-test/           ← 自动化测试（桌面自动化+测试规则）
 
 <agent>/tools/              ← 辅助工具
 ├── screenshot_with_cursor.py  ← 截图并标记鼠标位置

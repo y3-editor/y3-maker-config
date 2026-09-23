@@ -1,0 +1,45 @@
+{
+  "base_path": "C:/Users/zhuyinhao01/Documents/我的POPO/testcase_output/archer_test_output",
+  "model_name": "archer",
+  "model_file": "archer_combined.fbx",
+  "anim_path": "C:/Users/zhuyinhao01/Documents/我的POPO/testcase_output/archer_test_output/anim/弓箭",
+  "meshes": [
+    {
+      "name": "ugc_dota_archer_01",
+      "textures": {
+        "diffuse":  "ugc_dota_archer_01_d_.tga",
+        "metallic": "ugc_dota_archer_01_m_.tga",
+        "normal":   "ugc_dota_archer_01_n_.tga"
+      }
+    },
+    {
+      "name": "ugc_dota_archer_02",
+      "textures": {
+        "diffuse":  "ugc_dota_archer_02_d_.tga",
+        "metallic": "ugc_dota_archer_02_m.tga",
+        "normal":   "ugc_dota_archer_02_n_.tga"
+      }
+    }
+  ],
+  "animations": {
+    "attack": {
+      "desc": "攻击",
+      "files": [
+        { "variant": "attack",  "file": "attack_fast.FBX" },
+        { "variant": "attack2", "file": "attack01.FBX" }
+      ]
+    },
+    "idle": {
+      "desc": "待机",
+      "files": [
+        { "variant": "idle", "file": "idle.FBX" }
+      ]
+    },
+    "run": {
+      "desc": "跑步",
+      "files": [
+        { "variant": "run", "file": "run_anim.FBX" }
+      ]
+    }
+  }
+}
