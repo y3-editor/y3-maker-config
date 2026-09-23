@@ -1,11 +1,12 @@
-# 地编模板必含条目清单
+# 地编模板条目清单（8 必含 + 1 可选）
 
 > 导出 / 导入脚本必须以本表为唯一权威。
 > 本 Skill 当前为 **format_version = 2**：装饰物物编通过 MCP `export_object_editor` / `import_object_editor` 走 zip 打包，不再直接复制 `editor_table/editordecoration/` 目录树。
+> `editor_decoration.zip` 为**可选**：缺失时模板进入 terrain-only 模式（见下方「1 个物编 zip 条目」）。
 
-## 必含条目（强制、不可缺、不可选）
+## 必含条目（8 文件强制；zip 可选）
 
-### 8 个文件直拷条目（地形 / 纹理 / 植被 / 布局 / 碰撞）
+### 8 个文件直拷条目（地形 / 纹理 / 植被 / 布局 / 碰撞）（强制）
 
 | # | 相对路径 | 类型 | 说明 |
 |---|---|---|---|
@@ -18,13 +19,20 @@
 | 7 | `resourceobjectdata.data` | file | 资源摆件数据 |
 | 8 | `grid.data` | file | 碰撞格子信息（地形碰撞 / 通行性，与装饰物布局对齐） |
 
-### 1 个物编 zip 条目（装饰物物编数据 + 编辑器分组）
+### 1 个物编 zip 条目（装饰物物编数据 + 编辑器分组）（**可选**）
 
 | # | 相对路径（仅模板内） | 类型 | 说明 |
 |---|---|---|---|
 | 9 | `editor_decoration.zip` | zip | 由 MCP `export_object_editor(object_types=["editor_decoration"])` 产出，包含装饰物物编 JSON 表（原 `editor_table/editordecoration/`）以及装饰物 folderinfo（原 `editor/folderinfo/folderinfo_editor_decoration.json`）。导入时通过 MCP `import_object_editor(zip_path=...)` 应用到目标关卡 |
 
 > ⚠️ `editor_decoration.zip` **只存在于模板目录**，永远不应出现在 Y3 关卡目录中；它的内容是被 MCP 解压回关卡的。
+>
+> ⚠️ **可选性说明**：该 zip 可能因体积过大（`include_dependencies=true` 会打进装饰物模型资源，实测可达 100MB+）被人工清理。缺失时模板为 **terrain-only 模式**：
+> - `find_missing_template_entries()` 不报缺（zip 不在必检清单）
+> - `import_terrain_template.py` stdout 返回 `decoration_zip: null` + warning
+> - 导入仍需完成 Step 5 / Step 6，但 **跳过 Step 4** `import_object_editor`
+> - 结果：地形 / 纹理 / 植被 / 装饰物布局 / 碰撞完整还原，装饰物**物编**不还原（模型 / 图标 / 属性可能缺失，装饰物渲染异常）
+> - 判定函数：`_common.has_decoration_bundle(template_root)`
 
 ## 禁止纳入清单（导入脚本检测到将报错「模板被污染」）
 
@@ -49,4 +57,5 @@
 
 - 8 个直拷文件保留与 Y3 关卡相同的相对路径结构（不扁平化），便于导入时按相对路径直接覆盖。
 - `editor_decoration.zip` 是 MCP 产物，**不要**手动解开/重打包；如需修改装饰物物编，请通过 `y3-obj-edit` 在源关卡中编辑后重新导出整个模板。
+- 导出时省略 `--decoration-zip` 即产出 **terrain-only 模板**（`file_count=8`、`decoration_bundle=null`、readme 自动带 TERRAIN-ONLY 警示块），与导入侧的可选 zip 对称。
 - 文件清单变更必须先改 spec，再改本文件，再改脚本中的 `_common.py` 常量。

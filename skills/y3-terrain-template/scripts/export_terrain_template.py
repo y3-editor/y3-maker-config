@@ -2,18 +2,20 @@
 """
 Export a Y3 map's terrain art layer into the local template library.
 
-A complete template now contains:
-  - 8 plain map files copied verbatim from the source map.
+A complete template contains:
+  - 8 plain map files copied verbatim from the source map (REQUIRED).
   - 1 ``editor_decoration.zip`` produced by MCP ``export_object_editor``
-    (BEFORE invoking this script). The Skill is responsible for the MCP call;
-    this script only takes the resulting zip path via ``--decoration-zip``.
+    (OPTIONAL). The Skill is responsible for the MCP call; this script only
+    takes the resulting zip path via ``--decoration-zip``. Omit the flag to
+    export a "terrain-only" template: the 8 files still import, but the
+    decoration object-editor data is not packaged and will NOT be restored.
 
 Usage:
     python export_terrain_template.py \\
         --map-dir         "<y3-project>/maps/<level>" \\
         --name            "<kebab-case-name>" \\
         --description     "<human readable description>" \\
-        --decoration-zip  "<absolute path to editor_decoration.zip>" \\
+        [--decoration-zip  "<absolute path to editor_decoration.zip>"] \\
         [--force]
 
 stdout (success):
@@ -62,10 +64,12 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
                    help="Template name in kebab-case")
     p.add_argument("--description", required=True,
                    help="Human-readable template description (written to readme.md)")
-    p.add_argument("--decoration-zip", required=True,
+    p.add_argument("--decoration-zip",
                    help=("Absolute path to editor_decoration.zip pre-produced by "
                          "MCP y3editor.export_object_editor (object_types=['editor_decoration']). "
-                         "The Skill must invoke that MCP BEFORE running this script."))
+                         "The Skill must invoke that MCP BEFORE running this script. "
+                         "OMIT this flag to export a terrain-only template "
+                         "(no decoration object-editor data)."))
     p.add_argument("--force", action="store_true",
                    help="Overwrite an existing template with the same name")
     return p.parse_args(argv)
@@ -76,7 +80,7 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
 # ---------------------------------------------------------------------------
 
 _README_TEMPLATE = """# {name}
-
+{mode_notice}
 ## 模板名
 
 `{name}`
@@ -104,12 +108,29 @@ _README_TEMPLATE = """# {name}
 ## 说明
 
 - 8 个 `.json` / `.data` 文件（地形 / 纹理 / 植被 / 装饰物布局 / 资源摆件 / 碰撞）走文件直拷
-- `editor_decoration.zip` 由 MCP `export_object_editor` 产出，导入时由 MCP `import_object_editor` 应用
-
+{decoration_note}
 ## 导入风险提示
 
 装饰物 / 资源摆件将被整体覆盖；如目标关卡有针对装饰物 ID 的脚本引用，导入后引用将失效。建议导入前 `git commit` 当前关卡。
 """
+
+_TERRAIN_ONLY_NOTICE = """
+> ⚠️ **TERRAIN-ONLY 模板（仅地形）** — 本模板**不含** `editor_decoration.zip`。
+> 地形 / 纹理 / 植被 / 装饰物布局 / 碰撞可完整导入；装饰物**物编**（模型 / 图标 / 属性）**不会还原**。
+> 导入时 `import_terrain_template.py` 会返回 `decoration_zip: null` + warning，需**跳过** MCP `import_object_editor`。
+> 如需补回装饰物物编：开编辑器打开源关卡后重跑 MCP `export_object_editor`，再重新导出本模板。
+"""
+
+_DECORATION_NOTE_WITH_ZIP = (
+    "- `editor_decoration.zip` 由 MCP `export_object_editor` 产出，"
+    "导入时由 MCP `import_object_editor` 应用\n"
+)
+
+_DECORATION_NOTE_TERRAIN_ONLY = (
+    "- 本模板**不含** `editor_decoration.zip`（terrain-only）：导入时 "
+    "`import_terrain_template.py` 返回 `decoration_zip: null`，"
+    "须**跳过** MCP `import_object_editor`；装饰物**物编**（模型 / 图标 / 属性）不会还原\n"
+)
 
 
 def _format_files_block(files: list[str]) -> str:
@@ -124,10 +145,13 @@ def _validate_inputs(args: argparse.Namespace) -> None:
     if not os.path.isdir(args.map_dir):
         raise ValueError(f"--map-dir is not a directory: {args.map_dir}")
     _common.validate_kebab_case(args.name)
+    if not args.decoration_zip:
+        return
     if not os.path.isfile(args.decoration_zip):
         raise ValueError(
             f"--decoration-zip not found: {args.decoration_zip} "
-            "(produce it first via MCP y3editor.export_object_editor)"
+            "(produce it first via MCP y3editor.export_object_editor, "
+            "or omit the flag to export a terrain-only template)"
         )
     # Sanity-check the zip is a real zip archive.
     if not zipfile.is_zipfile(args.decoration_zip):
@@ -182,7 +206,8 @@ def _stage_decoration_zip(decoration_zip_src: str, template_dir: str) -> str:
 def _write_meta(template_dir: str, *, name: str, description: str,
                 size: tuple[int, int], source_map: str,
                 editor_version: str,
-                files: list[str]) -> dict:
+                files: list[str],
+                decoration_bundle: str | None) -> dict:
     meta = {
         "name": name,
         "description": description,
@@ -193,8 +218,8 @@ def _write_meta(template_dir: str, *, name: str, description: str,
         "editor_version": editor_version,
         # Files actually packaged (flat list).
         "files": list(files),
-        # Bundle layout descriptor — useful for forward compat / tooling.
-        "decoration_bundle": _common.TEMPLATE_DECORATION_ZIP,
+        # Bundle layout descriptor — ``None`` for terrain-only templates.
+        "decoration_bundle": decoration_bundle,
         "format_version": 2,
     }
     meta_path = os.path.join(template_dir, "template_meta.json")
@@ -206,14 +231,18 @@ def _write_meta(template_dir: str, *, name: str, description: str,
 
 def _write_readme(template_dir: str, meta: dict) -> None:
     readme_path = os.path.join(template_dir, "readme.md")
+    terrain_only = meta["decoration_bundle"] is None
     body = _README_TEMPLATE.format(
         name=meta["name"],
+        mode_notice=_TERRAIN_ONLY_NOTICE if terrain_only else "",
         w=meta["size"][0],
         h=meta["size"][1],
         description=meta["description"],
         source_map=meta["source_map"],
         exported_at=meta["exported_at"],
         files_block=_format_files_block(meta["files"]),
+        decoration_note=(_DECORATION_NOTE_TERRAIN_ONLY if terrain_only
+                         else _DECORATION_NOTE_WITH_ZIP),
     )
     with open(readme_path, "w", encoding="utf-8") as f:
         f.write(body)
@@ -243,8 +272,10 @@ def _run(args: argparse.Namespace) -> dict:
     template_dir = _prepare_template_dir(args.name, args.force)
     try:
         files = _copy_map_files(args.map_dir, template_dir)
-        zip_rel = _stage_decoration_zip(args.decoration_zip, template_dir)
-        files.append(zip_rel)
+        zip_rel: str | None = None
+        if args.decoration_zip:
+            zip_rel = _stage_decoration_zip(args.decoration_zip, template_dir)
+            files.append(zip_rel)
         meta = _write_meta(
             template_dir,
             name=args.name,
@@ -253,6 +284,7 @@ def _run(args: argparse.Namespace) -> dict:
             source_map=os.path.basename(os.path.normpath(args.map_dir)),
             editor_version=editor_version,
             files=files,
+            decoration_bundle=zip_rel,
         )
         _write_readme(template_dir, meta)
     except BaseException:

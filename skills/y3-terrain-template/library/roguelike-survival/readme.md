@@ -1,5 +1,11 @@
 # roguelike-survival
 
+> ⚠️ **TERRAIN-ONLY 模板（仅地形）** — 本模板**不含** `editor_decoration.zip`。
+> 地形 / 纹理 / 植被 / 装饰物布局 / 碰撞可完整导入；装饰物**物编**（模型 / 图标 / 属性）**不会还原**。
+> 导入时 `import_terrain_template.py` 会返回 `decoration_zip: null` + warning，需**跳过** MCP `import_object_editor`。
+> 清理原因：该 zip 达 134 MB（`include_dependencies=true` 打入了装饰物模型资源 `editor_model.kkres`）。清理时间 2026-09-23。
+> 如需恢复完整模板：开编辑器打开源关卡 `EntryMap`，重跑 MCP `export_object_editor` 后重新导出模板。
+
 ## 模板名
 
 `roguelike-survival`
@@ -30,12 +36,13 @@
 - `decorationdata.data`
 - `resourceobjectdata.data`
 - `grid.data`
-- `editor_decoration.zip`
+
+> ~~`editor_decoration.zip`~~ — 已清理（terrain-only 模式）
 
 ## 说明
 
 - 8 个 `.json` / `.data` 文件（地形 / 纹理 / 植被 / 装饰物布局 / 资源摆件 / 碰撞）走文件直拷
-- `editor_decoration.zip` 由 MCP `export_object_editor` 产出，导入时由 MCP `import_object_editor` 应用
+- 原 `editor_decoration.zip` 由 MCP `export_object_editor` 产出、导入时由 MCP `import_object_editor` 应用；**本模板已删除该 zip**，导入时须跳过该步
 
 ## 逻辑节点
 

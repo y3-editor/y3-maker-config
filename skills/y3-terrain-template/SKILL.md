@@ -47,12 +47,13 @@ Y3 地编模板的「打包 / 还原」Skill。
 └──────────────────────────────────────────────────────────────────────┘
 
 ┌──────────────────────────────────────────────────────────────────────┐
-│   导入（4 MCP + 1 Python，编辑器需开着目标关卡）                     │
+│   导入（4 MCP + 1 Python，编辑器需开着目标关卡；terrain-only 为 3 MCP）│
 ├──────────────────────────────────────────────────────────────────────┤
 │   1. 读模板 template_meta.json → 取尺寸 (w, h)                       │
 │   2. MCP save_editor             ← 保护用户未保存改动                 │
 │   3. MCP resize_terrain(w, h)    ← 调整目标关卡尺寸                   │
 │   4. MCP import_object_editor(zip_path=…/editor_decoration.zip)       │
+│      ← 仅当 decoration_zip 非 null；terrain-only 模板跳过本步         │
 │      ← 应用装饰物物编（含自动 save_editor + 物编视图刷新）            │
 │      ← 必须先于文件覆盖；否则其内部 save 会反向覆盖磁盘上的新 8 文件   │
 │   5. import_terrain_template.py --apply  ← 备份 + 覆盖 8 文件         │
@@ -71,11 +72,12 @@ Y3 地编模板的「打包 / 还原」Skill。
 
 用户说「导出地编 / 把这张图的地形保存成模板 / 打包地编」等。
 
-### 2.2 强制 2 步顺序
+### 2.2 2 步顺序（Step 1 可选）
 
 > ⚠️ 编辑器必须打开**源关卡**；MCP `export_object_editor` 作用在当前打开的地图。
+> 仅当要导出**完整模板**（含装饰物物编）时才需要 Step 1；导出 terrain-only 模板时 Step 1 可整段跳过。
 
-**Step 1 — MCP 产物准备（先于 Python 脚本）**
+**Step 1 — MCP 产物准备（先于 Python 脚本；仅完整模板需要）**
 
 ```
 y3editor.export_object_editor(
@@ -88,6 +90,8 @@ y3editor.export_object_editor(
 ```
 
 > 输出目录建议放在 skill 自有的 `.export_staging/<模板名>/` 下，导出成功后 Skill 应清理该 staging 目录。
+>
+> ⚠️ **体积**：`include_dependencies = true` 会把装饰物模型资源（`editor_model.kkres`）一并打进 zip，实测可达 **100 MB+**（如 `roguelike-survival` 为 134 MB；`easy-tower-defense-terrain` 仅 12 KB）。若模板仅用于同一工程内复用（模型资源已存在）或希望模板轻量，可传 `false`，或干脆省略 `--decoration-zip` 导出 terrain-only 模板。
 
 **Step 2 — Python 脚本组包**
 
@@ -100,12 +104,18 @@ python .codemaker/skills/y3-terrain-template/scripts/export_terrain_template.py 
   [--force]   # 模板已存在时覆盖
 ```
 
+> `--decoration-zip` **可选**（与导入侧对称）：
+> - 传入 → 完整模板，`file_count=9`，`template_meta.json#decoration_bundle="editor_decoration.zip"`，readme 无警示块
+> - 省略 → **terrain-only 模板**，`file_count=8`，`decoration_bundle=null`，readme 顶部自动写入 TERRAIN-ONLY 警示块（导出时即省下百 MB 体积，适合同工程内复用或模型资源已存在的场景）
+> - 传入但路径不存在 / 非法 zip → 报 `--decoration-zip not found` / `is not a valid zip archive`，不产出半成品
+
 ### 2.3 stdout 协议
 
 成功：
 ```json
 {"status":"ok","name":"forest-arena-01","size":[256,256],"path":".../library/forest-arena-01","file_count":9}
 ```
+> `file_count` 为 **8**（省略 `--decoration-zip`，terrain-only）或 **9**（含 zip）。
 
 失败：
 ```json
@@ -140,13 +150,16 @@ Step 1  读模板 template_meta.json → 取 (w, h)、读 dry-run 输出的 deco
 Step 2  MCP y3editor.save_editor                     # 保护未保存改动
 Step 3  MCP y3editor.resize_terrain(w, h)            # 尺寸先匹配
 Step 4  MCP y3editor.import_object_editor(zip_path)  # 先导入装饰物物编（自动 save 物编视图）
+                                                     # ⚠️ decoration_zip 为 null（terrain-only 模板）时跳过本步
 Step 5  python import_terrain_template.py --apply    # 备份 + 覆盖 8 个文件
 Step 6  MCP y3editor.restart_editor(save_before_restart=false)
                                                       # 一次性重启：加载新地形并使已有装饰物实例按新物编重渲染
                                                       # ⚠️ 必须传 save_before_restart=false（默认 true 会先 save，反向覆盖 Step 5 写盘的新 8 文件）
 ```
 
-> `zip_path` 取自 dry-run stdout 的 `decoration_zip` 字段（也即模板目录下的 `editor_decoration.zip` 绝对路径）。
+> `zip_path` 取自 dry-run stdout 的 `decoration_zip` 字段（也即模板目录下的 `editor_decoration.zip` 绝对路径）。该字段为 `null` 时表示 terrain-only 模板，跳过 Step 4。
+>
+> ⚠️ **terrain-only 模板**：模板目录缺 `editor_decoration.zip` 时，地形 / 纹理 / 植被 / 装饰物布局 / 碰撞仍整体覆盖，但装饰物**物编**（模型 / 图标 / 属性）不还原，地图中装饰物可能渲染异常。dry-run 的 `warnings` 会明确提示，Skill MUST 在二次确认时转告用户。
 >
 > 💡 **为什么先 import_object_editor 再覆盖文件**：`import_object_editor` 内部会自动 `save_editor`，把编辑器内存里的 8 文件写回磁盘。若先覆盖文件再调它，会**反向覆盖**磁盘上刚导入的新地形。把文件覆盖（Step 5）放到最后，可彻底规避这个反向覆盖陷阱，并把两次 restart 合并为一次。
 >
@@ -179,7 +192,7 @@ python .codemaker/skills/y3-terrain-template/scripts/import_terrain_template.py 
 {
   "status": "ok" | "dry-run" | "error",
   "files": ["terrain.json", ...],            // 8 文件
-  "decoration_zip": "<模板目录下 editor_decoration.zip 绝对路径>",
+  "decoration_zip": "<模板目录下 editor_decoration.zip 绝对路径>" | null,
   "backup_dir": "<absolute path or null>",
   "warnings": ["editor version mismatch ignored", ...],   // 可选
   "reason": "<仅 error 时存在>"
@@ -187,7 +200,7 @@ python .codemaker/skills/y3-terrain-template/scripts/import_terrain_template.py 
 ```
 
 失败时若 `backup_dir` 已存在，**脚本仍会输出 `backup_dir` 路径**，便于用户手工回滚。
-`decoration_zip` 在 error 阶段也会回填，便于 Skill 仍可手动追加 MCP `import_object_editor` 步骤。
+`decoration_zip` 在 error 阶段也会回填，便于 Skill 仍可手动追加 MCP `import_object_editor` 步骤；模板为 terrain-only 时该字段为 `null`。
 
 ## 4. 用户二次确认护栏（强制）
 
@@ -200,6 +213,9 @@ python .codemaker/skills/y3-terrain-template/scripts/import_terrain_template.py 
    - 目标关卡路径
    - 即将被覆盖的 8 文件清单（来自 dry-run 的 files）
    - 即将通过 MCP import_object_editor 覆盖装饰物物编（zip 路径）
+     · 若 `decoration_zip` 为 `null` → 明确告知用户「本模板为 terrain-only，
+       Step 4 将被跳过，装饰物物编（模型 / 图标 / 属性）不还原，
+       地图中装饰物可能渲染异常」，并把 dry-run 的 `warnings` 原文呈现
    - 默认会创建的备份目录路径（template-backup/<时间戳>/）
    - 风险提示：「装饰物物编 / 资源摆件将被整体覆盖；
                  如目标关卡有针对装饰物 ID 的脚本引用，
@@ -216,9 +232,11 @@ python .codemaker/skills/y3-terrain-template/scripts/import_terrain_template.py 
 详见 `references/file_manifest.md`。**速查**：
 
 - 模板库根：`.codemaker/skills/y3-terrain-template/library/<模板名>/`
-- 模板必含 **8 文件 + 1 zip** + `template_meta.json` + `readme.md`
+- 模板必含 **8 文件** + `template_meta.json` + `readme.md`
   - 8 文件：`terrain.json`、`texture.json`、`terrainedit.json`、`foliage.json`、`texturefoliage.json`、`decorationdata.data`、`resourceobjectdata.data`、`grid.data`
-  - 1 zip：`editor_decoration.zip`（MCP 产物，含装饰物物编 + 装饰物 folderinfo）
+- `editor_decoration.zip`（MCP 产物，含装饰物物编 + 装饰物 folderinfo）**可选**：
+  - 存在 → 正常模式，导入时走 Step 4 `import_object_editor`
+  - 缺失 → **terrain-only 模板**（体积过大被清理等），地形 8 文件仍可导入，但装饰物物编不还原；脚本会返回 `decoration_zip: null` 并给出 warning，Skill MUST 跳过 Step 4
 - 模板 MUST NOT 包含 `logicres.json` 等禁区文件
 - `template_meta.json#format_version` 当前为 `2`（v1 = 直拷目录树形式，已废弃，不再支持导入）
 
@@ -262,5 +280,5 @@ python .codemaker/skills/y3-terrain-template/scripts/import_terrain_template.py 
 
 ## 9. 参考资料
 
-- `references/file_manifest.md` — 8 文件 + 1 zip 权威清单
+- `references/file_manifest.md` — 8 文件（+ 可选 `editor_decoration.zip`）权威清单
 - `references/scene_merge_tool_diff.md` — 与原参考工具 `scene_merge_tool` 的差异

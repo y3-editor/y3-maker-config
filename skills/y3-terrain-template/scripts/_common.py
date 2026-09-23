@@ -1,7 +1,8 @@
 """
 Shared utilities for the y3-terrain-template skill scripts.
 
-This module is the *single source of truth* for the 10-entry template manifest
+This module is the *single source of truth* for the 9-entry template manifest
+(8 required map files + 1 optional decoration bundle)
 and the helper functions consumed by both export_terrain_template.py and
 import_terrain_template.py.
 
@@ -23,11 +24,14 @@ from typing import Iterable, Optional, Tuple
 # Manifest constants (spec Requirement 2)
 # ---------------------------------------------------------------------------
 #
-# A template now contains exactly two kinds of artifacts:
+# A template contains:
 #   1) 8 plain map files copied verbatim between source-map / template / target-map.
-#   2) 1 object-editor bundle (``editor_decoration.zip``) that is produced via
+#      REQUIRED.
+#   2) 1 optional object-editor bundle (``editor_decoration.zip``) produced via
 #      MCP ``export_object_editor`` and re-applied via MCP ``import_object_editor``.
 #      The Skill (NOT this Python layer) is responsible for those MCP calls.
+#      A template without this bundle is a "terrain-only" template: the 8 files
+#      still import, but decoration object-editor data is NOT restored.
 
 # 8 plain files at the map root (file-copy bridge)
 TEMPLATE_FILES: Tuple[str, ...] = (
@@ -285,13 +289,18 @@ def find_missing_map_entries(map_root: str) -> list[str]:
 def find_missing_template_entries(template_root: str) -> list[str]:
     """Return missing entries inside a *template* directory.
 
-    A complete template MUST contain the 8 map-bridge files plus the
-    ``editor_decoration.zip`` produced by MCP ``export_object_editor``.
+    A template MUST contain the 8 map-bridge files. ``editor_decoration.zip``
+    is OPTIONAL: when absent the template is "terrain-only" — the 8 files still
+    import, but the MCP ``import_object_editor`` step must be skipped, so
+    decoration object-editor data (models / icons / attrs) is NOT restored.
+    Use :func:`has_decoration_bundle` to distinguish the two modes.
     """
-    missing = find_missing_map_entries(template_root)
-    if not os.path.isfile(os.path.join(template_root, TEMPLATE_DECORATION_ZIP)):
-        missing.append(TEMPLATE_DECORATION_ZIP)
-    return missing
+    return find_missing_map_entries(template_root)
+
+
+def has_decoration_bundle(template_root: str) -> bool:
+    """True if *template_root* ships ``editor_decoration.zip``."""
+    return os.path.isfile(os.path.join(template_root, TEMPLATE_DECORATION_ZIP))
 
 
 # Backward-compatible alias for any external caller. Prefer the explicit

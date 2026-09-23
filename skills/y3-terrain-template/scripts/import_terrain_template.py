@@ -4,17 +4,22 @@
 Import a terrain template into a target Y3 map.
 
 This script handles the *file-bridge* portion of the import:
-  - Validates the template (8 map files + editor_decoration.zip).
+  - Validates the template (8 map files required; editor_decoration.zip optional).
   - Backs up the target map's affected files.
   - Overwrites the 8 map-bridge files in the target map.
   - Emits the absolute path of ``editor_decoration.zip`` in stdout so the
-    Skill can hand it to MCP ``y3editor.import_object_editor``.
+    Skill can hand it to MCP ``y3editor.import_object_editor``. When the
+    template is terrain-only, this field is ``null`` and the Skill MUST skip
+    that MCP step.
 
 The Skill (NOT this script) is responsible for:
   - MCP ``save_editor`` (BEFORE this script).
   - MCP ``resize_terrain`` (BEFORE this script).
-  - MCP ``restart_editor`` (AFTER this script — to load new terrain).
-  - MCP ``import_object_editor`` with ``decoration_zip`` (AFTER restart).
+  - MCP ``import_object_editor`` with ``decoration_zip`` (BEFORE this script —
+    its internal ``save_editor`` would otherwise overwrite the files this
+    script just wrote). Skipped when ``decoration_zip`` is ``null``.
+  - MCP ``restart_editor`` (AFTER this script — to load new terrain), and it
+    MUST be called with ``save_before_restart=false``.
 
 Usage:
     python import_terrain_template.py \\
@@ -28,7 +33,7 @@ stdout (success / dry-run / error):
     {
       "status": "ok" | "dry-run" | "error",
       "files": [...],                   # 8 map-bridge files to overwrite
-      "decoration_zip": "<abs path>",   # template's editor_decoration.zip
+      "decoration_zip": "<abs path>" | null,  # null => terrain-only template
       "backup_dir": "<absolute path or null>",
       "warnings": [...],                # optional
       "reason":   "..."                 # only when status == "error"
@@ -212,9 +217,17 @@ def _run(args: argparse.Namespace) -> dict:
                           args.ignore_version, warnings)
 
     files = _collect_manifest_lists()
-    decoration_zip = os.path.abspath(
-        os.path.join(template_dir, _common.TEMPLATE_DECORATION_ZIP)
-    )
+    decoration_zip: str | None = None
+    if _common.has_decoration_bundle(template_dir):
+        decoration_zip = os.path.abspath(
+            os.path.join(template_dir, _common.TEMPLATE_DECORATION_ZIP)
+        )
+    else:
+        warnings.append(
+            "terrain-only template: editor_decoration.zip missing, "
+            "skip MCP import_object_editor (decoration object-editor data "
+            "will NOT be restored)"
+        )
 
     if not args.apply:
         return {

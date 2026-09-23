@@ -16,9 +16,8 @@
     "texturefoliage.json",
     "decorationdata.data",
     "resourceobjectdata.data",
-    "grid.data",
-    "editor_decoration.zip"
+    "grid.data"
   ],
-  "decoration_bundle": "editor_decoration.zip",
+  "decoration_bundle": null,
   "format_version": 2
 }
