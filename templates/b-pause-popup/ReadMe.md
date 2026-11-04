@@ -17,7 +17,7 @@
 |------|------|
 | 等级 | **B** |
 | 名称 | 暂停弹窗模板 |
-| 路径 | `.codex/templates/b-pause-popup/` |
+| 路径 | `<agent>/templates/b-pause-popup/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.9` |
 | 能力标签 | `pause-menu`, `popup`, `multiplayer-aware`, `ui-popup` |
@@ -369,7 +369,7 @@ y3.game.resume_soft_pause()
 **解决**：修正 `maps/EntryMap/ui/[0]PAUSE.json` 中相关 `opacity` 为 `1.0`，重新生成 UI 树并重启/热更。不要用 `ui:set_alpha(255)` 作为显隐逻辑的补丁。
 
 ```bash
-python3 .codex/skills/y3-ui-pipeline/gen_ui_tree.py .
+python3 <agent>/skills/y3-ui-pipeline/gen_ui_tree.py .
 ```
 
 ### 坑 6：不要用 `set_alpha` 控制弹窗显隐

@@ -6,7 +6,7 @@
 |------|------|
 | 等级 | **A** |
 | 名称 | 通用父子状态机 |
-| 路径 | `.codemaker/templates/a-game-fsm/` |
+| 路径 | `<agent>/templates/a-game-fsm/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `fsm`, `state-machine`, `flow`, `game-stage`, `parent-child` |
@@ -94,7 +94,7 @@ M.setup({
 ### 1. 基础用法
 
 ```lua
-local FSM = include '.codemaker.templates.a-game-fsm.logic'
+local FSM = include '<agent>.templates.a-game-fsm.logic'
 
 local gameFSM = FSM.setup({
     states      = { Init='Init', Lobby='Lobby', Battle='Battle', Result='Result', End='End' },

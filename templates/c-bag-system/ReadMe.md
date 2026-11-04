@@ -11,7 +11,7 @@
 |------|------|
 | 等级 | **C** |
 | 名称 | 多背包槽位管理系统 |
-| 路径 | `.codemaker/templates/c-bag-system/` |
+| 路径 | `<agent>/templates/c-bag-system/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `bag`, `inventory`, `slot`, `item-stack`, `pickup`, `item-move` |

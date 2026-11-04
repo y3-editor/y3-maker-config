@@ -11,7 +11,7 @@
 |------|------|
 | 等级 | **C** |
 | 名称 | 通用结算面板模板 |
-| 路径 | `.codemaker/templates/c-game-settle/` |
+| 路径 | `<agent>/templates/c-game-settle/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `settle`, `game-end`, `reward-summary`, `player-stats`, `result-screen` |
@@ -178,13 +178,13 @@ mklink /J codemaker ..\..\..\codemaker
 ```
 
 > **为什么需要软链接？**  
-> Y3 Lua 的 `require` 只搜索 `script/` 和 `global_script/`，而模板放在 `.codemaker/templates/`。  
-> 通过软链接将 `codemaker` 映射到 `.codemaker`，即可用 `require('codemaker.templates.xxx.logic')` 引入。
+> Y3 Lua 的 `require` 只搜索 `script/` 和 `global_script/`，而模板放在 `<agent>/templates/`。  
+> 通过软链接将 `codemaker` 映射到 `<agent>`，即可用 `require('codemaker.templates.xxx.logic')` 引入。
 
 ### 导入 UI
 
 ```
-编辑器 → y3editor.import_ui(".codemaker/templates/c-game-settle/c-game-settle.upui")
+编辑器 → y3editor.import_ui("<agent>/templates/c-game-settle/c-game-settle.upui")
 ```
 
 导入后 UI 列表中出现 `[HUD]SETTLE` 画板即成功。
@@ -192,7 +192,7 @@ mklink /J codemaker ..\..\..\codemaker
 ### Lua 代码接入
 
 ```lua
--- 1. 引入模板（script/ 目录下需有 codemaker 软链接指向 .codemaker）
+-- 1. 引入模板（script/ 目录下需有 codemaker 软链接指向 <agent>）
 local GameSettle = require('codemaker.templates.c-game-settle.logic')
 
 -- 2. 实现 Adapter（参考上方 MockAdapter，替换为项目实际逻辑）

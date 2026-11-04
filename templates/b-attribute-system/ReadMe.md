@@ -12,7 +12,7 @@
 |------|------|
 | 等级 | **B** |
 | 名称 | 通用属性系统 |
-| 路径 | `.codemaker/templates/b-attribute-system/` |
+| 路径 | `<agent>/templates/b-attribute-system/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `attribute`, `stat-system`, `formula-dsl`, `reactive`, `rpg` |

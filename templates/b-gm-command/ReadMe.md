@@ -6,7 +6,7 @@
 |------|------|
 | 等级 | **B** |
 | 名称 | GM 调试指令系统 |
-| 路径 | `.codemaker/templates/b-gm-command/` |
+| 路径 | `<agent>/templates/b-gm-command/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `gm`, `debug`, `command`, `console`, `recording`, `replay` |

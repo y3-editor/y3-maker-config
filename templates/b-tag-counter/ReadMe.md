@@ -6,7 +6,7 @@
 |------|-----|
 | 等级 | **B** |
 | 名称 | 标签计数器 |
-| 路径 | `.codemaker/templates/b-tag-counter/` |
+| 路径 | `<agent>/templates/b-tag-counter/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.1` |
 | 能力标签 | `标签`, `计数器`, `羁绊`, `阶梯`, `计数` |
@@ -132,7 +132,7 @@ tc:removeTag(1, 1)    -- 玩家1 失去 1 个"召唤"标签
 | 环境 | 命令 |
 |------|------|
 | Y3 游戏内 | MCP `execute_lua` 内联执行（需游戏运行中） |
-| 独立 Lua | `lua .codemaker\templates\b-tag-counter\test_tag_counter.lua` |
+| 独立 Lua | `lua <agent>\templates\b-tag-counter\test_tag_counter.lua` |
 
 覆盖：基本计数、跨级 onLevelUp/onLevelDown 逐级触发、getNextThreshold、reset、多玩家隔离。
 

@@ -6,7 +6,7 @@
 |------|------|
 | 等级 | **C** |
 | 名称 | 时间轴关卡调度器 |
-| 路径 | `.codemaker/templates/c-wave-scheduler/` |
+| 路径 | `<agent>/templates/c-wave-scheduler/` |
 | 状态 | `verified` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `wave`, `schedule`, `spawn`, `boss`, `stage`, `level`, `tower-defense`, `roguelike` |

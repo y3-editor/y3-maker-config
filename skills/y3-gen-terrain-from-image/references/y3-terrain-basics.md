@@ -288,3 +288,5 @@ grid_z = (world_z + (H - 1)) / 2
 | `terrain_get_block` | **格点坐标** | 直接用 CSV 的 x, z |
 | `terrain_vegetation_draw_block` | **植被坐标** | ⚠️ 特殊坐标系，与格点不同 |
 | `entity_create_block` | **世界坐标** | ⚠️ 需格点→世界转换：`world_x = grid_x * 2 - (W - 1)` |
+
+> `entity_create_block` 的 `pos` 虽然格式是 `[x, y, z]`，但 `RESOURCE_MODEL` 等类型的 `pos[1]` 会被引擎覆盖。高度请用 `relative_height`（相对脚下地形，米）或 `absolute_height`（绝对高度，米）；`yaw/pitch/roll` 为弧度。

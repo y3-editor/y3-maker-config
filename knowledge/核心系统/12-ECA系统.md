@@ -30,7 +30,7 @@ ECA 是 Y3 编辑器的可视化逻辑系统，对应 JSON 数据格式。一个
 
 ## 二、工具脚本（11 个）
 
-均位于 `.codemaker/skills/eca-json-builder/`。
+均位于 `<agent>/skills/eca-json-builder/`。
 
 | 脚本 | 用途 | CLI 子命令 |
 |------|------|-----------|
@@ -310,7 +310,7 @@ py -3 table_reader.py find E:\Project\maps\EntryMap\tables\游戏设定.json --k
 ### 7.3 全量项目验证
 
 ```bash
-# 全量 round-trip 测试（参考 .codemaker/memory/sandbox/dm32_audit/batch_rt.py）
+# 全量 round-trip 测试（参考 <agent>/memory/sandbox/dm32_audit/batch_rt.py）
 # 报告：总数 / 崩溃数 / OK 数 / 差异分布
 ```
 
@@ -347,11 +347,34 @@ py -3 table_reader.py find E:\Project\maps\EntryMap\tables\游戏设定.json --k
 
 ## 十、相关文档
 
-- `.codemaker/skills/eca-json-builder/SKILL.md` — 技能详细规则
-- `.codemaker/skills/eca-json-builder/eca-json-builder.md` — DSL 完整规范
-- `.codemaker/skills/eca-json-builder/eca_index.json` — ECA 索引数据
-- `.codemaker/memory/sandbox/dm32_audit/gap_report.md` — DM32 差距分析报告
-- `.codemaker/memory/sandbox/dm32_audit/batch_rt.py` — 全量 round-trip 测试脚本
+- `<agent>/skills/eca-json-builder/SKILL.md` — 技能详细规则
+- `<agent>/skills/eca-json-builder/eca-json-builder.md` — DSL 完整规范
+- **`<agent>/skills/eca-json-builder/runtime_pitfalls.md` — 「编辑器接受 ≠ 运行时生效」陷阱清单（必读）**
+- `<agent>/skills/eca-json-builder/eca_index.json` — ECA 索引数据
+- `<agent>/memory/sandbox/dm32_audit/gap_report.md` — DM32 差距分析报告
+- `<agent>/memory/sandbox/dm32_audit/batch_rt.py` — 全量 round-trip 测试脚本
 
 ---
-*最后更新：2026-06-12 / 基于 DM32（1666 条触发器）验证 100% 往返成功*
+
+## 十一、运行时陷阱（静态校验全绿但运行时不生效）
+
+> ⚠️ `validate` / `scan` / `diff` / lint **只能证明写法被编辑器接受**，
+> 证明不了运行时真的执行。以下都是「四种静态校验全绿、`valid=true`、参数没被清空，
+> 但游戏里什么都不发生」的写法。逐条证据与取证方法见
+> `skills/eca-json-builder/runtime_pitfalls.md`。
+
+| 陷阱 | 一句话结论 |
+|------|-----------|
+| **UI 事件有两条通道** | 设计期控件 `event_list` 具名事件 + `TRIGGER_COMPONENT_EVENT` 读**普通字符串** ✅ 可用；运行时 `CREATE_UI_COMP_EVENT_EX_EX` + `STR_TO_UI_EVENT` ❌ 运行时不生效 |
+| **`UI:send_event` 的传参** | 必须传包装后的对象（内部带 handle）；直接把 Lua 对象交给 `GameAPI.trigger_ui_event` 会打挂运行时 Lua 虚拟机 |
+| **群体移动命令无效** | `API_RELEASE_UNIT_GROUP_COMMAND` 系列实测零效果；必须逐只 `UNIT_RELEASE_COMMAND` |
+| **`ET_UNIT_DIE` 时序** | 事件里死亡单位仍在单位组内（`GET_COUNT` 0.5 秒后还算它）→ 结算判定必须改成轮询 |
+| **`save_editor` 会裁剪新变量** | 磁盘上有、编辑器内存里没有的全局变量会被删掉，引用它的触发器全 `valid=false` |
+| **`NEW_TIMER` 变量赋 `0`** | 参数被清成 `null`，**整条触发器 `valid=false`** |
+| **比较运算别混类型** | `FLOAT_COMPARE` 混用 INTEGER 实参 / 全局 `BOOLEAN` 读取都会静默不成立；统一 `INTEGER_COMPARE` + INTEGER 变量 |
+
+> **交付前至少做一次状态探针**（往全局变量写哨兵值 → 运行时读回），确认触发器真的跑了。
+> 只跑静态校验就宣布"实现完成"，是最容易犯的错。
+
+---
+*历史：基于 1666 条触发器样本验证 100% 往返成功*

@@ -11,7 +11,7 @@
 |------|------|
 | 等级 | **A** |
 | 名称 | 二次确认弹窗模板 |
-| 路径 | `.codex/templates/a-double-check-dialog/` |
+| 路径 | `<agent>/templates/a-double-check-dialog/` |
 | 状态 | `validated` |
 | 版本 | `v1.0.1` |
 | 能力标签 | `ui`, `dialog`, `confirm`, `double-check`, `popup` |

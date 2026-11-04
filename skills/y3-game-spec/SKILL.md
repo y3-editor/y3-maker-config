@@ -15,7 +15,7 @@ description: >
 
 管理从零开始制作游戏的完整闭环：**策划案 → 执行案 → 制作 → 测试案 → 测试 → 迭代**。
 
-> 📊 **评估报告**：本技能执行时会在 `.codemaker/skills/y3-game-spec/report/` 下自动生成评估报告，记录执行过程、token 估算、测试问题及修复情况，并在流程结束时整合为完整流程报告（含 HTML 版本）。
+> 📊 **评估报告**：本技能执行时会在 `<agent>/skills/y3-game-spec/report/` 下自动生成评估报告，记录执行过程、token 估算、测试问题及修复情况，并在流程结束时整合为完整流程报告（含 HTML 版本）。
 
 ## 🎯 Y3 引擎定位（务必先读）
 
@@ -46,7 +46,7 @@ description: >
 python -c "from datetime import datetime; print(datetime.now().strftime('%Y-%m-%d-%H%M'))"
 ```
 
-2. 创建文件 `.codemaker/skills/y3-game-spec/report/report-$REPORT_TIMESTAMP.md`，写入以下骨架：
+2. 创建文件 `<agent>/skills/y3-game-spec/report/report-$REPORT_TIMESTAMP.md`，写入以下骨架：
 
 ```markdown
 # GameSpec 评估报告 — $REPORT_TIMESTAMP
@@ -124,12 +124,12 @@ python -c "from datetime import datetime; print(datetime.now().strftime('%H:%M')
 **Step R4-A：创建测试报告快照**
 
 将当次生成的测试报告文件（`openspec/docs/{gameName}测试报告-*.md` 中最新的一份）完整复制到：
-`.codemaker/skills/y3-game-spec/report/test-snapshot-$REPORT_TIMESTAMP.md`
+`<agent>/skills/y3-game-spec/report/test-snapshot-$REPORT_TIMESTAMP.md`
 
 **Step R4-B：生成完整流程 HTML 报告**
 
 读取 `report-$REPORT_TIMESTAMP.md` + `test-snapshot-$REPORT_TIMESTAMP.md`，将两份文档的**全部内容**按三部分结构合并，**直接生成 HTML 文件**：
-`.codemaker/skills/y3-game-spec/report/full-report-$REPORT_TIMESTAMP.html`
+`<agent>/skills/y3-game-spec/report/full-report-$REPORT_TIMESTAMP.html`
 
 > ⚠️ **不得精简或总结任何内容**，原始记录全部保留，仅做排版整合。无需生成中间 MD 文件。
 
@@ -140,8 +140,8 @@ python -c "from datetime import datetime; print(datetime.now().strftime('%H:%M')
 python -c "
 import markdown, pathlib
 ts = '$REPORT_TIMESTAMP'
-report_md = pathlib.Path(f'.codemaker/skills/y3-game-spec/report/report-{ts}.md').read_text(encoding='utf-8')
-snapshot_md = pathlib.Path(f'.codemaker/skills/y3-game-spec/report/test-snapshot-{ts}.md').read_text(encoding='utf-8')
+report_md = pathlib.Path(f'<agent>/skills/y3-game-spec/report/report-{ts}.md').read_text(encoding='utf-8')
+snapshot_md = pathlib.Path(f'<agent>/skills/y3-game-spec/report/test-snapshot-{ts}.md').read_text(encoding='utf-8')
 
 # 从 report 中提取执行阶段和测试阶段内容
 exec_section = report_md.split('## 测试阶段')[0].replace('## 执行阶段', '').strip()
@@ -191,7 +191,7 @@ html = f'''<!DOCTYPE html>
 <body>{body}</body>
 </html>'''
 
-out = pathlib.Path(f'.codemaker/skills/y3-game-spec/report/full-report-{ts}.html')
+out = pathlib.Path(f'<agent>/skills/y3-game-spec/report/full-report-{ts}.html')
 out.write_text(html, encoding='utf-8')
 print(f'HTML 报告已生成：{out}')
 "
@@ -227,6 +227,26 @@ print(f'HTML 报告已生成：{out}')
 ---
 
 ## 🚦 前置步骤
+
+### Step -1：核对工程现状（执行案的「✅ 已完成」不可信）
+
+执行案里的「✅ 完成 / 已导入 / 已生成」标记**反映的是规划时的状态，不是当前磁盘的状态**。
+实测遇到过：执行案写着「模板已导入、装饰物物编已在工程内」，实际是干净工程
+（地形是默认的、无装饰物、无单位、`editor_table/*` 全空）。
+
+开工前先花 30 秒核对，避免按错误前提铺开：
+
+```powershell
+# 物编数量（0 = 干净工程）
+Get-ChildItem "maps\EntryMap\editor_table\editorunit","maps\EntryMap\editor_table\abilityall" -File | Measure-Object
+# 地形/装饰物（空 = 模板未导入）
+(Get-Item "maps\EntryMap\decorationdata.data").Length
+# 已有触发器与逻辑节点
+Get-Content "maps\EntryMap\global_trigger\trigger\index.txt"
+Get-Content "maps\EntryMap\logicres.json"
+```
+
+> 发现不一致时**先向用户确认**是按「从零做」还是「补差量」，再决定走 Full Mode 还是 Patch Mode。
 
 **在进入任何模式（Full Mode / Patch Mode）执行任务之前，必须先执行以下步骤：**
 
@@ -265,12 +285,12 @@ print(f'HTML 报告已生成：{out}')
 
 | 文档类型 | 文件名模板 | 示例 |
 |----------|-----------|------|
-| 策划案 | `{gameName}设计案.md` | `塔防设计案.md` |
-| 执行案（单文档） | `{gameName}执行案.md` | `塔防执行案.md` |
-| 执行案（多文档主控） | `{gameName}执行案_主控.md` | `塔防执行案_主控.md` |
-| 执行案（多文档子文档） | `{gameName}执行案_{Phase/模块名}.md` | `塔防执行案_Phase3.md` |
-| 测试案 | `{gameName}测试案.md` | `塔防测试案.md` |
-| 测试报告 | `{gameName}测试报告-{timestamp}.md` | `塔防测试报告-2026年4月14日11时12分54秒.md` |
+| 策划案 | `{gameName}设计案.md` | `示例设计案.md` |
+| 执行案（单文档） | `{gameName}执行案.md` | `示例执行案.md` |
+| 执行案（多文档主控） | `{gameName}执行案_主控.md` | `示例执行案_主控.md` |
+| 执行案（多文档子文档） | `{gameName}执行案_{Phase/模块名}.md` | `示例执行案_Phase3.md` |
+| 测试案 | `{gameName}测试案.md` | `示例测试案.md` |
+| 测试报告 | `{gameName}测试报告-{timestamp}.md` | `示例测试报告-2026年4月14日11时12分54秒.md` |
 
 > 多文档拆分详见 `phase-2-execution.md` §3「多文档拆分」。大型项目（F-ID > 30 或 Phase 3/4 跨 3+ 独立模块）推荐使用。
 
@@ -328,12 +348,13 @@ Step 1 游戏类型 → Step 1.2 Roadmap 复用询问（🆕 仅塔防/生存且
 |-------|------|----------|
 | Phase 1 | 物编准备 + 场景模板匹配 | `y3-obj-edit` + `y3-terrain-template` |
 | Phase 2 | UI 开发 | `y3-ui-pipeline` |
-| Phase 3 | 核心玩法（Lua） | `y3-lua-pipeline` |
-| Phase 4 | 扩展机制（Lua） | `y3-lua-pipeline` |
-| Phase 5 | Lua 审查 | `y3-lua-review` |
+| Phase 3 | 核心玩法（Lua / 纯 ECA） | `y3-lua-pipeline` / `y3-eca-pipeline` |
+| Phase 4 | 扩展机制（Lua / 纯 ECA） | `y3-lua-pipeline` / `y3-eca-pipeline` |
+| Phase 5 | Lua 审查 / ECA 对账 | `y3-lua-review` / `y3-eca-pipeline` |
 | Phase 6 | 测试验收 | `y3-auto-test` ⚠️ **强制走完整流程** |
 
 > Phase 3/4 从策划案第 2~7 章提取，按「核心玩法」和「扩展机制」分配。详见 `phase-2-execution.md` 动态 Phase 速查表。
+> 纯 ECA 路线（全程零 Lua）统一走 `y3-eca-pipeline`；Lua 路线走 `y3-lua-pipeline`，两条路线不要混用。
 
 ### 功能模板支持（可选增强）
 
@@ -380,7 +401,9 @@ Gate 准入（Gate 1A/1B/2/2.5/3）→ 测试案生成 → 一致性校验 → �
 | 所有 UI 开发（无模板匹配） | `y3-ui-pipeline` |
 | 模板 `.upui` 导入 | `y3editor.import_ui`（由 `y3-game-spec` 模板分支编排） |
 | 所有 Lua 代码（含模板 `logic.lua` 融合/适配） | `y3-lua-pipeline` |
+| 所有 ECA 触发器 / ECA 函数 / ECA 变量 | `y3-eca-pipeline` |
 | Lua 审查 | `y3-lua-review` |
+| ECA 交付前对账 / 状态探针 | `y3-eca-pipeline` |
 | 物编生成 | `y3-obj-edit` |
 | 自动化测试 | `y3-auto-test` |
 
@@ -425,4 +448,4 @@ Y+（南/下）↓
 
 ---
 
-*最后更新: 2026-04-23 — 合并 Incremental Mode 到 Patch Mode，所有增量迭代统一走完整流程*
+*最后更新：合并 Incremental Mode 到 Patch Mode，所有增量迭代统一走完整流程*

@@ -1,0 +1,7193 @@
+{
+ "_source": {
+  "arg_type_count": 330,
+  "const_count": 1271,
+  "data_version": "1",
+  "derived_by": "sync_from_source.py",
+  "file_count": 123,
+  "sha256": "86f2d5af33186bba853cb12545c92fa7780ff4e3ed01ac6ac7f759c932a648c8"
+ },
+ "arg_type_ids": {
+  "ABILITY": 100014,
+  "ABILITY_BOOL_ATTRS": 100080,
+  "ABILITY_CAST_TYPE": 100219,
+  "ABILITY_CONF_FLOAT_ATTRS": 100250,
+  "ABILITY_CONF_INT_ATTRS": 100248,
+  "ABILITY_EVENT": 100128,
+  "ABILITY_FLOAT_ATTRS": 100078,
+  "ABILITY_FORMULA_ATTRS": 100249,
+  "ABILITY_INT_ATTRS": 100079,
+  "ABILITY_NAME": 100039,
+  "ABILITY_RELEASE_ID": 101018,
+  "ABILITY_RELEASE_TIMING": 101020,
+  "ABILITY_STR_ATTRS": 100221,
+  "ABILITY_TRIGGER": 100068,
+  "ABILITY_TYPE": 100182,
+  "ACTION_LIST": 100022,
+  "ADD_OR_REMOVE": 100045,
+  "ALL_GAME_FUNC": 100253,
+  "ALTER_NUMBER": 100036,
+  "ANGLE": 100225,
+  "ANIMATION_GRAPH_TYPE": 100337,
+  "ANIMATION_TURN_TYPE": 100336,
+  "ANNULAR_SHAPE": 100061,
+  "AREA_METHOD": 100044,
+  "AREA_SHAPE": 100213,
+  "ARITHMETIC_OPERATOR": 100016,
+  "ATTACH_MODEL_ENTITY": 1011011,
+  "ATTACK_TARGET_HIT_TYPE": 100085,
+  "ATTR_ELEMENT": 100300,
+  "ATTR_ELEMENT_READ": 100301,
+  "AUDIO_CHANNEL": 1001560,
+  "AUDIO_KEY": 100084,
+  "BOOLEAN": 100001,
+  "BOOLEAN_OPERATOR": 100035,
+  "BOOL_SAVE": 100233,
+  "BUILD_KEY": 100173,
+  "CAMERA": 100073,
+  "CAMERA_ATTR_INTEGER": 500501,
+  "CAMERA_ATTR_REAL_NUMBER": 500500,
+  "CAMERA_MODE": 100323,
+  "CAMERA_MOVE_MODE_TYPE": 100217,
+  "CAMERA_RAY_DIRECTION": 100330,
+  "CAMERA_ROTATE": 100256,
+  "CAMERA_SHAKE_MODE_TYPE": 100218,
+  "CAMERA_SHAKE_WITH_DECAY_MODE_TYPE": 100234,
+  "CAMLINE": 100244,
+  "CC_ACTION": 100317,
+  "CC_ANIMATION_MACHINE_STATUS": 100320,
+  "CC_ASM_STATE": 100328,
+  "CC_EMO": 100329,
+  "CC_HAND": 100318,
+  "CHASING_MOVER_READABLE_ATTR": 100268,
+  "CHASING_MOVER_WRITEABLE_ATTR": 100272,
+  "CIRCULAR_SHAPE": 100211,
+  "COIN_CURRENCY": 402217,
+  "COLLIDER": 100299,
+  "COLLIDER_BOOL_ATTRS": 100308,
+  "COLLIDER_FLOAT_ATTRS": 100309,
+  "COLLISION_LAYER": 100209,
+  "COLLISION_TYPE": 100321,
+  "COLOR_GRADING": 100237,
+  "COMPARISON_OPERATOR": 100015,
+  "COMPONENT_EVENT": 100086,
+  "CONDITION_LIST": 100021,
+  "CURSOR_KEY": 100288,
+  "CURSOR_STATE": 100289,
+  "CURVED_MOVER_READABLE_ATTR": 100269,
+  "CURVED_MOVER_WRITEABLE_ATTR": 100273,
+  "CURVED_PATH": 100222,
+  "CURVED_PATH_3D": 100228,
+  "CUS_EVENT": 100238,
+  "CUS_PARAM": 100240,
+  "DAMAGE_ARMOR_TYPE": 100401,
+  "DAMAGE_ATTACK_TYPE": 100400,
+  "DAMAGE_TYPE": 100064,
+  "DEBUG_SHAPE": 100341,
+  "DECO_ENTITY": 100195,
+  "DECO_NAME": 101015,
+  "DESTRUCTIBLE_ENTITY": 100205,
+  "DESTRUCTIBLE_EVENT": 100206,
+  "DESTRUCTIBLE_NAME": 100207,
+  "DESTRUCTIBLE_TRIGGER": 100204,
+  "DIALOG_DEBUG_TYPE": 100175,
+  "DYNAMIC_TRIGGER_INSTANCE": 100178,
+  "EDIT_GAME_FUNC": 100252,
+  "EVENT_UNIT": 100007,
+  "FLOAT": 100000,
+  "FLOAT_ARITHMETIC_OPERATOR": 100017,
+  "FLOAT_SAVE": 100232,
+  "FOG": 1001554,
+  "FOG_ATTR": 100293,
+  "FOG_TYPE": 1001561,
+  "FONT_NAME": 100157,
+  "FONT_TYPE": 100335,
+  "FORCE_ENTITY": 402209,
+  "FOV_BLOCK_TYPE": 100227,
+  "FUNCTION": 100177,
+  "FUNC_KEYBOARD_KEY": 200223,
+  "GAME_MODE": 100505,
+  "GENERIC_DEST_EVENT": 100241,
+  "GENERIC_PHYSICS_ENTITY_EVENT": 500405,
+  "GENERIC_UNIT_EVENT": 100008,
+  "GLOBAL_ARCHIVE_SLOT": 100331,
+  "GOODS_KEY": 1001574,
+  "HARM_TEXT_TYPE": 100220,
+  "HARM_TEXT_TYPE_NEW": 100259,
+  "HIT_POINT_BOOL": 100260,
+  "HIT_POINT_INT": 100261,
+  "IMAGE_KEY": 100224,
+  "IMAGE_QUALITY": 100506,
+  "INTEGER": 100002,
+  "INT_SAVE": 100230,
+  "ITEM_ENTITY": 100031,
+  "ITEM_FLOAT_ATTR": 100324,
+  "ITEM_GROUP": 100171,
+  "ITEM_INT_ATTR": 100325,
+  "ITEM_NAME": 100032,
+  "ITEM_NAME_BAR_TYPE": 101021,
+  "ITEM_STACK_TYPE": 101013,
+  "ITEM_TRIGGER": 1000673,
+  "ITEM_TYPE_FLOAT_ATTR": 100326,
+  "ITEM_TYPE_INT_ATTR": 100327,
+  "JOINT": 100302,
+  "JUMP_WORD_TRACK": 100333,
+  "KEYBOARD_KEY": 200220,
+  "KNOCKUP_MOVER_READABLE_ATTR": 100347,
+  "KNOCKUP_MOVER_WRITEABLE_ATTR": 100346,
+  "LANGUAGE_ALLOW_TYPE": 100200,
+  "LANGUAGE_TYPE": 100257,
+  "LINK_SFX_ENTITY": 100202,
+  "LINK_SFX_KEY": 100191,
+  "LINK_SFX_POINT_TYPE": 500217,
+  "LIVE2D": 1001567,
+  "LOCAL_UNIT_ENTITY": 100348,
+  "LOCAL_UNIT_GROUP": 100349,
+  "MAP": 900002,
+  "MATERIAL_ID": 100243,
+  "MINI_MAP_COLOR_TYPE": 100235,
+  "MODEL": 100122,
+  "MODIFIER": 100046,
+  "MODIFIER_EFFECT_SHOW_TYPE": 101011,
+  "MODIFIER_EFFECT_TYPE": 100174,
+  "MODIFIER_ENTITY": 100076,
+  "MODIFIER_EVENT": 100129,
+  "MODIFIER_STATE_TYPE": 100194,
+  "MODIFIER_TRIGGER": 100069,
+  "MODIFIER_TYPE": 100186,
+  "MOUSE_KEY": 200221,
+  "MOUSE_KEY_WITHOUT_MIDDLE": 200224,
+  "MOUSE_WHEEL": 200222,
+  "MOVEMENT_OBSTACLE_PROCESS_TYPE": 1000672,
+  "MOVER_COLLISION_TYPE": 100176,
+  "MOVER_ENTITY": 100263,
+  "MOVER_TYPE": 100264,
+  "MOVE_DIRECTION": 100332,
+  "MOVE_TYPE": 100338,
+  "NEW_BLOOD_BAR_TYPE": 100223,
+  "NEW_TIMER": 100181,
+  "NORMAL_KEY": 100254,
+  "OBJECT_NAME_DESC_TYPE": 500601,
+  "OBJECT_TYPE": 500600,
+  "ONCE_OR_CIRCLE": 100049,
+  "ON_OR_OFF": 100048,
+  "ORTHOGONAL_CAMERA": 100155,
+  "PATROL_MODE": 100051,
+  "PHYSICS_ENTITY": 100297,
+  "PHYSICS_ENTITY_KEY": 100304,
+  "PHYSICS_ENTITY_STATE": 100322,
+  "PHYSICS_FILTER": 100314,
+  "PHYSICS_OBJECT": 100296,
+  "PHYSICS_OBJECT_KEY": 100303,
+  "PLATFORM_COMMUNITY_TYPE": 100292,
+  "PLATFORM_DECO_TYPE": 100290,
+  "PLATFORM_SIGNIN_TYPE": 100291,
+  "PLATFORM_TRIGGER": 1000674,
+  "PLAYER": 100025,
+  "PLAYER_GROUP": 100027,
+  "PLAY_OPERATION": 100316,
+  "POINT": 100004,
+  "POINT_LIGHT": 1001550,
+  "POINT_LIGHT_ATTR": 1001551,
+  "POINT_LIST": 100024,
+  "POLYGON": 100150,
+  "POST_EFFECT": 1001557,
+  "PRIMARY_ATTR": 100500,
+  "PROJECTILE": 100062,
+  "PROJECTILE_ENTITY": 100077,
+  "PROJECTILE_EVENT": 100130,
+  "PROJECTILE_GROUP": 100203,
+  "PROJECTILE_TRIGGER": 1000670,
+  "RANDOM_POOL": 100201,
+  "RANDOM_POOL_DROP": 100334,
+  "REACTION": 100311,
+  "REACTION_GROUP": 100312,
+  "RECORD_KEY": 100255,
+  "RECTANGLE": 100009,
+  "RECTANGLE_SHAPE": 100060,
+  "RESCUER_TYPE": 101004,
+  "RESCUE_SEEKER_TYPE": 101003,
+  "RIGID_BODY": 100298,
+  "RIGID_BODY_BOOL_ATTRS": 100307,
+  "RIGID_BODY_GROUP": 100306,
+  "RIGID_BODY_TYPE": 100310,
+  "ROAD_GROUP": 100149,
+  "ROLE_RELATION": 1000204,
+  "ROLE_RES_KEY": 100037,
+  "ROLE_STATUS": 100180,
+  "ROLE_TYPE": 100179,
+  "ROTATION": 100305,
+  "ROUND_AREA": 100023,
+  "ROUND_MODE": 100345,
+  "ROUND_MOVER_DIRECTION_TYPE": 100208,
+  "ROUND_MOVER_READABLE_ATTR": 100267,
+  "ROUND_MOVER_WRITEABLE_ATTR": 100271,
+  "ROUND_RULE": 100343,
+  "SCENE_PRESET": 100196,
+  "SCENE_SOUND": 100262,
+  "SCENE_UI": 100236,
+  "SECTOR_SHAPE": 100059,
+  "SEQUENCE": 100295,
+  "SFX_ENTITY": 100148,
+  "SFX_KEY": 100066,
+  "SFX_ROTATE_TYPE": 500220,
+  "SFX_VISIBLE_TYPE": 100131,
+  "SHIELD_TYPE": 100245,
+  "SIGNAL_TYPE": 100275,
+  "SIGNAL_VISIBLE_TYPE": 100286,
+  "SITE_STATE": 402216,
+  "SKILL_INDICATOR_EFFECT": 100287,
+  "SKILL_POINTER_TYPE": 100258,
+  "SLAVE_ATTR": 100502,
+  "SLOT_TYPE": 100135,
+  "SNAPSHOT_DETAIL_LEVEL": 101017,
+  "SNAPSHOT_TRACEBACK_LEVEL": 101016,
+  "SORT_TYPE": 100251,
+  "SOUND_ENTITY": 100214,
+  "SPECIAL_PHYSICS_ENTITY_EVENT": 500406,
+  "SPINE": 100339,
+  "SPOT_LIGHT": 1001552,
+  "SPOT_LIGHT_ATTR": 1001553,
+  "START_MODE": 100246,
+  "STATE": 100075,
+  "STORE_ITEM_TYPE": 101005,
+  "STORE_KEY": 100134,
+  "STRAIGHT_MOVER_READABLE_ATTR": 100265,
+  "STRAIGHT_MOVER_WRITEABLE_ATTR": 100270,
+  "STRING": 100003,
+  "STR_LIST_NO_INDEX": 100167,
+  "STR_SAVE": 100231,
+  "TABLE": 100011,
+  "TABLE_ORDER": 100319,
+  "TABLE_SAVE": 100247,
+  "TAG_ABILITY": 100057,
+  "TAG_ITEM": 100056,
+  "TAG_MODIFIER": 100124,
+  "TAG_PROJECTILE": 100123,
+  "TAG_ROAD": 100168,
+  "TAG_UNIT": 100055,
+  "TEAM": 100020,
+  "TECH_KEY": 100172,
+  "TEXTURE": 100115,
+  "TEXTURE_TYPE": 100212,
+  "TRIGGER": 100019,
+  "TRIGONOMETRIC_OPERATOR": 100018,
+  "UI_ANIM": 100239,
+  "UI_ANIM_CURVE": 100313,
+  "UI_ANIM_PLAY_MODE": 100340,
+  "UI_BTN_STATUS": 1001563,
+  "UI_CHAT_RECV_CHANNEL": 1001576,
+  "UI_CHAT_SEND_CHANNEL": 1001575,
+  "UI_COMP": 100070,
+  "UI_COMP_ALIGN_TYPE": 100192,
+  "UI_COMP_ATTR": 1001555,
+  "UI_COMP_EVENT_TYPE": 100072,
+  "UI_COMP_TYPE": 100071,
+  "UI_DIRECTION": 100193,
+  "UI_ECA_ANIM_TYPE": 100344,
+  "UI_EFFECT_CAMERA_MODE": 1001572,
+  "UI_EQUIP_SLOT_DRAG_TYPE": 1001566,
+  "UI_EQUIP_SLOT_USE_TYPE": 1001565,
+  "UI_EVENT": 100067,
+  "UI_GRIDVIEW_BAR_TYPE": 1001571,
+  "UI_GRIDVIEW_TYPE": 1001570,
+  "UI_LAYOUT_CLIPPING_TYPE": 1001569,
+  "UI_MODEL_CAMERA_MOD": 1001562,
+  "UI_POINT": 101019,
+  "UI_POS_ADAPT_MODE": 1001573,
+  "UI_PREFAB": 1001556,
+  "UI_PREFAB_INSTANCE": 1001558,
+  "UI_PREFAB_INS_UID": 1001559,
+  "UI_SCROLLVIEW_TYPE": 1001564,
+  "UI_TEXT_FONT_NAME": 100342,
+  "UI_TEXT_OVER_LENGTH_HANDLING_TYPE": 1001568,
+  "UI_TRIGGER": 1000675,
+  "UNIT_ATTRIBUTES": 100041,
+  "UNIT_BAR_SHOW_NAME_TYPE": 101010,
+  "UNIT_BAR_TEXT_TYPE": 100170,
+  "UNIT_BEHAVIOR": 100242,
+  "UNIT_COMMAND": 100216,
+  "UNIT_COMMAND_TYPE": 100210,
+  "UNIT_COMPARABLE_ATTR": 100082,
+  "UNIT_CONDITIONS": 100054,
+  "UNIT_ENTITY": 100006,
+  "UNIT_GROUP": 100026,
+  "UNIT_GROUP_COMMAND": 101001,
+  "UNIT_GROUP_COMMAND_TYPE": 101002,
+  "UNIT_HP_BAR_ATTR": 100159,
+  "UNIT_HP_BAR_SHOW_TYPE": 100163,
+  "UNIT_KEY_FLOAT_ATTRIBUTE": 100043,
+  "UNIT_NAME": 100116,
+  "UNIT_NAME_BAR_ATTR": 100160,
+  "UNIT_NAME_BAR_SHOW_TYPE": 100164,
+  "UNIT_NAME_POOL": 100038,
+  "UNIT_STR_ATTRIBUTES": 100063,
+  "UNIT_TEXT_BAR_ATTR": 100161,
+  "UNIT_TITLE_ATTR": 100156,
+  "UNIT_TITLE_STYLE_TYPE": 100158,
+  "UNIT_TRIGGER": 1000671,
+  "UNIT_TYPE": 100010,
+  "UNIT_WRITE_ATTRIBUTE": 100042,
+  "VAR": 100030,
+  "VAR_LIST": 100028,
+  "VAR_LIST_NO_INDEX": 100081,
+  "VECTOR3": 100294,
+  "VECTOR3_ARITHMETIC_OPERATOR": 100315,
+  "WATCHING_MODE_STATUS": 101012,
+  "WEATHER_TYPE": 100215,
+  "WINDOW_TYPE_SETTING": 100507,
+  "WIN_OR_LOSE": 100047
+ },
+ "arg_types": {
+  "ABILITY": {
+   "can_compare": true,
+   "const": "ABILITY",
+   "default": "None",
+   "id": 100014,
+   "implemented": [
+    "GET_ABILITY_FROM_EVENT",
+    "GET_ITEM_PASSIVE_ABILITY",
+    "NONE_ABILITY",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {
+    "0": [
+     0,
+     "UInt64"
+    ]
+   },
+   "sub_types": {
+    "CUR_ABILITY": 3,
+    "UNIT_ABILITY": 1,
+    "VARIABLE": 2
+   }
+  },
+  "ABILITY_BOOL_ATTRS": {
+   "const": "ABILITY_BOOL_ATTRIBUTE",
+   "id": 100080,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ABILITY_CAST_TYPE": {
+   "can_compare": true,
+   "const": "ABILITY_CAST_TYPE",
+   "default": 0,
+   "id": 100219,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "ABILITY_CONF_FLOAT_ATTRS": {
+   "const": "ABILITY_CONF_FLOAT_ATTRS",
+   "id": 100250,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ABILITY_CONF_INT_ATTRS": {
+   "const": "ABILITY_CONF_INT_ATTRS",
+   "id": 100248,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ABILITY_EVENT": {
+   "const": "ABILITY_EVENT",
+   "id": 100128,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ABILITY_FLOAT_ATTRS": {
+   "const": "ABILITY_FLOAT_ATTRIBUTE",
+   "id": 100078,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ABILITY_FORMULA_ATTRS": {
+   "const": "ABILITY_FORMULA_ATTRS",
+   "id": 100249,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ABILITY_INT_ATTRS": {
+   "const": "ABILITY_INT_ATTRIBUTE",
+   "id": 100079,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ABILITY_NAME": {
+   "can_compare": true,
+   "const": "ABILITY_KEY",
+   "default": 0,
+   "id": 100039,
+   "implemented": [
+    "CONST",
+    "NONE_ABILITY_KEY",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "ABILITY_KEY_OF_UNIT_KEY": 500017,
+    "CONST": 1,
+    "NONE_ABILITY_KEY": 500002,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "ABILITY_RELEASE_ID": {
+   "can_compare": true,
+   "const": "ABILITY_RELEASE_ID",
+   "default": 0,
+   "id": 101018,
+   "implemented": [
+    "GET_ABILITY_RELEASE_ID"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "GET_ABILITY_RELEASE_ID": "GET_ABILITY_RELEASE_ID"
+   }
+  },
+  "ABILITY_RELEASE_TIMING": {
+   "const": "ABILITY_RELEASE_TIMING",
+   "default": 1,
+   "id": 101020
+  },
+  "ABILITY_STR_ATTRS": {
+   "const": "ABILITY_STR_ATTRIBUTE",
+   "id": 100221,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ABILITY_TRIGGER": {
+   "const": "ABILITY_TRIGGER",
+   "id": 100068,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ABILITY_TYPE": {
+   "can_compare": true,
+   "const": "ABILITY_TYPE",
+   "default": 0,
+   "id": 100182,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "ACTION_LIST": {
+   "const": "ACTION_LIST",
+   "id": 100022,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ADD_OR_REMOVE": {
+   "const": "ADD_OR_REMOVE",
+   "id": 100045,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ALL_GAME_FUNC": {
+   "const": "ALL_GAME_FUNC",
+   "default": 0,
+   "id": 100253,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ALTER_NUMBER": {
+   "const": "ALTER_NUMBER",
+   "id": 100036,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ANGLE": {
+   "can_compare": true,
+   "const": "ANGLE",
+   "default": "Fix32(0)",
+   "id": 100225,
+   "implemented": [
+    "CONST",
+    "GET_ABILITY_RELEASE_DIRECTION",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "ANIMATION_GRAPH_TYPE": {
+   "const": "ANIMATION_GRAPH_TYPE",
+   "default": 0,
+   "id": 100337
+  },
+  "ANIMATION_TURN_TYPE": {
+   "const": "ANIMATION_TURN_TYPE",
+   "default": 0,
+   "id": 100336
+  },
+  "ANNULAR_SHAPE": {
+   "const": "ANNULAR_SHAPE",
+   "id": 100061,
+   "implemented": [],
+   "op_arg_defaults": {},
+   "sub_types": {}
+  },
+  "AREA_METHOD": {
+   "const": "AREA_METHOD",
+   "id": 100044,
+   "implemented": [
+    "CONST_METHOD"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST_METHOD": 1
+   }
+  },
+  "AREA_SHAPE": {
+   "const": "AREA_SHAPE",
+   "id": 100213,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ARITHMETIC_OPERATOR": {
+   "const": "ARITHMETIC_OPERATOR",
+   "id": 100016,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ATTACH_MODEL_ENTITY": {
+   "can_compare": true,
+   "const": "ATTACH_MODEL_ENTITY",
+   "default": 0,
+   "id": 1011011,
+   "implemented": [
+    "GET_ATTACH_MODEL_ON_MODIFIER",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "GET_ATTACH_MODEL_ON_MODIFIER": 2,
+    "VARIABLE": 1
+   }
+  },
+  "ATTACK_TARGET_HIT_TYPE": {
+   "const": "ATTACK_TARGET_HIT_TYPE",
+   "id": 100085,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ATTR_ELEMENT": {
+   "can_compare": true,
+   "const": "ATTR_ELEMENT",
+   "default": "",
+   "id": 100300,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "ATTR_ELEMENT_READ": {
+   "can_compare": true,
+   "const": "ATTR_ELEMENT_READ",
+   "default": "",
+   "id": 100301,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "AUDIO_CHANNEL": {
+   "can_compare": true,
+   "const": "AUDIO_CHANNEL",
+   "default": 0,
+   "id": 1001560,
+   "implemented": [
+    "ALL_UI_COMP"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "ALL_UI_COMP": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "AUDIO_KEY": {
+   "can_compare": true,
+   "const": "AUDIO_KEY",
+   "default": 0,
+   "id": 100084,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "BOOLEAN": {
+   "can_compare": true,
+   "const": "BOOLEAN",
+   "default": "False",
+   "id": 100001,
+   "implemented": [
+    "BOOL_VARIABLE",
+    "CONST",
+    "GET_CUR_DAMAGE_IS_CRITICAL",
+    "GET_DEST_ATTACK_STATUE",
+    "GET_DEST_COLLECT_STATUE",
+    "GET_DEST_SELECT_STATUE",
+    "HURT_DAMAGE_IS_MISS",
+    "POINT_VISIBLE_TO_PLAYER",
+    "WHETHER_ABILITY_HAVE_TARGET"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {
+    "0": [
+     "",
+     "RecordKey"
+    ]
+   },
+   "sub_types": {
+    "BOOL_VARIABLE": "VARIABLE",
+    "CONST": 1
+   }
+  },
+  "BOOLEAN_OPERATOR": {
+   "const": "BOOLEAN_OPERATOR",
+   "id": 100035,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "BOOL_SAVE": {
+   "const": "BOOL_SAVE",
+   "default": "True",
+   "id": 100233,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "BUILD_KEY": {
+   "const": "BUILD_KEY",
+   "id": 100173,
+   "implemented": [
+    "CONST_KEY"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST_KEY": 1
+   }
+  },
+  "CAMERA": {
+   "can_compare": true,
+   "const": "CAMERA",
+   "default": 0,
+   "id": 100073,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "CAMERA_ATTR_INTEGER": {
+   "can_compare": true,
+   "const": "CAMERA_ATTR_INTEGER",
+   "default": "",
+   "id": 500501,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": false,
+   "is_kv_value": false,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "CAMERA_ATTR_REAL_NUMBER": {
+   "can_compare": true,
+   "const": "CAMERA_ATTR_REAL_NUMBER",
+   "default": "",
+   "id": 500500,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": false,
+   "is_kv_value": false,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "CAMERA_MODE": {
+   "const": "CAMERA_MODE",
+   "default": 0,
+   "id": 100323,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "CAMERA_MOVE_MODE_TYPE": {
+   "const": "CAMERA_MOVE_MODE_TYPE",
+   "id": 100217,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "CAMERA_RAY_DIRECTION": {
+   "const": "CAMERA_RAY_DIRECTION",
+   "default": 0,
+   "id": 100330,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "CAMERA_ROTATE": {
+   "const": "CAMERA_ROTATE",
+   "default": 0,
+   "id": 100256,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "CAMERA_SHAKE_MODE_TYPE": {
+   "const": "CAMERA_SHAKE_MODE_TYPE",
+   "id": 100218,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "CAMERA_SHAKE_WITH_DECAY_MODE_TYPE": {
+   "const": "CAMERA_SHAKE_WITH_DECAY_MODE_TYPE",
+   "id": 100234,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "CAMLINE": {
+   "can_compare": true,
+   "const": "CAMLINE",
+   "default": 0,
+   "id": 100244,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "CC_ACTION": {
+   "const": "CC_ACTION",
+   "default": 0,
+   "id": 100317,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "CC_ANIMATION_MACHINE_STATUS": {
+   "const": "CC_ANIMATION_MACHINE_STATUS",
+   "default": 0,
+   "id": 100320,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "CC_ASM_STATE": {
+   "const": "CC_ASM_STATE",
+   "default": 0,
+   "id": 100328,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "CC_EMO": {
+   "const": "CC_EMO",
+   "default": 0,
+   "id": 100329,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "CC_HAND": {
+   "const": "CC_HAND",
+   "default": 0,
+   "id": 100318,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "CHASING_MOVER_READABLE_ATTR": {
+   "const": "CHASING_MOVER_READABLE_ATTR",
+   "default": 0,
+   "id": 100268,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "CHASING_MOVER_WRITEABLE_ATTR": {
+   "const": "CHASING_MOVER_WRITEABLE_ATTR",
+   "default": 0,
+   "id": 100272,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "CIRCULAR_SHAPE": {
+   "const": "CIRCULAR_SHAPE",
+   "id": 100211,
+   "implemented": [],
+   "op_arg_defaults": {},
+   "sub_types": {}
+  },
+  "COIN_CURRENCY": {
+   "can_compare": true,
+   "const": "COIN_CURRENCY",
+   "default": "CNY",
+   "id": 402217,
+   "implemented": [
+    "COIN_CURRENCY_TYPE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "COIN_CURRENCY_TYPE": 1
+   }
+  },
+  "COLLIDER": {
+   "const": "COLLIDER",
+   "default": 0,
+   "id": 100299,
+   "implemented": [
+    "GET_REACT_COLLIDER_IN_REACTION",
+    "GET_REACT_SOURCE_COLLIDER_IN_REACTION",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "GET_REACT_COLLIDER_IN_REACTION": "GET_REACT_COLLIDER_IN_REACTION",
+    "GET_REACT_SOURCE_COLLIDER_IN_REACTION": "GET_REACT_SOURCE_COLLIDER_IN_REACTION",
+    "VARIABLE": 1
+   }
+  },
+  "COLLIDER_BOOL_ATTRS": {
+   "const": "COLLIDER_BOOL_ATTRS",
+   "id": 100308,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "COLLIDER_FLOAT_ATTRS": {
+   "const": "COLLIDER_FLOAT_ATTRS",
+   "id": 100309,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "COLLISION_LAYER": {
+   "can_compare": true,
+   "const": "COLLISION_LAYER",
+   "default": 32,
+   "id": 100209,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": false,
+   "is_kv_value": false,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "COLLISION_TYPE": {
+   "const": "COLLISION_TYPE",
+   "default": 0,
+   "id": 100321,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "COLOR_GRADING": {
+   "const": "COLOR_GRADING",
+   "id": 100237,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "COMPARISON_OPERATOR": {
+   "const": "COMPARISON_OPERATOR",
+   "id": 100015,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "COMPONENT_EVENT": {
+   "const": "WIDGET_EVENT",
+   "id": 100086
+  },
+  "CONDITION_LIST": {
+   "const": "CONDITION_LIST",
+   "id": 100021,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "CURSOR_KEY": {
+   "const": "CURSOR_KEY",
+   "default": 0,
+   "id": 100288,
+   "implemented": [
+    "CONST_KEY",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST_KEY": 1,
+    "VARIABLE": 2
+   }
+  },
+  "CURSOR_STATE": {
+   "const": "CURSOR_STATE",
+   "default": 0,
+   "id": 100289,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "CURVED_MOVER_READABLE_ATTR": {
+   "const": "CURVED_MOVER_READABLE_ATTR",
+   "default": 0,
+   "id": 100269,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "CURVED_MOVER_WRITEABLE_ATTR": {
+   "const": "CURVED_MOVER_WRITEABLE_ATTR",
+   "default": 0,
+   "id": 100273,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "CURVED_PATH": {
+   "const": "CURVED_PATH",
+   "default": "[]",
+   "id": 100222,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "CURVED_PATH_3D": {
+   "const": "CURVED_PATH_3D",
+   "default": "[]",
+   "id": 100228,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "CUS_EVENT": {
+   "const": "CUS_EVENT",
+   "default": 0,
+   "id": 100238,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "CUS_PARAM": {
+   "const": "CUS_PARAM",
+   "id": 100240,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "DAMAGE_ARMOR_TYPE": {
+   "can_compare": true,
+   "const": "DAMAGE_ARMOR_TYPE",
+   "default": 0,
+   "id": 100401,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "DAMAGE_ATTACK_TYPE": {
+   "can_compare": true,
+   "const": "DAMAGE_ATTACK_TYPE",
+   "default": 0,
+   "id": 100400,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "DAMAGE_TYPE": {
+   "can_compare": true,
+   "const": "DAMAGE_TYPE",
+   "default": 0,
+   "id": 100064,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "DEBUG_SHAPE": {
+   "const": "DEBUG_SHAPE",
+   "default": 0,
+   "id": 100341,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": 2
+   }
+  },
+  "DECO_ENTITY": {
+   "can_compare": true,
+   "const": "DECO_ENTITY",
+   "default": 0,
+   "id": 100195,
+   "implemented": [
+    "DECO_IN_SCENE",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": false,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "DECO_IN_SCENE": 1,
+    "VARIABLE": 2
+   }
+  },
+  "DECO_NAME": {
+   "can_compare": false,
+   "const": "DECO_NAME",
+   "default": 0,
+   "id": 101015,
+   "implemented": [
+    "CONST_KEY",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": false,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST_KEY": 1,
+    "VARIABLE": 2
+   }
+  },
+  "DESTRUCTIBLE_ENTITY": {
+   "can_compare": true,
+   "const": "DESTRUCTIBLE_ENTITY",
+   "default": 0,
+   "id": 100205,
+   "implemented": [
+    "DEST_IN_EVENT",
+    "DEST_IN_SCENE",
+    "TARGET_DEST_IN_ABILITY",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CREATE_DESTRUCTIBLE": 4004384,
+    "DEST_IN_EVENT": "DEST_IN_EVENT",
+    "DEST_IN_SCENE": 1,
+    "TARGET_DEST_IN_ABILITY": "TARGET_DEST_IN_ABILITY",
+    "VARIABLE": 2
+   }
+  },
+  "DESTRUCTIBLE_EVENT": {
+   "const": "DESTRUCTIBLE_EVENT",
+   "id": 100206,
+   "implemented": [
+    "EVENT_DESTRUCTIBLE"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "EVENT_DESTRUCTIBLE": 1
+   }
+  },
+  "DESTRUCTIBLE_NAME": {
+   "can_compare": true,
+   "const": "DESTRUCTIBLE_NAME",
+   "default": 0,
+   "id": 100207,
+   "implemented": [
+    "CONST_KEY",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST_KEY": 1,
+    "VARIABLE": 2
+   }
+  },
+  "DESTRUCTIBLE_TRIGGER": {
+   "const": "DESTRUCTIBLE_TRIGGER",
+   "id": 100204,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "DIALOG_DEBUG_TYPE": {
+   "const": "DIALOG_DEBUG_TYPE",
+   "id": 100175,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "DYNAMIC_TRIGGER_INSTANCE": {
+   "can_compare": true,
+   "const": "DYNAMIC_TRIGGER_INSTANCE",
+   "default": 0,
+   "id": 100178,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "EDIT_GAME_FUNC": {
+   "const": "EDIT_GAME_FUNC",
+   "default": 0,
+   "id": 100252,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {
+    "0": [
+     "",
+     "RecordKey"
+    ]
+   },
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "EVENT_UNIT": {
+   "const": "UNIT_EVENT",
+   "id": 100007,
+   "implemented": [
+    "UNIT_EVENT"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "UNIT_EVENT": 1
+   }
+  },
+  "FLOAT": {
+   "can_compare": true,
+   "const": "FLOAT",
+   "default": "Fix32(0)",
+   "id": 100000,
+   "implemented": [
+    "CONST",
+    "GET_BUFF_SHIELD",
+    "GET_DEST_CUR_HP",
+    "GET_HP_CUR",
+    "GET_MP_CUR",
+    "GET_UNIT_ATTR",
+    "GET_UNIT_PREV_FLOAT_ATTR_IN_EVENT",
+    "HURT_DAMAGE",
+    "POINT_X_AXIS",
+    "POINT_Y_AXIS",
+    "POINT_Z_AXIS",
+    "ROUND_DEC",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {
+    "0": [
+     "False",
+     "Bool"
+    ]
+   },
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "FLOAT_ARITHMETIC_OPERATOR": {
+   "const": "FLOAT_ARITHMETIC_OPERATOR",
+   "id": 100017,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "FLOAT_SAVE": {
+   "const": "FLOAT_SAVE",
+   "default": 0.0,
+   "id": 100232,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "FOG": {
+   "can_compare": true,
+   "const": "FOG",
+   "default": 0,
+   "id": 1001554,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "FOG_ATTR": {
+   "const": "FOG_ATTR",
+   "id": 100293,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "FOG_TYPE": {
+   "const": "FOG_TYPE",
+   "default": 0,
+   "id": 1001561
+  },
+  "FONT_NAME": {
+   "const": "FONT_NAME",
+   "id": 100157,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "FONT_TYPE": {
+   "const": "FONT_TYPE",
+   "default": 0,
+   "id": 100335,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "FORCE_ENTITY": {
+   "can_compare": true,
+   "const": "FORCE",
+   "default": 0,
+   "id": 402209,
+   "implemented": [
+    "NONE_FORCE",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "NONE_FORCE": "NONE_FORCE",
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "FOV_BLOCK_TYPE": {
+   "can_compare": true,
+   "const": "FOV_BLOCK_TYPE",
+   "default": 1024,
+   "id": 100227,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": false,
+   "is_kv_value": false,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "FUNCTION": {
+   "const": "FUNCTION",
+   "id": 100177,
+   "implemented": [],
+   "op_arg_defaults": {},
+   "sub_types": {}
+  },
+  "FUNC_KEYBOARD_KEY": {
+   "can_compare": true,
+   "const": "FUNC_KEYBOARD_KEY",
+   "default": 0,
+   "id": 200223,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "GAME_MODE": {
+   "can_compare": true,
+   "const": "GAME_MODE",
+   "default": "game_consts.DEFAULT_GAME_MODE",
+   "id": 100505,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "GENERIC_DEST_EVENT": {
+   "const": "GENERIC_DEST_EVENT",
+   "id": 100241,
+   "implemented": [
+    "GENERIC_DEST_EVENT"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "GENERIC_DEST_EVENT": "GENERIC_DEST_EVENT"
+   }
+  },
+  "GENERIC_PHYSICS_ENTITY_EVENT": {
+   "const": "GENERIC_PHYSICS_ENTITY_EVENT",
+   "id": 500405,
+   "implemented": [
+    "GENERIC_PHYSICS_ENTITY_EVENT"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "GENERIC_PHYSICS_ENTITY_EVENT": "GENERIC_PHYSICS_ENTITY_EVENT"
+   }
+  },
+  "GENERIC_UNIT_EVENT": {
+   "const": "GENERIC_UNIT_EVENT",
+   "id": 100008,
+   "implemented": [
+    "GENERIC_UNIT_EVENT"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "GENERIC_UNIT_EVENT": "GENERIC_UNIT_EVENT"
+   }
+  },
+  "GLOBAL_ARCHIVE_SLOT": {
+   "const": "GLOBAL_ARCHIVE_SLOT",
+   "default": "",
+   "id": 100331,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "GOODS_KEY": {
+   "can_compare": true,
+   "const": "GOODS_KEY",
+   "default": 0,
+   "id": 1001574,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "HARM_TEXT_TYPE": {
+   "const": "HARM_TEXT_TYPE",
+   "id": 100220,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "HARM_TEXT_TYPE_NEW": {
+   "const": "HARM_TEXT_TYPE_NEW",
+   "default": 0,
+   "id": 100259,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "HIT_POINT_BOOL": {
+   "const": "HIT_POINT_BOOL",
+   "default": "True",
+   "id": 100260,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "HIT_POINT_INT": {
+   "const": "HIT_POINT_INT",
+   "default": 0,
+   "id": 100261,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "IMAGE_KEY": {
+   "const": "IMAGE_KEY",
+   "default": 0,
+   "id": 100224,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "IMAGE_QUALITY": {
+   "can_compare": true,
+   "const": "IMAGE_QUALITY",
+   "default": "",
+   "id": 100506,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "INTEGER": {
+   "can_compare": true,
+   "const": "INTEGER",
+   "default": 0,
+   "id": 100002,
+   "implemented": [
+    "CONST",
+    "GET_DAY_OF_SERVER_TIMESTAMP",
+    "GET_HOUR_OF_SERVER_TIMESTAMP",
+    "GET_ITER_RANDOM_POOL_ARCHIVE_INCREMENT",
+    "GET_ITER_RANDOM_POOL_ARCHIVE_KEY",
+    "GET_MONTH_OF_SERVER_TIMESTAMP",
+    "GET_RANDOM_NUMBER_ERR_CODE",
+    "GET_RANDOM_POOL_RET_CODE",
+    "GET_SETTLE_LADDER_DIFF_VALUE",
+    "GET_SETTLE_LADDER_NEW_SCORE",
+    "GET_TECH_KEY_PRE_CONDITION_REQUIRE_COUNT",
+    "GET_TECH_TAG_PRE_CONDITION_REQUIRE_COUNT",
+    "GET_UNIT_KEY_PRE_CONDITION_REQUIRE_COUNT",
+    "GET_UNIT_TAG_PRE_CONDITION_REQUIRE_COUNT",
+    "GET_YEAR_OF_SERVER_TIMESTAMP",
+    "ITER_TABLE_KEY_INT",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 6
+   }
+  },
+  "INT_SAVE": {
+   "const": "INT_SAVE",
+   "default": 0,
+   "id": 100230,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "ITEM_ENTITY": {
+   "can_compare": true,
+   "const": "ITEM",
+   "default": 0,
+   "id": 100031,
+   "implemented": [
+    "FOR_EACH_SELECTED_ITEM",
+    "GET_ITEM_PROP_FROM_EVENT",
+    "ITEM_IN_SCENE",
+    "NONE_ITEM",
+    "TARGET_ITEM_IN_ABILITY",
+    "TRIGGER_ITEM_ENTITY",
+    "TRIGGER_ITEM_IN_DEST_EVENT",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "ITEM_IN_SCENE": 3,
+    "LAST_CREATE_ITEM": 2,
+    "UNIT_LAST_OPERATION_ITEM": 1,
+    "VARIABLE": 4
+   }
+  },
+  "ITEM_FLOAT_ATTR": {
+   "const": "ITEM_FLOAT_ATTR",
+   "default": 0,
+   "id": 100324,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ITEM_GROUP": {
+   "can_compare": true,
+   "const": "ITEM_GROUP",
+   "default": "[]",
+   "id": 100171,
+   "implemented": [
+    "NONE_ITEM_GROUP",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {
+    "0": [
+     0,
+     "SortType"
+    ],
+    "1": [
+     "None",
+     "Ability"
+    ]
+   },
+   "sub_types": {
+    "NONE_ITEM_GROUP": "NONE_ITEM_GROUP",
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "ITEM_INT_ATTR": {
+   "const": "ITEM_INT_ATTR",
+   "default": 0,
+   "id": 100325,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ITEM_NAME": {
+   "can_compare": true,
+   "const": "ITEM_KEY",
+   "default": 0,
+   "id": 100032,
+   "implemented": [
+    "CONST",
+    "NONE_ITEM_KEY",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "KEY_OF_ITEM": 500006,
+    "NONE_ITEM_KEY": 500003,
+    "VARIABLE": 2
+   }
+  },
+  "ITEM_NAME_BAR_TYPE": {
+   "const": "ITEM_NAME_BAR_TYPE",
+   "id": 101021
+  },
+  "ITEM_STACK_TYPE": {
+   "can_compare": true,
+   "const": "ITEM_STACK_TYPE",
+   "default": 0,
+   "id": 101013,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ITEM_TRIGGER": {
+   "const": "ITEM_TRIGGER",
+   "id": 1000673,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ITEM_TYPE_FLOAT_ATTR": {
+   "const": "ITEM_TYPE_FLOAT_ATTR",
+   "default": 0,
+   "id": 100326,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ITEM_TYPE_INT_ATTR": {
+   "const": "ITEM_TYPE_INT_ATTR",
+   "default": 0,
+   "id": 100327,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "JOINT": {
+   "can_compare": false,
+   "const": "JOINT",
+   "default": 0,
+   "id": 100302,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "JUMP_WORD_TRACK": {
+   "const": "JUMP_WORD_TRACK",
+   "default": 0,
+   "id": 100333,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "KEYBOARD_KEY": {
+   "can_compare": true,
+   "const": "KEYBOARD_KEY",
+   "default": 0,
+   "id": 200220,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "KNOCKUP_MOVER_READABLE_ATTR": {
+   "const": "KNOCKUP_MOVER_READABLE_ATTR",
+   "default": 0,
+   "id": 100347,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "KNOCKUP_MOVER_WRITEABLE_ATTR": {
+   "const": "KNOCKUP_MOVER_WRITEABLE_ATTR",
+   "default": 0,
+   "id": 100346,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "LANGUAGE_ALLOW_TYPE": {
+   "const": "LANGUAGE_ALLOW_TYPE",
+   "default": 0,
+   "id": 100200
+  },
+  "LANGUAGE_TYPE": {
+   "const": "LANGUAGE_TYPE",
+   "default": 0,
+   "id": 100257,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "LINK_SFX_ENTITY": {
+   "can_compare": true,
+   "const": "LINK_SFX_ENTITY",
+   "default": 0,
+   "id": 100202,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CREATE_LINK_SFX_FROM_POINT_TO_POINT": 500203,
+    "CREATE_LINK_SFX_FROM_POINT_TO_POINT1": 500229,
+    "CREATE_LINK_SFX_FROM_POINT_TO_UNIT": 500202,
+    "CREATE_LINK_SFX_FROM_POINT_TO_UNIT1": 500228,
+    "CREATE_LINK_SFX_FROM_UNIT_TO_POINT": 500200,
+    "CREATE_LINK_SFX_FROM_UNIT_TO_POINT1": 500226,
+    "CREATE_LINK_SFX_FROM_UNIT_TO_UNIT": 500201,
+    "CREATE_LINK_SFX_FROM_UNIT_TO_UNIT1": 500227
+   }
+  },
+  "LINK_SFX_KEY": {
+   "can_compare": true,
+   "const": "LINK_SFX_KEY",
+   "default": 0,
+   "id": 100191,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 4
+   }
+  },
+  "LINK_SFX_POINT_TYPE": {
+   "const": "LINK_SFX_POINT_TYPE",
+   "id": 500217,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "LIVE2D": {
+   "can_compare": true,
+   "const": "LIVE2D_KEY",
+   "default": 0,
+   "id": 1001567,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "UNIT_LIVE2D": 2,
+    "UNIT_SOURCE_LIVE2D": 3,
+    "VARIABLE": 4
+   }
+  },
+  "LOCAL_UNIT_ENTITY": {
+   "can_compare": true,
+   "const": "LOCAL_UNIT",
+   "default": 0,
+   "id": 100348,
+   "implemented": [
+    "FOR_EACH_SELECTED_LOCAL_UNIT",
+    "NONE_UNIT",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": false,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "FOR_EACH_SELECTED_LOCAL_UNIT": 17,
+    "VARIABLE": 11
+   }
+  },
+  "LOCAL_UNIT_GROUP": {
+   "can_compare": true,
+   "const": "LOCAL_UNIT_GROUP",
+   "default": "[]",
+   "id": 100349,
+   "implemented": [
+    "NONE_LOCAL_UNIT_GROUP",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": 14
+   }
+  },
+  "MAP": {
+   "const": "MAP",
+   "default": "None",
+   "id": 900002,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "MATERIAL_ID": {
+   "const": "MATERIAL_ID",
+   "id": 100243,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "MINI_MAP_COLOR_TYPE": {
+   "can_compare": true,
+   "const": "MINI_MAP_COLOR_TYPE",
+   "default": 1,
+   "id": 100235,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "MODEL": {
+   "can_compare": true,
+   "const": "MODEL_KEY",
+   "default": 0,
+   "id": 100122,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "UNIT_MODEL": 2,
+    "UNIT_SOURCE_MODEL": 3,
+    "VARIABLE": 4
+   }
+  },
+  "MODIFIER": {
+   "can_compare": true,
+   "const": "MODIFIER_KEY",
+   "default": 0,
+   "id": 100046,
+   "implemented": [
+    "CONST",
+    "GET_WILL_MODIFIER_TYPE",
+    "NONE_MODIFIER_KEY",
+    "TRANSFER_NUM_INTO_MODIFIER",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "GET_WILL_MODIFIER_TYPE": "GET_WILL_MODIFIER_TYPE",
+    "NONE_MODIFIER_KEY": "NONE_MODIFIER_KEY",
+    "TRANSFER_NUM_INTO_MODIFIER": "TRANSFER_NUM_INTO_MODIFIER",
+    "VARIABLE": 2
+   }
+  },
+  "MODIFIER_EFFECT_SHOW_TYPE": {
+   "const": "MODIFIER_EFFECT_SHOW_TYPE",
+   "id": 101011,
+   "implemented": [
+    "EFFECT_SHOW_TYPE",
+    "VARIABLE"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "EFFECT_SHOW_TYPE": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "MODIFIER_EFFECT_TYPE": {
+   "can_compare": true,
+   "const": "MODIFIER_EFFECT_TYPE",
+   "default": 0,
+   "id": 100174,
+   "implemented": [
+    "CONST",
+    "GET_MODIFIER_EFFECT_TYPE"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "GET_MODIFIER_EFFECT_TYPE": "GET_MODIFIER_EFFECT_TYPE"
+   }
+  },
+  "MODIFIER_ENTITY": {
+   "can_compare": true,
+   "const": "MODIFIER",
+   "default": "None",
+   "id": 100076,
+   "implemented": [
+    "NONE_MODIFIER",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "NONE_MODIFIER": "NONE_MODIFIER"
+   }
+  },
+  "MODIFIER_EVENT": {
+   "const": "MODIFIER_EVENT",
+   "id": 100129,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "MODIFIER_STATE_TYPE": {
+   "const": "MODIFIER_STATE_TYPE",
+   "default": 0,
+   "id": 100194
+  },
+  "MODIFIER_TRIGGER": {
+   "const": "MODIFIER_TRIGGER",
+   "id": 100069,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "MODIFIER_TYPE": {
+   "can_compare": true,
+   "const": "MODIFIER_TYPE",
+   "default": 0,
+   "id": 100186,
+   "implemented": [
+    "CONST",
+    "GET_MODIFIER_TYPE"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "GET_MODIFIER_TYPE": "GET_MODIFIER_TYPE"
+   }
+  },
+  "MOUSE_KEY": {
+   "can_compare": true,
+   "const": "MOUSE_KEY",
+   "default": 0,
+   "id": 200221,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "MOUSE_KEY_WITHOUT_MIDDLE": {
+   "can_compare": true,
+   "const": "MOUSE_KEY_WITHOUT_MIDDLE",
+   "default": 0,
+   "id": 200224,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "MOUSE_WHEEL": {
+   "can_compare": true,
+   "const": "MOUSE_WHEEL",
+   "default": 0,
+   "id": 200222,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "MOVEMENT_OBSTACLE_PROCESS_TYPE": {
+   "const": "MOVEMENT_OBSTACLE_PROCESS_TYPE",
+   "id": 1000672,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "MOVER_COLLISION_TYPE": {
+   "const": "MOVER_COLLISION_TYPE",
+   "default": 0,
+   "id": 100176
+  },
+  "MOVER_ENTITY": {
+   "can_compare": true,
+   "const": "MOVER",
+   "default": 0,
+   "id": 100263,
+   "implemented": [
+    "NONE_MOVER",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "NONE_MOVER": "NONE_MOVER",
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "MOVER_TYPE": {
+   "const": "MOVER_TYPE",
+   "default": 0,
+   "id": 100264,
+   "implemented": [],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "MOVE_DIRECTION": {
+   "const": "MOVE_DIRECTION",
+   "default": 0,
+   "id": 100332,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "MOVE_TYPE": {
+   "const": "MOVE_TYPE",
+   "id": 100338,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {}
+  },
+  "NEW_BLOOD_BAR_TYPE": {
+   "const": "NEW_BLOOD_BAR_TYPE",
+   "id": 100223
+  },
+  "NEW_TIMER": {
+   "can_compare": true,
+   "const": "NEW_TIMER",
+   "default": -1,
+   "id": 100181,
+   "implemented": [
+    "CURRENT_EXPIRED_TIMER",
+    "LAST_CREATE_TIMER",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CREATE_TIMER": 400318,
+    "CURRENT_EXPIRED_TIMER": "CURRENT_EXPIRED_TIMER",
+    "LAST_CREATE_TIMER": "LAST_CREATE_TIMER",
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "NORMAL_KEY": {
+   "const": "NORMAL_KEY",
+   "default": 0,
+   "id": 100254,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "OBJECT_NAME_DESC_TYPE": {
+   "const": "OBJECT_NAME_DESC_TYPE",
+   "default": 0,
+   "id": 500601,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "OBJECT_TYPE": {
+   "const": "OBJECT_TYPE",
+   "default": 0,
+   "id": 500600,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ONCE_OR_CIRCLE": {
+   "const": "ONCE_OR_LOOP",
+   "id": 100049,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ON_OR_OFF": {
+   "const": "ON_OR_OFF",
+   "id": 100048,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {}
+  },
+  "ORTHOGONAL_CAMERA": {
+   "const": "ORTHOGONAL_CAMERA",
+   "id": 100155,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "PATROL_MODE": {
+   "const": "PATROL_MODE",
+   "id": 100051,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "PHYSICS_ENTITY": {
+   "can_compare": false,
+   "const": "PHYSICS_ENTITY",
+   "default": 0,
+   "id": 100297,
+   "implemented": [
+    "CONST",
+    "GET_REACT_SOURCE_PHYSICS_ENTITY_IN_REACTION",
+    "NONE_PHYSICS_ENTITY",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "NONE_PHYSICS_ENTITY": 3,
+    "VARIABLE": 2
+   }
+  },
+  "PHYSICS_ENTITY_KEY": {
+   "can_compare": true,
+   "const": "PHYSICS_ENTITY_KEY",
+   "default": 0,
+   "id": 100304,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "PHYSICS_ENTITY_STATE": {
+   "const": "PHYSICS_ENTITY_STATE",
+   "default": 0,
+   "id": 100322,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "PHYSICS_FILTER": {
+   "const": "PHYSICS_FILTER",
+   "default": 0,
+   "id": 100314,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "PHYSICS_OBJECT": {
+   "can_compare": true,
+   "const": "PHYSICS_OBJECT",
+   "default": 0,
+   "id": 100296,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "PHYSICS_OBJECT_KEY": {
+   "can_compare": true,
+   "const": "PHYSICS_OBJECT_KEY",
+   "default": 0,
+   "id": 100303,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "PLATFORM_COMMUNITY_TYPE": {
+   "const": "PLATFORM_COMMUNITY_TYPE",
+   "default": 0,
+   "id": 100292,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "PLATFORM_DECO_TYPE": {
+   "const": "PLATFORM_DECO_TYPE",
+   "default": 1,
+   "id": 100290,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "PLATFORM_SIGNIN_TYPE": {
+   "const": "PLATFORM_SIGNIN_TYPE",
+   "default": 0,
+   "id": 100291,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "PLATFORM_TRIGGER": {
+   "const": "PLATFORM_TRIGGER",
+   "id": 1000674,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "PLAYER": {
+   "can_compare": true,
+   "const": "ROLE",
+   "default": 0,
+   "id": 100025,
+   "implemented": [
+    "GET_SETTLE_LADDER_ROLE_ID",
+    "NEW_PLAYER",
+    "NONE_ROLE",
+    "OLD_PLAYER",
+    "OWNER_PLAYER",
+    "PICKED_PLAYER",
+    "PRESET",
+    "TRIGGER_PLAYER",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "NEW_PLAYER": "NEW_PLAYER",
+    "NONE_ROLE": "NONE_ROLE",
+    "OLD_PLAYER": "OLD_PLAYER",
+    "OWNER_PLAYER": "OWNER_PLAYER",
+    "PICKED_PLAYER": "PICKED_PLAYER",
+    "PRESET": 1,
+    "TRIGGER_PLAYER": "TRIGGER_PLAYER",
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "PLAYER_GROUP": {
+   "can_compare": true,
+   "const": "ROLE_GROUP",
+   "default": "[]",
+   "id": 100027,
+   "implemented": [
+    "ALL_NO_NPC_PLAYER",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "ALL_NO_NPC_PLAYER": "ALL_NO_NPC_PLAYER",
+    "VARIABLE": 14
+   }
+  },
+  "PLAY_OPERATION": {
+   "const": "PLAY_OPERATION",
+   "default": 0,
+   "id": 100316,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "POINT": {
+   "can_compare": true,
+   "const": "POINT",
+   "default": "(0, 0, 0)",
+   "id": 100004,
+   "implemented": [
+    "ABILITY_RELEASE_POSITION",
+    "FLOAT_TO_POINT",
+    "FOR_EACH_POLY_AREA_POINT",
+    "FOR_EACH_SELECTED_POINT",
+    "LOGIC_RES",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "FLOAT_TO_POINT": 6,
+    "GET_POINT_FROM_EVENT": 500037,
+    "LOGIC_RES": 1,
+    "NEAREST_POINT_WITH_ROAD": "NEAREST_POINT_WITH_ROAD",
+    "POINT_IN_ROUTE": 500026,
+    "POINT_ROTATE_Y": 500027,
+    "ROAD_POINT_END": 500018,
+    "ROAD_POINT_START": 7,
+    "VARIABLE": 19
+   }
+  },
+  "POINT_LIGHT": {
+   "can_compare": true,
+   "const": "POINT_LIGHT",
+   "default": 0,
+   "id": 1001550,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "POINT_LIGHT_ATTR": {
+   "const": "POINT_LIGHT_ATTR",
+   "id": 1001551,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "POINT_LIST": {
+   "can_compare": true,
+   "const": "POINT_LIST",
+   "default": 0,
+   "id": 100024,
+   "implemented": [
+    "FOR_EACH_SELECTED_ROAD_POINT_LIST",
+    "LOGIC_RES",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "LOGIC_RES": 1,
+    "NEAREST_POINT_LIST": 3,
+    "OFFSET_POINT_LIST": 4,
+    "VARIABLE": 2
+   }
+  },
+  "POLYGON": {
+   "can_compare": true,
+   "const": "POLYGON_AREA",
+   "default": 0,
+   "id": 100150,
+   "implemented": [
+    "FOR_EACH_SELECTED_POLYGON_AREA",
+    "LOGIC_RES",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {}
+  },
+  "POST_EFFECT": {
+   "can_compare": true,
+   "const": "POST_EFFECT",
+   "default": 0,
+   "id": 1001557,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "PRIMARY_ATTR": {
+   "const": "PRIMARY_ATTR",
+   "id": 100500
+  },
+  "PROJECTILE": {
+   "can_compare": true,
+   "const": "PROJECTILE_KEY",
+   "default": 0,
+   "id": 100062,
+   "implemented": [
+    "CONST",
+    "NONE_PROJECTILE_KEY",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "NONE_PROJECTILE_KEY": "NONE_PROJECTILE_KEY",
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "PROJECTILE_3D": {
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {}
+  },
+  "PROJECTILE_ENTITY": {
+   "can_compare": true,
+   "const": "PROJECTILE",
+   "default": 0,
+   "id": 100077,
+   "implemented": [
+    "FOR_EACH_SELECTED_PROJECTILE",
+    "GET_MOVER_OWNER_PROJECTILE",
+    "NONE_PROJECTILE",
+    "PROJECTILE_IN_SCENE",
+    "PROJECTILE_SELF",
+    "TRIGGER_PROJECTILE",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "NONE_PROJECTILE": "NONE_PROJECTILE",
+    "PROJECTILE_IN_SCENE": 1,
+    "PROJECTILE_SELF": "PROJECTILE_SELF",
+    "TRIGGER_PROJECTILE": "TRIGGER_PROJECTILE",
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "PROJECTILE_EVENT": {
+   "const": "PROJECTILE_EVENT",
+   "id": 100130,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "PROJECTILE_GROUP": {
+   "can_compare": true,
+   "const": "PROJECTILE_GROUP",
+   "default": "[]",
+   "id": 100203,
+   "implemented": [
+    "PROJECTILE_LIST_IN_SHAPE",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {
+    "0": [
+     1,
+     "SortType"
+    ]
+   },
+   "sub_types": {
+    "PROJECTILE_LIST_IN_SHAPE": "PROJECTILE_LIST_IN_SHAPE",
+    "VARIABLE": 14
+   }
+  },
+  "PROJECTILE_TRIGGER": {
+   "const": "PROJECTILE_TRIGGER",
+   "id": 1000670,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "RANDOM_POOL": {
+   "can_compare": true,
+   "const": "RANDOM_POOL",
+   "default": "None",
+   "id": 100201,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": 3
+   }
+  },
+  "RANDOM_POOL_DROP": {
+   "const": "RANDOM_POOL_DROP",
+   "default": "",
+   "id": 100334,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "REACTION": {
+   "can_compare": true,
+   "const": "REACTION",
+   "default": 0,
+   "id": 100311,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": 1
+   }
+  },
+  "REACTION_GROUP": {
+   "can_compare": true,
+   "const": "REACTION_GROUP",
+   "default": "[]",
+   "id": 100312,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": 1
+   }
+  },
+  "RECORD_KEY": {
+   "const": "RECORD_KEY",
+   "default": 0,
+   "id": 100255,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "RECTANGLE": {
+   "can_compare": true,
+   "const": "RECTANGLE_AREA",
+   "default": 0,
+   "id": 100009,
+   "implemented": [
+    "FOR_EACH_SELECTED_RECT_AREA",
+    "LOGIC_RES",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CREATE_REC_AREA_BY_TWO_POINTS": 400156,
+    "FOR_EACH_SELECTED_RECT_AREA": "FOR_EACH_SELECTED_RECT_AREA",
+    "LOGIC_RES": 1,
+    "VARIABLE": 7
+   }
+  },
+  "RECTANGLE_SHAPE": {
+   "const": "RECTANGLE_SHAPE",
+   "id": 100060,
+   "implemented": [],
+   "op_arg_defaults": {},
+   "sub_types": {}
+  },
+  "RESCUER_TYPE": {
+   "can_compare": true,
+   "const": "RESCUER_TYPE",
+   "default": 0,
+   "id": 101004,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "RESCUE_SEEKER_TYPE": {
+   "can_compare": true,
+   "const": "RESCUE_SEEKER_TYPE",
+   "default": 0,
+   "id": 101003,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "RIGID_BODY": {
+   "can_compare": true,
+   "const": "RIGID_BODY",
+   "default": 0,
+   "id": 100298,
+   "implemented": [
+    "CONST",
+    "FOR_EACH_SELECTED_RIGID_BODY",
+    "GET_REACTED_COLLIDER",
+    "GET_REACTED_PHYSICS_ENTITY",
+    "GET_REACTED_RIGID_BODY",
+    "GET_REACTED_UNIT",
+    "GET_REACT_RIGID_BODY_IN_REACTION",
+    "GET_REACT_SOURCE_RIGID_BODY_IN_REACTION",
+    "GET_SOURCE_COLLIDER",
+    "GET_SOURCE_CONTACT_POINT",
+    "GET_SOURCE_CONTACT_POINT_NORMAL",
+    "GET_SOURCE_PHYSICS_ENTITY",
+    "GET_SOURCE_RIGID_BODY",
+    "GET_SOURCE_UNIT",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "RIGID_BODY_BOOL_ATTRS": {
+   "const": "RIGID_BODY_BOOL_ATTRS",
+   "id": 100307,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "RIGID_BODY_GROUP": {
+   "can_compare": true,
+   "const": "RIGID_BODY_GROUP",
+   "default": "[]",
+   "id": 100306,
+   "implemented": [
+    "NONE_RIGID_BODY_GROUP",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "NONE_RIGID_BODY_GROUP": "NONE_RIGID_BODY_GROUP",
+    "VARIABLE": 1
+   }
+  },
+  "RIGID_BODY_TYPE": {
+   "const": "RIGID_BODY_TYPE",
+   "id": 100310,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ROAD_GROUP": {
+   "can_compare": false,
+   "const": "ROAD_GROUP",
+   "default": "[]",
+   "id": 100149,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": false,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": 500016
+   }
+  },
+  "ROLE_RELATION": {
+   "can_compare": true,
+   "const": "ROLE_RELATION",
+   "default": 1,
+   "id": 1000204,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ROLE_RES_KEY": {
+   "can_compare": true,
+   "const": "ROLE_RES_KEY",
+   "default": "",
+   "id": 100037,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "ROLE_STATUS": {
+   "can_compare": true,
+   "const": "ROLE_STATUS",
+   "default": 0,
+   "id": 100180,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "ROLE_TYPE": {
+   "can_compare": true,
+   "const": "ROLE_TYPE",
+   "default": 0,
+   "id": 100179,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "ROTATION": {
+   "can_compare": true,
+   "const": "ROTATION",
+   "default": "(0, 0, 0)",
+   "id": 100305,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": 1
+   }
+  },
+  "ROUND_AREA": {
+   "can_compare": true,
+   "const": "CIRCLE_AREA",
+   "default": 0,
+   "id": 100023,
+   "implemented": [
+    "CIR_AREA_LAST_CREATED",
+    "FOR_EACH_SELECTED_CIR_AREA",
+    "LOGIC_RES",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CIR_AREA_LAST_CREATED": "CIR_AREA_LAST_CREATED",
+    "LOGIC_RES": 1,
+    "VARIABLE": 2
+   }
+  },
+  "ROUND_MODE": {
+   "const": "ROUND_MODE",
+   "id": 100345,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "ROUND_MOVER_DIRECTION_TYPE": {
+   "const": "ROUND_MOVER_DIRECTION_TYPE",
+   "default": 0,
+   "id": 100208
+  },
+  "ROUND_MOVER_READABLE_ATTR": {
+   "const": "ROUND_MOVER_READABLE_ATTR",
+   "default": 0,
+   "id": 100267,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "ROUND_MOVER_WRITEABLE_ATTR": {
+   "const": "ROUND_MOVER_WRITEABLE_ATTR",
+   "default": 0,
+   "id": 100271,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "ROUND_RULE": {
+   "const": "ROUND_RULE",
+   "id": 100343,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "SCENE_PRESET": {
+   "const": "SCENE_PRESET",
+   "default": 0,
+   "id": 100196,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": 2
+   }
+  },
+  "SCENE_SOUND": {
+   "can_compare": true,
+   "const": "SCENE_SOUND",
+   "default": 0,
+   "id": 100262,
+   "implemented": [
+    "LOGIC_RES"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "LOGIC_RES": 1
+   }
+  },
+  "SCENE_UI": {
+   "can_compare": true,
+   "const": "SCENE_UI",
+   "default": "None",
+   "id": 100236,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": 3
+   }
+  },
+  "SECTOR_SHAPE": {
+   "const": "SECTOR_SHAPE",
+   "id": 100059,
+   "implemented": [],
+   "op_arg_defaults": {},
+   "sub_types": {}
+  },
+  "SEQUENCE": {
+   "const": "SEQUENCE",
+   "default": 0,
+   "id": 100295,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "SFX_ENTITY": {
+   "can_compare": true,
+   "const": "SFX_ENTITY",
+   "default": 0,
+   "id": 100148,
+   "implemented": [
+    "GET_EFFECT_ON_MODIFIER",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {
+    "0": [
+     "None",
+     "Role"
+    ],
+    "1": [
+     "False",
+     "Bool"
+    ],
+    "2": [
+     "False",
+     "Bool"
+    ]
+   },
+   "sub_types": {
+    "GET_EFFECT_ON_MODIFIER": 5,
+    "PLAY_SFX_ON_CAMERA": "PLAY_SFX_ON_CAMERA",
+    "VARIABLE": 4
+   }
+  },
+  "SFX_KEY": {
+   "can_compare": true,
+   "const": "SFX_KEY",
+   "default": 0,
+   "id": 100066,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 4
+   }
+  },
+  "SFX_ROTATE_TYPE": {
+   "const": "SFX_ROTATE_TYPE",
+   "id": 500220,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "SFX_VISIBLE_TYPE": {
+   "const": "SFX_VISIBLE_TYPE",
+   "id": 100131,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "SHIELD_TYPE": {
+   "const": "SHIELD_TYPE",
+   "id": 100245,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "SIGNAL_TYPE": {
+   "const": "SIGNAL_TYPE",
+   "default": 0,
+   "id": 100275
+  },
+  "SIGNAL_VISIBLE_TYPE": {
+   "const": "SIGNAL_VISIBLE_TYPE",
+   "default": 0,
+   "id": 100286
+  },
+  "SITE_STATE": {
+   "can_compare": true,
+   "const": "SITE_STATE",
+   "default": 0,
+   "id": 402216,
+   "implemented": [
+    "SITE_STATE_TYPE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "SITE_STATE_TYPE": 1
+   }
+  },
+  "SKILL_INDICATOR_EFFECT": {
+   "const": "SKILL_INDICATOR_EFFECT",
+   "default": 0,
+   "id": 100287,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "SKILL_POINTER_TYPE": {
+   "can_compare": true,
+   "const": "SKILL_POINTER_TYPE",
+   "default": 0,
+   "id": 100258,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "SLAVE_ATTR": {
+   "const": "SLAVE_ATTR",
+   "id": 100502
+  },
+  "SLOT_TYPE": {
+   "can_compare": true,
+   "const": "SLOT_TYPE",
+   "default": 0,
+   "id": 100135,
+   "implemented": [
+    "CONST",
+    "GET_PICK_ITEM_SLOT"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "GET_PICK_ITEM_SLOT": "GET_PICK_ITEM_SLOT"
+   }
+  },
+  "SNAPSHOT_DETAIL_LEVEL": {
+   "const": "SNAPSHOT_DETAIL_LEVEL",
+   "default": 0,
+   "id": 101017,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "SNAPSHOT_TRACEBACK_LEVEL": {
+   "const": "SNAPSHOT_TRACEBACK_LEVEL",
+   "default": 0,
+   "id": 101016,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "SORT_TYPE": {
+   "const": "SORT_TYPE",
+   "default": 0,
+   "id": 100251
+  },
+  "SOUND_ENTITY": {
+   "can_compare": true,
+   "const": "SOUND_ENTITY",
+   "default": 0,
+   "id": 100214,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": 2
+   }
+  },
+  "SPECIAL_PHYSICS_ENTITY_EVENT": {
+   "const": "SPECIAL_PHYSICS_ENTITY_EVENT",
+   "id": 500406,
+   "implemented": [
+    "SPECIAL_PHYSICS_ENTITY_EVENT"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "SPECIAL_PHYSICS_ENTITY_EVENT": "SPECIAL_PHYSICS_ENTITY_EVENT"
+   }
+  },
+  "SPINE": {
+   "const": "SPINE",
+   "default": 0,
+   "id": 100339,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "SPOT_LIGHT": {
+   "can_compare": true,
+   "const": "SPOT_LIGHT",
+   "default": 0,
+   "id": 1001552,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "SPOT_LIGHT_ATTR": {
+   "const": "SPOT_LIGHT_ATTR",
+   "id": 1001553,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "START_MODE": {
+   "const": "START_MODE",
+   "id": 100246,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "STATE": {
+   "const": "BATTLE_STATE",
+   "id": 100075,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "STORE_ITEM_TYPE": {
+   "can_compare": true,
+   "const": "STORE_ITEM_TYPE",
+   "default": 0,
+   "id": 101005,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "STORE_KEY": {
+   "can_compare": true,
+   "const": "STORE_KEY",
+   "default": 0,
+   "id": 100134,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "STRAIGHT_MOVER_READABLE_ATTR": {
+   "const": "STRAIGHT_MOVER_READABLE_ATTR",
+   "default": 0,
+   "id": 100265,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "STRAIGHT_MOVER_WRITEABLE_ATTR": {
+   "const": "STRAIGHT_MOVER_WRITEABLE_ATTR",
+   "default": 0,
+   "id": 100270,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "STRING": {
+   "can_compare": true,
+   "const": "STRING",
+   "default": "",
+   "id": 100003,
+   "implemented": [
+    "CONST",
+    "FOR_EACH_PRE_CONDITION_SELECTED_TECH_TAG",
+    "FOR_EACH_PRE_CONDITION_SELECTED_UNIT_TAG",
+    "GET_ABILITY_OBJECT_DESC",
+    "GET_ABILITY_OBJECT_NAME",
+    "GET_DEST_NAME",
+    "GET_DEST_SOURCE_NAME",
+    "GET_LATEST_ENGINE_VERSION",
+    "GET_LATEST_GAME_VERSION",
+    "GET_LATEST_MAP_ID",
+    "GET_ROLE_OPEN_ARCHIVE",
+    "GET_UNIT_DESC",
+    "NUMBER_TO_STR",
+    "VALUE_TO_STR",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "STR_LIST_NO_INDEX": {
+   "const": "STR_LIST_NO_INDEX",
+   "id": 100167,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "STR_SAVE": {
+   "const": "STR_SAVE",
+   "default": "",
+   "id": 100231,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "TABLE": {
+   "can_compare": true,
+   "const": "TABLE",
+   "default": "None",
+   "id": 100011,
+   "implemented": [
+    "GET_NIL",
+    "PREFAB",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "GET_NIL": "GET_NIL",
+    "PREFAB": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "TABLE_ORDER": {
+   "const": "TABLE_ORDER",
+   "default": 0,
+   "id": 100319,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "TABLE_SAVE": {
+   "const": "TABLE_SAVE",
+   "default": "",
+   "id": 100247,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "TAG_ABILITY": {
+   "const": "TAG_ABILITY",
+   "id": 100057,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "TAG_ITEM": {
+   "const": "TAG_ITEM",
+   "id": 100056,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "TAG_MODIFIER": {
+   "const": "TAG_MODIFIER",
+   "id": 100124,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "TAG_PROJECTILE": {
+   "const": "TAG_PROJECTILE",
+   "id": 100123,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "TAG_ROAD": {
+   "const": "TAG_ROAD",
+   "id": 100168,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "TAG_UNIT": {
+   "const": "TAG_UNIT",
+   "id": 100055,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "TEAM": {
+   "can_compare": true,
+   "const": "CAMP",
+   "default": 0,
+   "id": 100020,
+   "implemented": [
+    "CONST_CAMP",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST_CAMP": 1,
+    "PLAYER_TEAM": 3,
+    "UNIT_TEAM": 2,
+    "VARIABLE": 4
+   }
+  },
+  "TECH_KEY": {
+   "can_compare": true,
+   "const": "TECH_KEY",
+   "default": 0,
+   "id": 100172,
+   "implemented": [
+    "CONST",
+    "FOR_EACH_PRE_CONDITION_SELECTED_TECH_KEY",
+    "NONE_TECH_KEY",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "TEXTURE": {
+   "const": "TEXTURE",
+   "default": 0,
+   "id": 100115,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "TEXTURE_TYPE": {
+   "const": "TEXTURE_TYPE",
+   "id": 100212,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "TRIGGER": {
+   "const": "GAME_TRIGGER",
+   "id": 100019,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "TRIGONOMETRIC_OPERATOR": {
+   "const": "TRIGONOMETRIC_OPERATOR",
+   "id": 100018,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "UI_ANIM": {
+   "can_compare": true,
+   "const": "UI_ANIM_KEY",
+   "default": 0,
+   "id": 100239,
+   "implemented": [
+    "PREFAB",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "PREFAB": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_ANIM_CURVE": {
+   "can_compare": true,
+   "const": "UI_ANIM_CURVE",
+   "default": 0,
+   "id": 100313,
+   "implemented": [
+    "ALL_UI_COMP"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "ALL_UI_COMP": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_ANIM_PLAY_MODE": {
+   "can_compare": true,
+   "const": "UI_ANIM_PLAY_MODE",
+   "default": 0,
+   "id": 100340,
+   "implemented": [
+    "ALL_UI_COMP"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "ALL_UI_COMP": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_BTN_STATUS": {
+   "can_compare": true,
+   "const": "UI_BTN_STATUS",
+   "default": 0,
+   "id": 1001563,
+   "implemented": [
+    "UI_BTN_STATUS",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "UI_BTN_STATUS": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_CHAT_RECV_CHANNEL": {
+   "can_compare": true,
+   "const": "UI_CHAT_RECV_CHANNEL",
+   "default": 0,
+   "id": 1001576,
+   "implemented": [
+    "UI_CHAT_RECV_CHANNEL",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "UI_CHAT_RECV_CHANNEL": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_CHAT_SEND_CHANNEL": {
+   "can_compare": true,
+   "const": "UI_CHAT_SEND_CHANNEL",
+   "default": 0,
+   "id": 1001575,
+   "implemented": [
+    "UI_CHAT_SEND_CHANNEL",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "UI_CHAT_SEND_CHANNEL": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_COMP": {
+   "can_compare": true,
+   "const": "UI_COMP_KEY",
+   "default": "",
+   "id": 100070,
+   "implemented": [
+    "ALL_UI_COMP",
+    "CREATE_SCENE_NODE_ON_POINT",
+    "GET_GRID_VIEW__ITEM_BY_INDEX",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "ALL_UI_COMP": 1,
+    "CREATE_SCENE_NODE_ON_POINT": "CREATE_SCENE_NODE_ON_POINT",
+    "CREATE_UI_COMP": 4004633,
+    "GET_GRID_VIEW__ITEM_BY_INDEX": "GET_GRID_VIEW__ITEM_BY_INDEX",
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_COMP_ALIGN_TYPE": {
+   "can_compare": true,
+   "const": "UI_COMP_ALIGN_TYPE",
+   "default": 0,
+   "id": 100192,
+   "implemented": [
+    "ALL_UI_COMP"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "ALL_UI_COMP": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_COMP_ATTR": {
+   "can_compare": true,
+   "const": "UI_COMP_ATTR",
+   "default": "",
+   "id": 1001555,
+   "implemented": [
+    "ALL_UI_ATTR"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "ALL_UI_ATTR": 1
+   }
+  },
+  "UI_COMP_EVENT_TYPE": {
+   "can_compare": true,
+   "const": "UI_COMP_EVENT_TYPE",
+   "default": 0,
+   "id": 100072,
+   "implemented": [
+    "ALL_UI_COMP",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "ALL_UI_COMP": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_COMP_TYPE": {
+   "can_compare": true,
+   "const": "UI_COMP_TYPE",
+   "default": 0,
+   "id": 100071,
+   "implemented": [
+    "ALL_UI_COMP"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "ALL_UI_COMP": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_DIRECTION": {
+   "can_compare": true,
+   "const": "UI_DIRECTION",
+   "default": 0,
+   "id": 100193,
+   "implemented": [
+    "ALL_UI_COMP"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "ALL_UI_COMP": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_ECA_ANIM_TYPE": {
+   "can_compare": true,
+   "const": "UI_ECA_ANIM_TYPE",
+   "default": 0,
+   "id": 100344,
+   "implemented": [
+    "ALL_UI_COMP"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "ALL_UI_COMP": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_EFFECT_CAMERA_MODE": {
+   "can_compare": true,
+   "const": "UI_EFFECT_CAMERA_MODE",
+   "default": 0,
+   "id": 1001572,
+   "implemented": [
+    "UI_EFFECT_CAMERA_MODE",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "UI_EFFECT_CAMERA_MODE": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_EQUIP_SLOT_DRAG_TYPE": {
+   "can_compare": true,
+   "const": "UI_EQUIP_SLOT_DRAG_TYPE",
+   "default": 0,
+   "id": 1001566,
+   "implemented": [
+    "EQUIP_SLOT_DRAG_TYPE",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "EQUIP_SLOT_DRAG_TYPE": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_EQUIP_SLOT_USE_TYPE": {
+   "can_compare": true,
+   "const": "UI_EQUIP_SLOT_USE_TYPE",
+   "default": 0,
+   "id": 1001565,
+   "implemented": [
+    "EQUIP_SLOT_USE_TYPE",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "EQUIP_SLOT_USE_TYPE": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_EVENT": {
+   "const": "UI_EVENT",
+   "id": 100067,
+   "implemented": [
+    "ALL_UI_EVENT"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "ALL_UI_EVENT": 1
+   }
+  },
+  "UI_GRIDVIEW_BAR_TYPE": {
+   "can_compare": true,
+   "const": "UI_GRIDVIEW_BAR_TYPE",
+   "default": 0,
+   "id": 1001571,
+   "implemented": [
+    "UI_GRIDVIEW_BAR_TYPE",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "UI_GRIDVIEW_BAR_TYPE": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_GRIDVIEW_TYPE": {
+   "can_compare": true,
+   "const": "UI_GRIDVIEW_TYPE",
+   "default": 0,
+   "id": 1001570,
+   "implemented": [
+    "UI_GRIDVIEW_TYPE",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "UI_GRIDVIEW_TYPE": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_LAYOUT_CLIPPING_TYPE": {
+   "can_compare": true,
+   "const": "UI_LAYOUT_CLIPPING_TYPE",
+   "default": 0,
+   "id": 1001569,
+   "implemented": [
+    "LAYOUT_CLIPPING_TYPE",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "LAYOUT_CLIPPING_TYPE": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_MODEL_CAMERA_MOD": {
+   "can_compare": true,
+   "const": "UI_MODEL_CAMERA_MOD",
+   "default": 0,
+   "id": 1001562,
+   "implemented": [
+    "MODEL_CAMERA_MOD",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "MODEL_CAMERA_MOD": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_POINT": {
+   "can_compare": true,
+   "const": "UI_POINT",
+   "default": "(0, 0)",
+   "id": 101019,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": 1
+   }
+  },
+  "UI_POS_ADAPT_MODE": {
+   "can_compare": true,
+   "const": "UI_POS_ADAPT_MODE",
+   "default": 0,
+   "id": 1001573,
+   "implemented": [
+    "UI_POS_ADAPT_MODE",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "UI_POS_ADAPT_MODE": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_PREFAB": {
+   "can_compare": true,
+   "const": "UI_PREFAB",
+   "default": "",
+   "id": 1001556,
+   "implemented": [
+    "ALL_UI_PREFAB",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "ALL_UI_PREFAB": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_PREFAB_INSTANCE": {
+   "can_compare": true,
+   "const": "UI_PREFAB_INS",
+   "default": "",
+   "id": 1001558,
+   "implemented": [],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_PREFAB_INS_UID": {
+   "can_compare": true,
+   "const": "UI_PREFAB_INS_UID",
+   "default": "",
+   "id": 1001559,
+   "implemented": [
+    "ALL_UI_PREFAB",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "ALL_UI_PREFAB": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_SCROLLVIEW_TYPE": {
+   "can_compare": true,
+   "const": "UI_SCROLLVIEW_TYPE",
+   "default": 0,
+   "id": 1001564,
+   "implemented": [
+    "UI_SCROLLVIEW_TYPE",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "UI_SCROLLVIEW_TYPE": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_TEXT_FONT_NAME": {
+   "can_compare": true,
+   "const": "UI_TEXT_FONT_NAME",
+   "default": "",
+   "id": 100342,
+   "implemented": [
+    "ALL_UI_COMP"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "ALL_UI_COMP": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_TEXT_OVER_LENGTH_HANDLING_TYPE": {
+   "can_compare": true,
+   "const": "UI_TEXT_OVER_LENGTH_HANDLING_TYPE",
+   "default": 0,
+   "id": 1001568,
+   "implemented": [
+    "TEXT_OVER_LENGTH_HANDLING_TYPE",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "TEXT_OVER_LENGTH_HANDLING_TYPE": 1,
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UI_TRIGGER": {
+   "const": "UI_TRIGGER",
+   "id": 1000675,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "UNIT_ATTRIBUTES": {
+   "const": "UNIT_READ_FLOAT_ATTRIBUTE",
+   "id": 100041,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "UNIT_BAR_SHOW_NAME_TYPE": {
+   "const": "UNIT_BAR_SHOW_NAME_TYPE",
+   "id": 101010,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "UNIT_BAR_TEXT_TYPE": {
+   "const": "UNIT_BAR_TEXT_TYPE",
+   "id": 100170
+  },
+  "UNIT_BEHAVIOR": {
+   "can_compare": true,
+   "const": "UNIT_BEHAVIOR",
+   "default": "caution",
+   "id": 100242,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "UNIT_COMMAND": {
+   "can_compare": false,
+   "const": "UNIT_COMMAND",
+   "default": "[]",
+   "id": 100216,
+   "implemented": [
+    "UNIT_COMMAND_ATTACK_MOVE",
+    "UNIT_COMMAND_ATTACK_TARGET",
+    "UNIT_COMMAND_CUSTOMIZED_MOVE_TO_POS",
+    "UNIT_COMMAND_FOLLOW",
+    "UNIT_COMMAND_HOLD_3D",
+    "UNIT_COMMAND_MOVE_ALONG_ROAD",
+    "UNIT_COMMAND_MOVE_TO_POS",
+    "UNIT_COMMAND_MOVE_TO_POS_3D",
+    "UNIT_COMMAND_USE_ITEM",
+    "UNIT_COMMAND_USE_SKILL"
+   ],
+   "is_global_var": false,
+   "is_kv_value": false,
+   "is_local_var": false,
+   "op_arg_defaults": {
+    "0": [
+     "None",
+     "Actor"
+    ],
+    "1": [
+     "None",
+     "Actor"
+    ],
+    "2": [
+     "None",
+     "Actor"
+    ],
+    "3": [
+     "None",
+     "Actor"
+    ],
+    "4": [
+     "None",
+     "Actor"
+    ]
+   },
+   "sub_types": {
+    "UNIT_COMMAND_ATTACK_MOVE": "UNIT_COMMAND_ATTACK_MOVE",
+    "UNIT_COMMAND_ATTACK_TARGET": "UNIT_COMMAND_ATTACK_TARGET",
+    "UNIT_COMMAND_CUSTOMIZED_MOVE_TO_POS": "UNIT_COMMAND_CUSTOMIZED_MOVE_TO_POS",
+    "UNIT_COMMAND_FOLLOW": "UNIT_COMMAND_FOLLOW",
+    "UNIT_COMMAND_HOLD_3D": "UNIT_COMMAND_HOLD_3D",
+    "UNIT_COMMAND_MOVE_ALONG_ROAD": "UNIT_COMMAND_MOVE_ALONG_ROAD",
+    "UNIT_COMMAND_MOVE_TO_POS": "UNIT_COMMAND_MOVE_TO_POS",
+    "UNIT_COMMAND_MOVE_TO_POS_3D": "UNIT_COMMAND_MOVE_TO_POS_3D",
+    "UNIT_COMMAND_USE_ITEM": "UNIT_COMMAND_USE_ITEM",
+    "UNIT_COMMAND_USE_SKILL": "UNIT_COMMAND_USE_SKILL"
+   }
+  },
+  "UNIT_COMMAND_TYPE": {
+   "can_compare": true,
+   "const": "UNIT_COMMAND_TYPE",
+   "default": 0,
+   "id": 100210,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "UNIT_COMPARABLE_ATTR": {
+   "const": "UNIT_COMPARABLE_ATTR",
+   "id": 100082,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "UNIT_CONDITIONS": {
+   "const": "UNIT_STATUS",
+   "id": 100054,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "UNIT_ENTITY": {
+   "can_compare": true,
+   "const": "UNIT",
+   "default": 0,
+   "id": 100006,
+   "implemented": [
+    "ABILITY_OWNER",
+    "CUR_UNIT",
+    "FOR_EACH_SELECTED_UNIT",
+    "GET_ABILITY_TARGET_UNIT_FROM_EVENT",
+    "GET_BUILD_UNIT_FROM_EVENT",
+    "GET_BUY_UNIT_FROM_EVENT",
+    "GET_MOVER_OWNER_UNIT",
+    "GET_REACT_SOURCE_UNIT_IN_REACTION",
+    "GET_SHOP_UNIT_FROM_EVENT",
+    "GET_UNIT_FROM_EVENT",
+    "GET_WILL_MODIFIER_UNIT",
+    "MODIFIER_RELEASER",
+    "NONE_UNIT",
+    "RANDOM_UNIT_IN_UNIT_GROUP",
+    "TARGET_UNIT_IN_ABILITY",
+    "UNIT_GROUP_DAMAGE_RANKER",
+    "UNIT_IN_COLLECTED_DEST_EVENT",
+    "UNIT_IN_SCENE",
+    "UNIT_OF_DEST_KILLER",
+    "UNIT_OF_HURT_DEST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "LAST_CREATE_UNIT": 4,
+    "UNIT_IN_SCENE": 1,
+    "VARIABLE": 11
+   }
+  },
+  "UNIT_GROUP": {
+   "can_compare": true,
+   "const": "UNIT_GROUP",
+   "default": "[]",
+   "id": 100026,
+   "implemented": [
+    "NONE_UNIT_GROUP",
+    "PLAYER_UNIT_GROUP",
+    "UNIT_LIST_IN_SHAPE",
+    "UNIT_TYPE_UNIT_GROUP",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {
+    "0": [
+     "None",
+     "Role"
+    ],
+    "1": [
+     "None",
+     "Role"
+    ],
+    "10": [
+     0,
+     "UInt32"
+    ],
+    "11": [
+     "False",
+     "Bool"
+    ],
+    "12": [
+     -1,
+     "Int32"
+    ],
+    "13": [
+     1,
+     "SortType"
+    ],
+    "14": [
+     "None",
+     "Ability"
+    ],
+    "2": [
+     "None",
+     "Role"
+    ],
+    "3": [
+     "[]",
+     "UnitGroup"
+    ],
+    "4": [
+     "",
+     "Str"
+    ],
+    "5": [
+     "",
+     "Str"
+    ],
+    "6": [
+     0,
+     "UnitKey"
+    ],
+    "7": [
+     "None",
+     "Unit"
+    ],
+    "8": [
+     0,
+     "UnitType"
+    ],
+    "9": [
+     0,
+     "UInt32"
+    ]
+   },
+   "sub_types": {
+    "AREA_UNIT_GROUP": 3,
+    "PLAYER_UNIT_GROUP": 1,
+    "RANDOM_UNIT_GROUP": 2,
+    "UNIT_LIST_IN_SHAPE": "UNIT_LIST_IN_SHAPE",
+    "UNIT_TYPE_UNIT_GROUP": 16,
+    "VARIABLE": 14
+   }
+  },
+  "UNIT_GROUP_COMMAND": {
+   "can_compare": false,
+   "const": "UNIT_GROUP_COMMAND",
+   "default": "[]",
+   "id": 101001,
+   "implemented": [
+    "UNIT_GROUP_COMMAND_ATTACK_MOVE",
+    "UNIT_GROUP_COMMAND_ATTACK_MOVE_RANDOM_POS",
+    "UNIT_GROUP_COMMAND_ATTACK_TARGET",
+    "UNIT_GROUP_COMMAND_FOLLOW",
+    "UNIT_GROUP_COMMAND_MOVE_ALONG_ROAD",
+    "UNIT_GROUP_COMMAND_MOVE_TO_POS",
+    "UNIT_GROUP_COMMAND_MOVE_TO_RANDOM_POS",
+    "UNIT_GROUP_COMMAND_STOP"
+   ],
+   "is_global_var": false,
+   "is_kv_value": false,
+   "is_local_var": false,
+   "op_arg_defaults": {
+    "0": [
+     0,
+     "Fixed"
+    ],
+    "1": [
+     "False",
+     "Bool"
+    ],
+    "2": [
+     -1,
+     "Fixed"
+    ],
+    "3": [
+     -10000,
+     "Fixed"
+    ],
+    "4": [
+     "False",
+     "Bool"
+    ]
+   },
+   "sub_types": {
+    "UNIT_GROUP_COMMAND_ATTACK_MOVE": "UNIT_GROUP_COMMAND_ATTACK_MOVE",
+    "UNIT_GROUP_COMMAND_ATTACK_MOVE_RANDOM_POS": "UNIT_GROUP_COMMAND_ATTACK_MOVE_RANDOM_POS",
+    "UNIT_GROUP_COMMAND_ATTACK_TARGET": "UNIT_GROUP_COMMAND_ATTACK_TARGET",
+    "UNIT_GROUP_COMMAND_FOLLOW": "UNIT_GROUP_COMMAND_FOLLOW",
+    "UNIT_GROUP_COMMAND_MOVE_ALONG_ROAD": "UNIT_GROUP_COMMAND_MOVE_ALONG_ROAD",
+    "UNIT_GROUP_COMMAND_MOVE_TO_POS": "UNIT_GROUP_COMMAND_MOVE_TO_POS",
+    "UNIT_GROUP_COMMAND_MOVE_TO_RANDOM_POS": "UNIT_GROUP_COMMAND_MOVE_TO_RANDOM_POS",
+    "UNIT_GROUP_COMMAND_STOP": "UNIT_GROUP_COMMAND_STOP"
+   }
+  },
+  "UNIT_GROUP_COMMAND_TYPE": {
+   "can_compare": true,
+   "const": "UNIT_GROUP_COMMAND_TYPE",
+   "default": 0,
+   "id": 101002,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": false,
+   "is_kv_value": true,
+   "is_local_var": false,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "UNIT_HP_BAR_ATTR": {
+   "const": "UNIT_HP_BAR_ATTR",
+   "id": 100159
+  },
+  "UNIT_HP_BAR_SHOW_TYPE": {
+   "const": "UNIT_HP_BAR_SHOW_TYPE",
+   "id": 100163
+  },
+  "UNIT_KEY_FLOAT_ATTRIBUTE": {
+   "const": "UNIT_KEY_READ_FLOAT_ATTRIBUTE",
+   "id": 100043,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "UNIT_NAME": {
+   "can_compare": true,
+   "const": "UNIT_KEY",
+   "default": 0,
+   "id": 100116,
+   "implemented": [
+    "CONST_KEY",
+    "FOR_EACH_PRE_CONDITION_SELECTED_UNIT_KEY",
+    "NONE_UNIT_KEY",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST_KEY": 1,
+    "VARIABLE": 2
+   }
+  },
+  "UNIT_NAME_BAR_ATTR": {
+   "const": "UNIT_NAME_BAR_ATTR",
+   "id": 100160
+  },
+  "UNIT_NAME_BAR_SHOW_TYPE": {
+   "const": "UNIT_NAME_BAR_SHOW_TYPE",
+   "id": 100164
+  },
+  "UNIT_NAME_POOL": {
+   "can_compare": true,
+   "const": "UNIT_KEY_POOL",
+   "default": "None",
+   "id": 100038,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": "VARIABLE"
+   }
+  },
+  "UNIT_STR_ATTRIBUTES": {
+   "const": "UNIT_STR_READ_ATTRIBUTE",
+   "id": 100063
+  },
+  "UNIT_TEXT_BAR_ATTR": {
+   "const": "UNIT_TEXT_BAR_ATTR",
+   "id": 100161
+  },
+  "UNIT_TITLE_ATTR": {
+   "const": "UNIT_TITLE_ATTR",
+   "id": 100156
+  },
+  "UNIT_TITLE_STYLE_TYPE": {
+   "const": "UNIT_TITLE_STYLE_TYPE",
+   "id": 100158
+  },
+  "UNIT_TRIGGER": {
+   "const": "UNIT_TRIGGER",
+   "id": 1000671,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "UNIT_TYPE": {
+   "can_compare": true,
+   "const": "UNIT_TYPE",
+   "default": 0,
+   "id": 100010,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "UNIT_WRITE_ATTRIBUTE": {
+   "can_compare": true,
+   "const": "UNIT_WRITE_FLOAT_ATTRIBUTE",
+   "default": "",
+   "id": 100042,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "VAR": {
+   "const": "VAR",
+   "id": 100030,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "VAR_LIST": {
+   "const": "VAR_LIST",
+   "id": 100028,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "VAR_LIST_NO_INDEX": {
+   "const": "VAR_LIST_NO_INDEX",
+   "id": 100081,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "VECTOR3": {
+   "can_compare": true,
+   "const": "VECTOR3",
+   "default": "(0, 0, 0)",
+   "id": 100294,
+   "implemented": [
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "VARIABLE": 1
+   }
+  },
+  "VECTOR3_ARITHMETIC_OPERATOR": {
+   "const": "VECTOR3_ARITHMETIC_OPERATOR",
+   "id": 100315,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "WATCHING_MODE_STATUS": {
+   "can_compare": true,
+   "const": "WATCHING_MODE_STATUS",
+   "default": 1,
+   "id": 101012,
+   "implemented": [
+    "CONST"
+   ],
+   "is_global_var": true,
+   "is_kv_value": false,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  },
+  "WEATHER_TYPE": {
+   "const": "WEATHER_TYPE",
+   "default": 0,
+   "id": 100215,
+   "implemented": [],
+   "op_arg_defaults": {},
+   "sub_types": {}
+  },
+  "WINDOW_TYPE_SETTING": {
+   "can_compare": true,
+   "const": "WINDOW_TYPE_SETTING",
+   "default": "",
+   "id": 100507,
+   "implemented": [
+    "CONST",
+    "VARIABLE"
+   ],
+   "is_global_var": true,
+   "is_kv_value": true,
+   "is_local_var": true,
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1,
+    "VARIABLE": 2
+   }
+  },
+  "WIN_OR_LOSE": {
+   "const": "GAME_RESULT",
+   "id": 100047,
+   "implemented": [
+    "CONST"
+   ],
+   "op_arg_defaults": {},
+   "sub_types": {
+    "CONST": 1
+   }
+  }
+ },
+ "categories": {
+  "COMPARABLE_VAR": [
+   "ABILITY",
+   "ABILITY_CAST_TYPE",
+   "ABILITY_NAME",
+   "ABILITY_RELEASE_ID",
+   "ABILITY_TYPE",
+   "ANGLE",
+   "ATTACH_MODEL_ENTITY",
+   "ATTR_ELEMENT",
+   "ATTR_ELEMENT_READ",
+   "AUDIO_CHANNEL",
+   "AUDIO_KEY",
+   "BOOLEAN",
+   "CAMERA",
+   "CAMERA_ATTR_INTEGER",
+   "CAMERA_ATTR_REAL_NUMBER",
+   "CAMLINE",
+   "COIN_CURRENCY",
+   "COLLISION_LAYER",
+   "DAMAGE_ARMOR_TYPE",
+   "DAMAGE_ATTACK_TYPE",
+   "DAMAGE_TYPE",
+   "DECO_ENTITY",
+   "DESTRUCTIBLE_ENTITY",
+   "DESTRUCTIBLE_NAME",
+   "DYNAMIC_TRIGGER_INSTANCE",
+   "FLOAT",
+   "FOG",
+   "FORCE_ENTITY",
+   "FOV_BLOCK_TYPE",
+   "FUNC_KEYBOARD_KEY",
+   "GAME_MODE",
+   "GOODS_KEY",
+   "IMAGE_QUALITY",
+   "INTEGER",
+   "ITEM_ENTITY",
+   "ITEM_GROUP",
+   "ITEM_NAME",
+   "ITEM_STACK_TYPE",
+   "KEYBOARD_KEY",
+   "LINK_SFX_ENTITY",
+   "LINK_SFX_KEY",
+   "LIVE2D",
+   "LOCAL_UNIT_ENTITY",
+   "LOCAL_UNIT_GROUP",
+   "MINI_MAP_COLOR_TYPE",
+   "MODEL",
+   "MODIFIER",
+   "MODIFIER_EFFECT_TYPE",
+   "MODIFIER_ENTITY",
+   "MODIFIER_TYPE",
+   "MOUSE_KEY",
+   "MOUSE_KEY_WITHOUT_MIDDLE",
+   "MOUSE_WHEEL",
+   "MOVER_ENTITY",
+   "NEW_TIMER",
+   "PHYSICS_ENTITY_KEY",
+   "PHYSICS_OBJECT",
+   "PHYSICS_OBJECT_KEY",
+   "PLAYER",
+   "PLAYER_GROUP",
+   "POINT",
+   "POINT_LIGHT",
+   "POINT_LIST",
+   "POLYGON",
+   "POST_EFFECT",
+   "PROJECTILE",
+   "PROJECTILE_ENTITY",
+   "PROJECTILE_GROUP",
+   "RANDOM_POOL",
+   "REACTION",
+   "REACTION_GROUP",
+   "RECTANGLE",
+   "RESCUER_TYPE",
+   "RESCUE_SEEKER_TYPE",
+   "RIGID_BODY",
+   "RIGID_BODY_GROUP",
+   "ROLE_RELATION",
+   "ROLE_RES_KEY",
+   "ROLE_STATUS",
+   "ROLE_TYPE",
+   "ROTATION",
+   "ROUND_AREA",
+   "SCENE_SOUND",
+   "SCENE_UI",
+   "SFX_ENTITY",
+   "SFX_KEY",
+   "SITE_STATE",
+   "SKILL_POINTER_TYPE",
+   "SLOT_TYPE",
+   "SOUND_ENTITY",
+   "SPOT_LIGHT",
+   "STORE_ITEM_TYPE",
+   "STORE_KEY",
+   "STRING",
+   "TABLE",
+   "TEAM",
+   "TECH_KEY",
+   "UI_ANIM",
+   "UI_ANIM_CURVE",
+   "UI_ANIM_PLAY_MODE",
+   "UI_BTN_STATUS",
+   "UI_CHAT_RECV_CHANNEL",
+   "UI_CHAT_SEND_CHANNEL",
+   "UI_COMP",
+   "UI_COMP_ALIGN_TYPE",
+   "UI_COMP_ATTR",
+   "UI_COMP_EVENT_TYPE",
+   "UI_COMP_TYPE",
+   "UI_DIRECTION",
+   "UI_ECA_ANIM_TYPE",
+   "UI_EFFECT_CAMERA_MODE",
+   "UI_EQUIP_SLOT_DRAG_TYPE",
+   "UI_EQUIP_SLOT_USE_TYPE",
+   "UI_GRIDVIEW_BAR_TYPE",
+   "UI_GRIDVIEW_TYPE",
+   "UI_LAYOUT_CLIPPING_TYPE",
+   "UI_MODEL_CAMERA_MOD",
+   "UI_POINT",
+   "UI_POS_ADAPT_MODE",
+   "UI_PREFAB",
+   "UI_PREFAB_INSTANCE",
+   "UI_PREFAB_INS_UID",
+   "UI_SCROLLVIEW_TYPE",
+   "UI_TEXT_FONT_NAME",
+   "UI_TEXT_OVER_LENGTH_HANDLING_TYPE",
+   "UNIT_BEHAVIOR",
+   "UNIT_COMMAND_TYPE",
+   "UNIT_ENTITY",
+   "UNIT_GROUP",
+   "UNIT_GROUP_COMMAND_TYPE",
+   "UNIT_NAME",
+   "UNIT_NAME_POOL",
+   "UNIT_TYPE",
+   "UNIT_WRITE_ATTRIBUTE",
+   "VECTOR3",
+   "WATCHING_MODE_STATUS",
+   "WINDOW_TYPE_SETTING"
+  ],
+  "GLOBAL_VAR_ARG_TYPE": [
+   "ABILITY",
+   "ABILITY_CAST_TYPE",
+   "ABILITY_NAME",
+   "ABILITY_RELEASE_ID",
+   "ABILITY_TYPE",
+   "ANGLE",
+   "ATTACH_MODEL_ENTITY",
+   "ATTR_ELEMENT",
+   "ATTR_ELEMENT_READ",
+   "AUDIO_CHANNEL",
+   "AUDIO_KEY",
+   "BOOLEAN",
+   "BOOL_SAVE",
+   "CAMERA",
+   "CAMLINE",
+   "COIN_CURRENCY",
+   "COLLIDER",
+   "CURSOR_KEY",
+   "CURVED_PATH",
+   "CURVED_PATH_3D",
+   "DAMAGE_ARMOR_TYPE",
+   "DAMAGE_ATTACK_TYPE",
+   "DAMAGE_TYPE",
+   "DEBUG_SHAPE",
+   "DECO_ENTITY",
+   "DECO_NAME",
+   "DESTRUCTIBLE_ENTITY",
+   "DESTRUCTIBLE_NAME",
+   "DYNAMIC_TRIGGER_INSTANCE",
+   "FLOAT",
+   "FLOAT_SAVE",
+   "FOG",
+   "FORCE_ENTITY",
+   "GAME_MODE",
+   "GLOBAL_ARCHIVE_SLOT",
+   "GOODS_KEY",
+   "IMAGE_KEY",
+   "IMAGE_QUALITY",
+   "INTEGER",
+   "INT_SAVE",
+   "ITEM_ENTITY",
+   "ITEM_GROUP",
+   "ITEM_NAME",
+   "ITEM_STACK_TYPE",
+   "JOINT",
+   "KEYBOARD_KEY",
+   "LINK_SFX_ENTITY",
+   "LINK_SFX_KEY",
+   "LIVE2D",
+   "LOCAL_UNIT_ENTITY",
+   "LOCAL_UNIT_GROUP",
+   "MODEL",
+   "MODIFIER",
+   "MODIFIER_ENTITY",
+   "MOVER_ENTITY",
+   "NEW_TIMER",
+   "PHYSICS_ENTITY",
+   "PHYSICS_ENTITY_KEY",
+   "PHYSICS_FILTER",
+   "PHYSICS_OBJECT",
+   "PHYSICS_OBJECT_KEY",
+   "PLAYER",
+   "PLAYER_GROUP",
+   "POINT",
+   "POINT_LIGHT",
+   "POINT_LIST",
+   "POLYGON",
+   "PROJECTILE",
+   "PROJECTILE_ENTITY",
+   "PROJECTILE_GROUP",
+   "RANDOM_POOL",
+   "RANDOM_POOL_DROP",
+   "REACTION",
+   "REACTION_GROUP",
+   "RECTANGLE",
+   "RIGID_BODY",
+   "RIGID_BODY_GROUP",
+   "ROAD_GROUP",
+   "ROLE_RES_KEY",
+   "ROLE_STATUS",
+   "ROLE_TYPE",
+   "ROTATION",
+   "ROUND_AREA",
+   "SCENE_PRESET",
+   "SCENE_UI",
+   "SEQUENCE",
+   "SFX_ENTITY",
+   "SFX_KEY",
+   "SITE_STATE",
+   "SOUND_ENTITY",
+   "SPINE",
+   "SPOT_LIGHT",
+   "STORE_ITEM_TYPE",
+   "STORE_KEY",
+   "STRING",
+   "STR_SAVE",
+   "TABLE",
+   "TABLE_SAVE",
+   "TEAM",
+   "TECH_KEY",
+   "TEXTURE",
+   "UI_ANIM",
+   "UI_ANIM_CURVE",
+   "UI_ANIM_PLAY_MODE",
+   "UI_BTN_STATUS",
+   "UI_CHAT_RECV_CHANNEL",
+   "UI_CHAT_SEND_CHANNEL",
+   "UI_COMP",
+   "UI_COMP_ALIGN_TYPE",
+   "UI_COMP_EVENT_TYPE",
+   "UI_COMP_TYPE",
+   "UI_DIRECTION",
+   "UI_ECA_ANIM_TYPE",
+   "UI_EFFECT_CAMERA_MODE",
+   "UI_EQUIP_SLOT_DRAG_TYPE",
+   "UI_EQUIP_SLOT_USE_TYPE",
+   "UI_GRIDVIEW_BAR_TYPE",
+   "UI_GRIDVIEW_TYPE",
+   "UI_LAYOUT_CLIPPING_TYPE",
+   "UI_MODEL_CAMERA_MOD",
+   "UI_POINT",
+   "UI_POS_ADAPT_MODE",
+   "UI_PREFAB",
+   "UI_PREFAB_INSTANCE",
+   "UI_PREFAB_INS_UID",
+   "UI_SCROLLVIEW_TYPE",
+   "UI_TEXT_FONT_NAME",
+   "UI_TEXT_OVER_LENGTH_HANDLING_TYPE",
+   "UNIT_ENTITY",
+   "UNIT_GROUP",
+   "UNIT_NAME",
+   "UNIT_NAME_POOL",
+   "UNIT_TYPE",
+   "UNIT_WRITE_ATTRIBUTE",
+   "VECTOR3",
+   "WATCHING_MODE_STATUS",
+   "WINDOW_TYPE_SETTING"
+  ],
+  "KV_VAR": [
+   "ABILITY",
+   "ABILITY_CAST_TYPE",
+   "ABILITY_NAME",
+   "ABILITY_RELEASE_ID",
+   "ABILITY_TYPE",
+   "ANGLE",
+   "ATTACH_MODEL_ENTITY",
+   "ATTR_ELEMENT",
+   "ATTR_ELEMENT_READ",
+   "AUDIO_CHANNEL",
+   "AUDIO_KEY",
+   "BOOLEAN",
+   "CAMERA",
+   "CAMLINE",
+   "COIN_CURRENCY",
+   "COLLIDER",
+   "CURSOR_KEY",
+   "CURVED_PATH",
+   "CURVED_PATH_3D",
+   "DAMAGE_ARMOR_TYPE",
+   "DAMAGE_ATTACK_TYPE",
+   "DAMAGE_TYPE",
+   "DESTRUCTIBLE_ENTITY",
+   "DESTRUCTIBLE_NAME",
+   "DYNAMIC_TRIGGER_INSTANCE",
+   "FLOAT",
+   "FOG",
+   "FONT_TYPE",
+   "FORCE_ENTITY",
+   "FUNC_KEYBOARD_KEY",
+   "GAME_MODE",
+   "GOODS_KEY",
+   "HARM_TEXT_TYPE_NEW",
+   "IMAGE_QUALITY",
+   "INTEGER",
+   "ITEM_ENTITY",
+   "ITEM_GROUP",
+   "ITEM_NAME",
+   "ITEM_STACK_TYPE",
+   "JOINT",
+   "JUMP_WORD_TRACK",
+   "KEYBOARD_KEY",
+   "LINK_SFX_ENTITY",
+   "LINK_SFX_KEY",
+   "LIVE2D",
+   "LOCAL_UNIT_GROUP",
+   "MINI_MAP_COLOR_TYPE",
+   "MODEL",
+   "MODIFIER",
+   "MODIFIER_EFFECT_TYPE",
+   "MODIFIER_ENTITY",
+   "MODIFIER_TYPE",
+   "MOUSE_KEY",
+   "MOUSE_KEY_WITHOUT_MIDDLE",
+   "MOUSE_WHEEL",
+   "MOVER_ENTITY",
+   "NEW_TIMER",
+   "PHYSICS_ENTITY",
+   "PHYSICS_ENTITY_KEY",
+   "PHYSICS_OBJECT",
+   "PHYSICS_OBJECT_KEY",
+   "PLAYER",
+   "PLAYER_GROUP",
+   "POINT",
+   "POINT_LIGHT",
+   "POINT_LIST",
+   "POLYGON",
+   "POST_EFFECT",
+   "PROJECTILE",
+   "PROJECTILE_ENTITY",
+   "PROJECTILE_GROUP",
+   "RANDOM_POOL",
+   "REACTION",
+   "REACTION_GROUP",
+   "RECTANGLE",
+   "RESCUER_TYPE",
+   "RESCUE_SEEKER_TYPE",
+   "RIGID_BODY",
+   "RIGID_BODY_GROUP",
+   "ROLE_RELATION",
+   "ROLE_RES_KEY",
+   "ROLE_STATUS",
+   "ROLE_TYPE",
+   "ROTATION",
+   "ROUND_AREA",
+   "SCENE_SOUND",
+   "SCENE_UI",
+   "SEQUENCE",
+   "SFX_ENTITY",
+   "SFX_KEY",
+   "SITE_STATE",
+   "SKILL_POINTER_TYPE",
+   "SLOT_TYPE",
+   "SOUND_ENTITY",
+   "SPINE",
+   "SPOT_LIGHT",
+   "STORE_ITEM_TYPE",
+   "STORE_KEY",
+   "STRING",
+   "TABLE",
+   "TEAM",
+   "TECH_KEY",
+   "TEXTURE",
+   "UI_ANIM",
+   "UI_ANIM_CURVE",
+   "UI_ANIM_PLAY_MODE",
+   "UI_BTN_STATUS",
+   "UI_CHAT_RECV_CHANNEL",
+   "UI_CHAT_SEND_CHANNEL",
+   "UI_COMP",
+   "UI_COMP_ALIGN_TYPE",
+   "UI_COMP_ATTR",
+   "UI_COMP_EVENT_TYPE",
+   "UI_COMP_TYPE",
+   "UI_DIRECTION",
+   "UI_ECA_ANIM_TYPE",
+   "UI_EFFECT_CAMERA_MODE",
+   "UI_EQUIP_SLOT_DRAG_TYPE",
+   "UI_EQUIP_SLOT_USE_TYPE",
+   "UI_GRIDVIEW_BAR_TYPE",
+   "UI_GRIDVIEW_TYPE",
+   "UI_LAYOUT_CLIPPING_TYPE",
+   "UI_MODEL_CAMERA_MOD",
+   "UI_POINT",
+   "UI_POS_ADAPT_MODE",
+   "UI_PREFAB",
+   "UI_PREFAB_INSTANCE",
+   "UI_PREFAB_INS_UID",
+   "UI_SCROLLVIEW_TYPE",
+   "UI_TEXT_FONT_NAME",
+   "UI_TEXT_OVER_LENGTH_HANDLING_TYPE",
+   "UNIT_BEHAVIOR",
+   "UNIT_COMMAND_TYPE",
+   "UNIT_ENTITY",
+   "UNIT_GROUP",
+   "UNIT_GROUP_COMMAND_TYPE",
+   "UNIT_NAME",
+   "UNIT_NAME_POOL",
+   "UNIT_TYPE",
+   "UNIT_WRITE_ATTRIBUTE",
+   "VECTOR3",
+   "WINDOW_TYPE_SETTING"
+  ],
+  "LOCAL_VAR_ARG_TYPE": [
+   "ABILITY",
+   "ABILITY_CAST_TYPE",
+   "ABILITY_NAME",
+   "ABILITY_RELEASE_ID",
+   "ABILITY_TYPE",
+   "ANGLE",
+   "ATTACH_MODEL_ENTITY",
+   "ATTR_ELEMENT",
+   "ATTR_ELEMENT_READ",
+   "AUDIO_CHANNEL",
+   "AUDIO_KEY",
+   "BOOLEAN",
+   "BOOL_SAVE",
+   "CAMERA",
+   "CAMLINE",
+   "COIN_CURRENCY",
+   "COLLIDER",
+   "CURSOR_KEY",
+   "CURVED_PATH",
+   "CURVED_PATH_3D",
+   "DAMAGE_ARMOR_TYPE",
+   "DAMAGE_ATTACK_TYPE",
+   "DAMAGE_TYPE",
+   "DEBUG_SHAPE",
+   "DECO_ENTITY",
+   "DECO_NAME",
+   "DESTRUCTIBLE_ENTITY",
+   "DESTRUCTIBLE_NAME",
+   "DYNAMIC_TRIGGER_INSTANCE",
+   "FLOAT",
+   "FLOAT_SAVE",
+   "FOG",
+   "FORCE_ENTITY",
+   "GAME_MODE",
+   "GLOBAL_ARCHIVE_SLOT",
+   "GOODS_KEY",
+   "IMAGE_KEY",
+   "IMAGE_QUALITY",
+   "INTEGER",
+   "INT_SAVE",
+   "ITEM_ENTITY",
+   "ITEM_GROUP",
+   "ITEM_NAME",
+   "ITEM_STACK_TYPE",
+   "JOINT",
+   "KEYBOARD_KEY",
+   "LINK_SFX_ENTITY",
+   "LINK_SFX_KEY",
+   "LIVE2D",
+   "LOCAL_UNIT_ENTITY",
+   "LOCAL_UNIT_GROUP",
+   "MODEL",
+   "MODIFIER",
+   "MODIFIER_ENTITY",
+   "MOVER_ENTITY",
+   "NEW_TIMER",
+   "PHYSICS_ENTITY",
+   "PHYSICS_ENTITY_KEY",
+   "PHYSICS_FILTER",
+   "PHYSICS_OBJECT",
+   "PHYSICS_OBJECT_KEY",
+   "PLAYER",
+   "PLAYER_GROUP",
+   "POINT",
+   "POINT_LIGHT",
+   "POINT_LIST",
+   "POLYGON",
+   "PROJECTILE",
+   "PROJECTILE_ENTITY",
+   "PROJECTILE_GROUP",
+   "RANDOM_POOL",
+   "RANDOM_POOL_DROP",
+   "REACTION",
+   "REACTION_GROUP",
+   "RECTANGLE",
+   "RIGID_BODY",
+   "RIGID_BODY_GROUP",
+   "ROAD_GROUP",
+   "ROLE_RES_KEY",
+   "ROLE_STATUS",
+   "ROLE_TYPE",
+   "ROTATION",
+   "ROUND_AREA",
+   "SCENE_PRESET",
+   "SCENE_UI",
+   "SEQUENCE",
+   "SFX_ENTITY",
+   "SFX_KEY",
+   "SITE_STATE",
+   "SOUND_ENTITY",
+   "SPINE",
+   "SPOT_LIGHT",
+   "STORE_ITEM_TYPE",
+   "STORE_KEY",
+   "STRING",
+   "STR_SAVE",
+   "TABLE",
+   "TABLE_SAVE",
+   "TEAM",
+   "TECH_KEY",
+   "TEXTURE",
+   "UI_ANIM",
+   "UI_ANIM_CURVE",
+   "UI_ANIM_PLAY_MODE",
+   "UI_BTN_STATUS",
+   "UI_CHAT_RECV_CHANNEL",
+   "UI_CHAT_SEND_CHANNEL",
+   "UI_COMP",
+   "UI_COMP_ALIGN_TYPE",
+   "UI_COMP_EVENT_TYPE",
+   "UI_COMP_TYPE",
+   "UI_DIRECTION",
+   "UI_ECA_ANIM_TYPE",
+   "UI_EFFECT_CAMERA_MODE",
+   "UI_EQUIP_SLOT_DRAG_TYPE",
+   "UI_EQUIP_SLOT_USE_TYPE",
+   "UI_GRIDVIEW_BAR_TYPE",
+   "UI_GRIDVIEW_TYPE",
+   "UI_LAYOUT_CLIPPING_TYPE",
+   "UI_MODEL_CAMERA_MOD",
+   "UI_POINT",
+   "UI_POS_ADAPT_MODE",
+   "UI_PREFAB",
+   "UI_PREFAB_INSTANCE",
+   "UI_PREFAB_INS_UID",
+   "UI_SCROLLVIEW_TYPE",
+   "UI_TEXT_FONT_NAME",
+   "UI_TEXT_OVER_LENGTH_HANDLING_TYPE",
+   "UNIT_ENTITY",
+   "UNIT_GROUP",
+   "UNIT_NAME",
+   "UNIT_NAME_POOL",
+   "UNIT_TYPE",
+   "UNIT_WRITE_ATTRIBUTE",
+   "VECTOR3",
+   "WATCHING_MODE_STATUS",
+   "WINDOW_TYPE_SETTING"
+  ]
+ },
+ "consts": {
+  "ABILITY": 100014,
+  "ABILITY_ADD_KV": 400131,
+  "ABILITY_BOOL_ATTRIBUTE": 100080,
+  "ABILITY_BTN_ATTRIBUTE": 100133,
+  "ABILITY_CAST_PARALLEL": 200107,
+  "ABILITY_CAST_TYPE": 100219,
+  "ABILITY_CONF_FLOAT_ATTRS": 100250,
+  "ABILITY_CONF_INT_ATTRS": 100248,
+  "ABILITY_DEL_KV": 400132,
+  "ABILITY_EVENT": 100128,
+  "ABILITY_EVENT_TO_GLOBAL": 200028,
+  "ABILITY_FLOAT_ATTRIBUTE": 100078,
+  "ABILITY_FORMULA_ATTRS": 100249,
+  "ABILITY_INDEX": 100058,
+  "ABILITY_INDEX_TO_INT": 500032,
+  "ABILITY_INT_ATTRIBUTE": 100079,
+  "ABILITY_KEY": 100039,
+  "ABILITY_KEY_OF_UNIT_KEY": 500017,
+  "ABILITY_NAME_STR_ATTR": 100141,
+  "ABILITY_RELEASE_ID": 101018,
+  "ABILITY_RELEASE_TIMING": 101020,
+  "ABILITY_SEND_GLOBAL_EVENT_WITH_INFO": 400179,
+  "ABILITY_STR_ATTRIBUTE": 100221,
+  "ABILITY_TRIGGER": 100068,
+  "ABILITY_TYPE": 100182,
+  "ABILITY_UI_ACTION": 100083,
+  "ACTION_LIST": 100022,
+  "ADDITIONAL_TICK": 400130,
+  "ADD_ABILITY_CD": 400412,
+  "ADD_ABILITY_FLOAT_ATTR": 400143,
+  "ADD_ABILITY_INT_ATTR": 400144,
+  "ADD_ABILITY_LEVEL": 400409,
+  "ADD_ABILITY_STACK": 400410,
+  "ADD_AREA_TAG": 400346,
+  "ADD_ATTR": 4004550,
+  "ADD_ATTR_BONUS": 4004358,
+  "ADD_ATTR_BOUNS_RATIO": 4004359,
+  "ADD_CAMERA_CONF": 401029,
+  "ADD_COLLIDER_COLLISION_END_REACTION": 401110,
+  "ADD_COLLIDER_COLLISION_END_REACTION_NO_SAVE": 401111,
+  "ADD_COLLIDER_COLLISION_START_REACTION": 401108,
+  "ADD_COLLIDER_COLLISION_START_REACTION_NO_SAVE": 401109,
+  "ADD_COLLIDER_OVERLAP_END_REACTION": 401114,
+  "ADD_COLLIDER_OVERLAP_END_REACTION_NO_SAVE": 401115,
+  "ADD_COLLIDER_OVERLAP_START_REACTION": 401112,
+  "ADD_COLLIDER_OVERLAP_START_REACTION_NO_SAVE": 401113,
+  "ADD_COLLISION_END_REACTION": 401094,
+  "ADD_COLLISION_END_REACTION_NO_SAVE": 401095,
+  "ADD_COLLISION_START_REACTION": 401092,
+  "ADD_COLLISION_START_REACTION_NO_SAVE": 401093,
+  "ADD_CUR_HP": 4004552,
+  "ADD_CUR_MP": 4004554,
+  "ADD_ITEM_ATTR": 400431,
+  "ADD_ITEM_CHARGE": 4004365,
+  "ADD_ITEM_STACK": 4004364,
+  "ADD_MODIFIER": 400022,
+  "ADD_OR_REMOVE": 100045,
+  "ADD_OVERLAP_END_REACTION": 401098,
+  "ADD_OVERLAP_END_REACTION_NO_SAVE": 401099,
+  "ADD_OVERLAP_START_REACTION": 401096,
+  "ADD_OVERLAP_START_REACTION_NO_SAVE": 401097,
+  "ADD_PROJECTILE_DURATION": 500106,
+  "ADD_PROJECTILE_MOVEMENT": 400049,
+  "ADD_RB_COLLISION_END_REACTION": 401102,
+  "ADD_RB_COLLISION_END_REACTION_NO_SAVE": 401103,
+  "ADD_RB_COLLISION_START_REACTION": 401100,
+  "ADD_RB_COLLISION_START_REACTION_NO_SAVE": 401101,
+  "ADD_RB_OVERLAP_END_REACTION": 401106,
+  "ADD_RB_OVERLAP_END_REACTION_NO_SAVE": 401107,
+  "ADD_RB_OVERLAP_START_REACTION": 401104,
+  "ADD_RB_OVERLAP_START_REACTION_NO_SAVE": 401105,
+  "ADD_ROAD_POINT_RES": 400327,
+  "ADD_ROAD_TAG": 400348,
+  "ADD_STATE": 400065,
+  "ADD_UI_COMP": 400226,
+  "ADD_UNIT_ABILITY_POINT": 401038,
+  "ADD_UNIT_LEVEL": 4004352,
+  "ADD_UNIT_MODEL": 400432,
+  "ADJUST_CAMERA_DIST": 400241,
+  "ADJUST_CAMERA_OFFSET": 400243,
+  "ADJUST_CAMERA_ROTATE": 400239,
+  "ADJUST_CAMERA_TARGET_POS": 400246,
+  "ADJUST_CAMERA_WIDTH": 400240,
+  "AI_TAKE_CONTROL": 200003,
+  "ALIGN_TYPE": 100120,
+  "ALL_GAME_FUNC": 100253,
+  "ALL_ROLE_PLAY_BGM": 400101,
+  "ALL_ROLE_STOP_BGM": 400103,
+  "ALTER_NUMBER": 100036,
+  "AND": 300000,
+  "ANGLE": 100225,
+  "ANIMATION_GRAPH_TYPE": 100337,
+  "ANIMATION_TURN_TYPE": 100336,
+  "ANNULAR_SHAPE": 100061,
+  "ANY_AI_TAKE_CONTROL": 200037,
+  "ANY_COMPARE": 300005,
+  "ANY_COMPARE_NEW": 300006,
+  "ANY_ROLE_JOIN_GAME": 200036,
+  "API_TEST_LOG_ADD_ASSERT_RESULT": 400366,
+  "API_TEST_PRINT_MSG_TO_LOG": 400356,
+  "API_TEST_SHOW_UI_MSG": 400367,
+  "APPLY_CAMERA": 400242,
+  "APPLY_CAMERA_CONF": 401030,
+  "APPLY_CAMERA_RES": 400112,
+  "APPLY_DAMAGE": 400019,
+  "AREA_METHOD": 100044,
+  "AREA_SHAPE": 100213,
+  "ARITHMETIC_OPERATOR": 100016,
+  "ASK_FOR_RELEASE_ABILITY": 400153,
+  "ASSIGN_BEHAVIOR_START": 400125,
+  "ATTACH_MODEL_ENTITY": 1011011,
+  "ATTACK_TARGET_HIT_TYPE": 100085,
+  "ATTR_ELEMENT": 100300,
+  "ATTR_ELEMENT_READ": 100301,
+  "AUDIO_ATTRIBUTE": 100153,
+  "AUDIO_CHANNEL": 1001560,
+  "AUDIO_KEY": 100084,
+  "AUDIO_SESSION_ID": 100136,
+  "BACK_GROUND_ATTRIBUTE": 100183,
+  "BAG_ATTRIBUTE": 100105,
+  "BATTLE_STATE": 100075,
+  "BIND_BUFF_ON_UI_COMP": 4004616,
+  "BIND_ITEM_ON_UI_COMP": 4004617,
+  "BIND_SKILL_ON_UI_COMP": 4004614,
+  "BIND_UNIT_GROUP_PANEL": 100146,
+  "BIND_UNIT_KEY_PANEL": 100143,
+  "BIND_UNIT_PANEL": 100138,
+  "BLOCK_GLOBAL_KEY_EVENT": 401023,
+  "BLOCK_GLOBAL_MOUSE_EVENT": 401024,
+  "BLOCK_TRIGGER_KEY_EVENT": 401025,
+  "BLOCK_TRIGGER_MOUSE_EVENT": 401026,
+  "BLOOD_BAR_TYPE": 100074,
+  "BOOLEAN": 100001,
+  "BOOLEAN_OPERATOR": 100035,
+  "BOOL_SAVE": 100233,
+  "BREAK_ABILITY_CS": 400310,
+  "BREAK_ITEM_EVENT": 200070,
+  "BREAK_LOOP": 400074,
+  "BREAK_UNIT_MOVER": 4004503,
+  "BT_ATTRIBUTE": 100053,
+  "BUFF_ITEM_ATTRIBUTE": 100189,
+  "BUFF_LIST_ATTRIBUTE": 100188,
+  "BUILD_KEY": 100173,
+  "BUTTON_ATTRIBUTE": 100088,
+  "CALL_BY_INPUT_KEY": 4004357,
+  "CALL_TRIGGER_FUNC": 400248,
+  "CALL_TRIGGER_FUNC_WITH_RETURN": 400341,
+  "CAMERA": 100073,
+  "CAMERA_ATTR_INTEGER": 500501,
+  "CAMERA_ATTR_REAL_NUMBER": 500500,
+  "CAMERA_MODE": 100323,
+  "CAMERA_MOVE_MODE_TYPE": 100217,
+  "CAMERA_RAY_DIRECTION": 100330,
+  "CAMERA_ROTATE": 100256,
+  "CAMERA_SHAKE_MODE_TYPE": 100218,
+  "CAMERA_SHAKE_WITH_DECAY_MODE_TYPE": 100234,
+  "CAMLINE": 100244,
+  "CAMP": 100020,
+  "CC_ACTION": 100317,
+  "CC_ANIMATION_MACHINE_STATUS": 100320,
+  "CC_ASM_STATE": 100328,
+  "CC_EMO": 100329,
+  "CC_HAND": 100318,
+  "CHANGE_ABILITY_CD": 400136,
+  "CHANGE_ATTR_BONUS": 400034,
+  "CHANGE_ATTR_BONUS_RATIO": 400035,
+  "CHANGE_MINI_MAP_COLOR_TYPE": 401075,
+  "CHANGE_MINI_MAP_IMG": 401028,
+  "CHANGE_ROLE_RES_ICON": 401042,
+  "CHANGE_SHOWROOM_CPOSITION": 401035,
+  "CHANGE_SHOWROOM_CROTATION": 401036,
+  "CHANGE_SHOWROOM_FOV": 401034,
+  "CHANGE_UNIT_FACE_ANGLE": 400094,
+  "CHANGE_UNIT_FACE_DIR": 400025,
+  "CHANGE_UNIT_HP_BAR_ATTR": 400232,
+  "CHANGE_UNIT_NAME_BAR_ATTR": 400234,
+  "CHANGE_UNIT_TEXT_BAR_ATTR": 400235,
+  "CHANGE_UNIT_TITLE": 400217,
+  "CHANGE_UNIT_TITLE_ATTR": 400227,
+  "CHASING_MOVER_READABLE_ATTR": 100268,
+  "CHASING_MOVER_WRITEABLE_ATTR": 100272,
+  "CHAT_BAR_ATTRIBUTE": 100110,
+  "CHAT_MSG_ATTRIBUTE": 100121,
+  "CHAT_SEND_GM": 200066,
+  "CIRCLE_AREA": 100023,
+  "CIRCULAR_SHAPE": 100211,
+  "CLEAR_GROUP": 400083,
+  "CLEAR_UNIT_DMG_OUTPUT": 400046,
+  "CLEAR_UNIT_GROUP": 4004345,
+  "CLOSE_SOURCE_PLAYER_VISION_TO_TARGET": 400419,
+  "CLOSE_SOURCE_UNIT_VISION_TO_TARGET": 400421,
+  "COIN_CURRENCY": 402217,
+  "COLLIDER": 100299,
+  "COLLIDER_BOOL_ATTRS": 100308,
+  "COLLIDER_FLOAT_ATTRS": 100309,
+  "COLLISION_LAYER": 100209,
+  "COLLISION_TYPE": 100321,
+  "COLOR": 100166,
+  "COLOR_GRADING": 100237,
+  "COMMAND": 100034,
+  "COMMAND_NAME": 100050,
+  "COMPARISON_OPERATOR": 100015,
+  "CONDITION_LIST": 100021,
+  "CONTINUE_LOOP": 500221,
+  "COPY_RANDOM_POOL": 4004351,
+  "COUNTER_ATTRIBUTE": 100107,
+  "CREATE_BUILDING_ON_POINT": 400296,
+  "CREATE_BUILDING_ON_POSITION": 400297,
+  "CREATE_CHASING_MOVER": 4004505,
+  "CREATE_CHASING_MOVER_SAVE": 4004512,
+  "CREATE_CIR_AREA": 400141,
+  "CREATE_CURVED_MOVER": 4004509,
+  "CREATE_CURVED_MOVER_SAVE": 4004516,
+  "CREATE_DAY_AND_NIGHT_HUMAN_TIME": 400317,
+  "CREATE_DESTRUCTIBLE": 4004384,
+  "CREATE_DESTRUCTIBLE_NEW": 4004385,
+  "CREATE_FORCE_DIRECTION": 402210,
+  "CREATE_FORCE_DIRECTION_SAVE": 402211,
+  "CREATE_FORCE_POINT": 402212,
+  "CREATE_FORCE_POINT_SAVE": 402213,
+  "CREATE_FORCE_TARGET": 402214,
+  "CREATE_FORCE_TARGET_SAVE": 402215,
+  "CREATE_GRID_ARRAY": 400195,
+  "CREATE_HARM_TEXT": 401022,
+  "CREATE_HARM_TEXT_NEW": 402200,
+  "CREATE_ILLUSION": 400350,
+  "CREATE_ITEM": 400122,
+  "CREATE_ITEM_EVENT": 200091,
+  "CREATE_KNOCKUP_MOVER": 4004520,
+  "CREATE_KNOCKUP_MOVER_SAVE": 4004521,
+  "CREATE_LINK_SFX_FROM_POINT_TO_POINT": 500203,
+  "CREATE_LINK_SFX_FROM_POINT_TO_POINT1": 500229,
+  "CREATE_LINK_SFX_FROM_POINT_TO_UNIT": 500202,
+  "CREATE_LINK_SFX_FROM_POINT_TO_UNIT1": 500228,
+  "CREATE_LINK_SFX_FROM_UNIT_TO_POINT": 500200,
+  "CREATE_LINK_SFX_FROM_UNIT_TO_POINT1": 500226,
+  "CREATE_LINK_SFX_FROM_UNIT_TO_UNIT": 500201,
+  "CREATE_LINK_SFX_FROM_UNIT_TO_UNIT1": 500227,
+  "CREATE_MODEL": 500028,
+  "CREATE_MODEL_ON_POINT": 400212,
+  "CREATE_POLYGON_AREA": 400339,
+  "CREATE_POLYGON_AREA_NEW": 401084,
+  "CREATE_PROJECTILE": 400048,
+  "CREATE_PROJECTILE_NEW": 401065,
+  "CREATE_PROJECTILE_ON_SOCKET": 400028,
+  "CREATE_PROJECTILE_ON_SOCKET_NEW": 401066,
+  "CREATE_RANDOM_POOL": 4004342,
+  "CREATE_REC_AREA": 400140,
+  "CREATE_REC_AREA_BY_TWO_POINTS": 400156,
+  "CREATE_ROAD_LIST": 400325,
+  "CREATE_ROUND_MOVER": 4004506,
+  "CREATE_ROUND_MOVER_SAVE": 4004513,
+  "CREATE_ROUND_MOVER_TO_POINT": 4004507,
+  "CREATE_ROUND_MOVER_TO_POINT_SAVE": 4004514,
+  "CREATE_SCENE_NODE_ON_POINT": 401076,
+  "CREATE_SCENE_NODE_ON_UNIT": 401077,
+  "CREATE_SFX_ON_MODIFIER_ATTACH_MODEL": 500224,
+  "CREATE_SFX_ON_POINT": 500214,
+  "CREATE_SFX_ON_POINT_NEW": 500222,
+  "CREATE_SFX_ON_UNIT": 500215,
+  "CREATE_SFX_ON_UNIT_3": 500225,
+  "CREATE_SFX_ON_UNIT_NEW": 500219,
+  "CREATE_SFX_ON_UNIT_NEW_NEW": 500223,
+  "CREATE_SINGLE_UNIT": 500025,
+  "CREATE_STRAIGHT_MOVER": 4004508,
+  "CREATE_STRAIGHT_MOVER_SAVE": 4004515,
+  "CREATE_TIMER": 400318,
+  "CREATE_UI_COMP": 4004633,
+  "CREATE_UI_COMP_EVENT": 4004636,
+  "CREATE_UNIT": 400004,
+  "CREATE_UNIT_MODEL": 400157,
+  "CURE_UNIT": 400024,
+  "CURSOR_KEY": 100288,
+  "CURSOR_STATE": 100289,
+  "CURVED_MOVER_READABLE_ATTR": 100269,
+  "CURVED_MOVER_WRITEABLE_ATTR": 100273,
+  "CURVED_PATH": 100222,
+  "CURVED_PATH_3D": 100228,
+  "CUSTOM_EVENT": 300008,
+  "CUS_EVENT": 100238,
+  "CUS_PARAM": 100240,
+  "DAMAGE_ARMOR_TYPE": 100401,
+  "DAMAGE_ATTACK_TYPE": 100400,
+  "DAMAGE_TYPE": 100064,
+  "DBG_DIALOG_PRINT_FRAME_TIMER_INFO": 400368,
+  "DEBUG_OUT_STRING": 400082,
+  "DEBUG_SHAPE": 100341,
+  "DECO_ENTITY": 100195,
+  "DECO_NAME": 101015,
+  "DEFENSE_MODE": 100052,
+  "DELETE_ALL_MODIFIERS_BY_TYPE": 400413,
+  "DELETE_AREA": 400142,
+  "DELETE_BEHAVIOR": 400126,
+  "DELETE_DEST": 4004370,
+  "DELETE_ITEM": 400198,
+  "DELETE_MODEL_ENTITY": 400213,
+  "DELETE_SFX_ENTITY": 400216,
+  "DELETE_SUB_STR": 400401,
+  "DELETE_TIMER": 400319,
+  "DELETE_UNIT": 400081,
+  "DELETE_UNIT_BEHAVIOR": 400128,
+  "DEL_OBJECT_KV": 400148,
+  "DESTROY_GRID": 400199,
+  "DESTROY_MODEL": 500029,
+  "DESTROY_UNIT_MODEL": 400158,
+  "DESTRUCTIBLE_ENTITY": 100205,
+  "DESTRUCTIBLE_EVENT": 100206,
+  "DESTRUCTIBLE_NAME": 100207,
+  "DESTRUCTIBLE_TRIGGER": 100204,
+  "DEST_AREA_ATTACKED": 200077,
+  "DEST_AREA_COLLECTED": 200078,
+  "DEST_AREA_DIE": 200075,
+  "DEST_AREA_DRY": 200076,
+  "DEST_ATTACKED": 200073,
+  "DEST_COLLECTED": 200074,
+  "DEST_DIE": 200071,
+  "DEST_SOURCE_DRY": 200072,
+  "DIALOG_DEBUG_TYPE": 100175,
+  "DISABLE_ABILITY": 400417,
+  "DISPLAY_INFO_TO_ROLE": 400115,
+  "DISPLAY_TO_ROLE_GROUP_TEXT_TIME": 400113,
+  "DOWNLOAD_MAP_ARCHIVE_CALLBACK": 200026,
+  "DOWNLOAD_SAVE_DATA": 400173,
+  "DRAG_AREA_ATTRIBUTE": 100108,
+  "DROP_ITEM": 400222,
+  "DRY_DEST": 4004381,
+  "DYADIC": 100101,
+  "DYNAMIC_TRIGGER_INSTANCE": 100178,
+  "EDITOR_ANIMATION": 1011010,
+  "EDIT_GAME_FUNC": 100252,
+  "ELSE_IF": 400075,
+  "ELSE_IF_LIST": 400076,
+  "ELSE_IF_LIST_ELSE": 400077,
+  "ELSE_IF_LIST_IF": 400078,
+  "ENABLE_ABILITY": 400416,
+  "ENABLE_LINK_SFX_SHOW": 500205,
+  "END_GAME_FOR_ROLE": 400170,
+  "ENTITY_IMAGE_ATTRIBUTE": 100169,
+  "EQUIP_SLOT_ATTRIBUTE": 100190,
+  "EXECUTE_TRIGGER": 400090,
+  "EXIT_GAME_ATTRIBUTE": 100114,
+  "EXTRACT_STR": 400402,
+  "FAST_FORWARD_ABILITY_STATE": 4004716,
+  "FILM_ATTRIBUTE": 100090,
+  "FLOAT": 100000,
+  "FLOAT_ARITHMETIC_OPERATOR": 100017,
+  "FLOAT_SAVE": 100232,
+  "FOG": 1001554,
+  "FOG_ATTR": 100293,
+  "FOG_TYPE": 1001561,
+  "FOLLOW_CAMERA_UNIT": 400111,
+  "FOLLOW_OBJECT_PLAY_3D_SOUND_FOR_PLAYER": 4004705,
+  "FONT_NAME": 100157,
+  "FONT_TYPE": 100335,
+  "FORCE": 402209,
+  "FORCE_TRANSMIT_UNIT": 400093,
+  "FORMULA": 100504,
+  "FOR_INT_DO_ACTION": 400080,
+  "FOR_LOOP": 400073,
+  "FOV_BLOCK_TYPE": 100227,
+  "FUNCTION": 100177,
+  "FUNC_KEYBOARD_KEY": 200223,
+  "GAME_END": 400071,
+  "GAME_INIT_FINISHED": 200000,
+  "GAME_MODE": 100505,
+  "GAME_PAUSE": 200033,
+  "GAME_RESULT": 100047,
+  "GAME_RESUME": 200034,
+  "GAME_TRIGGER": 100019,
+  "GENERIC_DEST_EVENT": 100241,
+  "GENERIC_PHYSICS_ENTITY_EVENT": 500405,
+  "GENERIC_UNIT_EVENT": 100008,
+  "GET_ABILITY_FROM_EVENT": 500056,
+  "GET_ACTOR_TIMER_RUN_TIME_NEW": 500012,
+  "GET_AREA_WEATHER": 4004711,
+  "GET_BUILD_UNIT_FROM_EVENT": 500055,
+  "GET_CUR_CAMERA_DIST": 500044,
+  "GET_CUR_CAMERA_PITCH": 500046,
+  "GET_CUR_CAMERA_TARGET_OFFSET": 500049,
+  "GET_CUR_CAMERA_TARGET_POS": 500048,
+  "GET_CUR_CAMERA_YAW": 500045,
+  "GET_CUR_EVENT_KEY_CODE": 500052,
+  "GET_CUR_MOVER": 101014,
+  "GET_CUR_ORTHO_CAMERA_WIDTH": 500047,
+  "GET_GLOBAL_WEATHER": 4004710,
+  "GET_INT_FROM_EVENT": 500036,
+  "GET_MOVER_OWNER_PROJITLE": 4004510,
+  "GET_MOVER_OWNER_UNIT": 4004511,
+  "GET_POINT_FROM_EVENT": 500037,
+  "GET_POINT_TEXTURE": 4004702,
+  "GET_RANDOM_POOL_PROBABILITY": 4004347,
+  "GET_RANDOM_POOL_SIZE": 40043449,
+  "GET_SOUND_BIND_TO_UNIT": 4004707,
+  "GET_TEXT_CONFIG": 401060,
+  "GET_UNIT_COMMAND_FROM_EVENT": 500054,
+  "GET_UNIT_FROM_EVENT": 500038,
+  "GET_UNIT_KEY_FROM_EVENT": 500050,
+  "GLOBAL_ABILITY_EVENT": 200043,
+  "GLOBAL_ARCHIVE_SLOT": 100331,
+  "GLOBAL_MODIFIER_EVENT": 200065,
+  "GLOBAL_PROJECTILE_EVENT": 200047,
+  "GOODS_KEY": 1001574,
+  "GRID": 100139,
+  "HARM_TEXT_TYPE": 100220,
+  "HARM_TEXT_TYPE_NEW": 100259,
+  "HAS_KEY_DOWN": 500053,
+  "HAS_TAG": 500041,
+  "HIDE_HEAD_BAR": 400063,
+  "HIDE_UI_COMP_WITH_ANIMATION": 4004602,
+  "HIT_POINT_BOOL": 100260,
+  "HIT_POINT_INT": 100261,
+  "IF_THEN_ELSE": 400072,
+  "IMAGE_KEY": 100224,
+  "IMAGE_QUALITY": 100506,
+  "IMMEDIATELY_CLEAR_CD": 400137,
+  "INCREASE_RANDOM_POOL_VALUE": 4004346,
+  "INPUT_FIELD_ATTRIBUTE": 100185,
+  "INPUT_KEY_ACTION": 4004356,
+  "INTEGER": 100002,
+  "INT_SAVE": 100230,
+  "INT_VAR": 100065,
+  "ITEM": 100031,
+  "ITEM_ADD_KV": 400123,
+  "ITEM_ADD_TAG": 4004366,
+  "ITEM_CHARGE_CHANGED_EVENT": 200057,
+  "ITEM_DEL_KV": 400124,
+  "ITEM_EVENT": 100033,
+  "ITEM_EVENT_TO_GLOBAL": 200042,
+  "ITEM_FLOAT_ATTR": 100324,
+  "ITEM_GROUP": 100171,
+  "ITEM_INT_ATTR": 100325,
+  "ITEM_KEY": 100032,
+  "ITEM_KEY_STR_ATTR": 500035,
+  "ITEM_NAME_BAR_TYPE": 101021,
+  "ITEM_ON_DESTROY_EVENT": 200062,
+  "ITEM_QUICK_USE_ATTR": 100154,
+  "ITEM_REMOVE_TAG": 4004367,
+  "ITEM_SEND_GLOBAL_EVENT_WITH_INFO": 400207,
+  "ITEM_STACK_CHANGED_EVENT": 200048,
+  "ITEM_STACK_TYPE": 101013,
+  "ITEM_TRIGGER": 1000673,
+  "ITEM_TYPE_FLOAT_ATTR": 100326,
+  "ITEM_TYPE_INT_ATTR": 100327,
+  "ITER_ABILITY_DO": 400407,
+  "ITER_AFFECT_TECH_DO": 401080,
+  "ITER_ALL_ABILITY_DO": 4004341,
+  "ITER_MODIFIER_DO": 400428,
+  "ITER_POLY_AREA_ACTION": 401085,
+  "ITER_ROAD_ACTION": 400215,
+  "ITER_ROUTE": 500024,
+  "ITER_SHOP_ITEM_DO": 401047,
+  "ITER_TAGGED_CIRCLE_AREA_DO": 400343,
+  "ITER_TAGGED_POINT_DO": 400369,
+  "ITER_TAGGED_POLYGON_AREA_DO": 400351,
+  "ITER_TAGGED_RECT_AREA_DO": 400344,
+  "ITER_TAGGED_ROAD_DO": 400345,
+  "ITER_TECH_DO": 401079,
+  "ITER_UI_COMP_DO": 500218,
+  "JOINT": 100302,
+  "JUMP_WORD_TRACK": 100333,
+  "KEYBOARD_KEY": 200220,
+  "KEYBOARD_KEY_DOWN_EVENT": 200100,
+  "KEYBOARD_KEY_UP_EVENT": 200101,
+  "KEY_CODE_MAKE_OUT_EVENT": 300007,
+  "KEY_OF_ITEM": 500006,
+  "KILL_DEST": 4004369,
+  "KILL_INFO_ATTRIBUTE": 100112,
+  "KNOCKUP_MOVER_READABLE_ATTR": 100347,
+  "KNOCKUP_MOVER_WRITEABLE_ATTR": 100346,
+  "LABEL_ATTRIBUTE": 100089,
+  "LANGUAGE_ALLOW_TYPE": 100200,
+  "LANGUAGE_TYPE": 100257,
+  "LAST_GRID": 500009,
+  "LAYER_ATTRIBUTE": 100106,
+  "LAYOUT_ATTRIBUTE": 100096,
+  "LEARN_ABILITY": 401040,
+  "LEFT_JOYSTICK_ATTRIBUTE": 100091,
+  "LENGTH_OF_STR": 400403,
+  "LINEAR_ADJUST_FOLLOW_CAMERA_PARAMS": 400110,
+  "LINEAR_MOVE_ROTATE_CAMERA": 400109,
+  "LINK_SFX_ENTITY": 100202,
+  "LINK_SFX_KEY": 100191,
+  "LINK_SFX_POINT_TYPE": 500217,
+  "LIST_LOOP": 401041,
+  "LIVE2D_KEY": 1001567,
+  "LOCAL_UNIT": 100348,
+  "LOCAL_UNIT_GROUP": 100349,
+  "LOCAL_VAR": 100125,
+  "LOCAL_VAR_LIST": 100126,
+  "MAP": 900002,
+  "MATERIAL_ID": 100243,
+  "MINI_MAP_ATTRIBUTE": 100109,
+  "MINI_MAP_COLOR_TYPE": 100235,
+  "MODEL": 100040,
+  "MODEL_ATTRIBUTE": 100095,
+  "MODEL_ENTITY": 100147,
+  "MODEL_ENTITY_NEW": 100151,
+  "MODEL_KEY": 100122,
+  "MODIFIER": 100076,
+  "MODIFIER_ADD_LAYERS": 400262,
+  "MODIFIER_ADD_MAG_SHIELD": 400264,
+  "MODIFIER_ADD_MAX_LAYERS": 400261,
+  "MODIFIER_ADD_PHY_SHIELD": 400265,
+  "MODIFIER_ADD_PULSE_TIME": 400259,
+  "MODIFIER_ADD_RES_TIME": 400260,
+  "MODIFIER_ADD_SHIELD": 400263,
+  "MODIFIER_BAR_ATTRIBUTE": 100111,
+  "MODIFIER_EFFECT_SHOW_TYPE": 101011,
+  "MODIFIER_EFFECT_TYPE": 100174,
+  "MODIFIER_EVENT": 100129,
+  "MODIFIER_EVENT_TO_GLOBAL": 200029,
+  "MODIFIER_KEY": 100046,
+  "MODIFIER_KEY_ADD_KV": 400069,
+  "MODIFIER_KEY_DEL_KV": 400070,
+  "MODIFIER_REMOVE_INS": 400266,
+  "MODIFIER_REMOVE_TYPE": 400291,
+  "MODIFIER_SEND_GLOBAL_EVENT_WITH_INFO": 400180,
+  "MODIFIER_SET_LAYERS": 400254,
+  "MODIFIER_SET_MAG_SHIELD": 400256,
+  "MODIFIER_SET_MAX_LAYERS": 400253,
+  "MODIFIER_SET_PHY_SHIELD": 400257,
+  "MODIFIER_SET_PULSE_TIME": 400252,
+  "MODIFIER_SET_RES_TIME": 400251,
+  "MODIFIER_SET_SHIELD": 400255,
+  "MODIFIER_STATE_TYPE": 100194,
+  "MODIFIER_TRIGGER": 100069,
+  "MODIFIER_TYPE": 100186,
+  "MODIFY_PANEL_ATTR": 400152,
+  "MODIFY_POINT_TEXTURE": 4004701,
+  "MODIFY_UNIT_ATTR": 400005,
+  "MODIFY_WIDGET_ATTR": 400151,
+  "MOUSE_KEY": 200221,
+  "MOUSE_KEY_DB_CLICK_EVENT": 200104,
+  "MOUSE_KEY_DOWN_EVENT": 200102,
+  "MOUSE_KEY_UP_EVENT": 200103,
+  "MOUSE_KEY_WITHOUT_MIDDLE": 200224,
+  "MOUSE_WHEEL": 200222,
+  "MOVEMENT_OBSTACLE_PROCESS_TYPE": 1000672,
+  "MOVER": 100263,
+  "MOVER_COLLISION_TYPE": 100176,
+  "MOVER_MISS_TARGET": 4004522,
+  "MOVER_TYPE": 100264,
+  "MOVE_DEST_TO_POINT": 4004368,
+  "MOVE_DIRECTION": 100332,
+  "MOVE_ITEM_TO_POINT": 4004363,
+  "MOVE_TYPE": 100338,
+  "NEW_BLOOD_BAR_TYPE": 100223,
+  "NEW_CAMERA_CANCEL_FOLLOW_UNIT": 402002,
+  "NEW_CAMERA_CANCEL_TPS_FOLLOW_UNIT": 402008,
+  "NEW_CAMERA_LIMIT_MOVE": 401016,
+  "NEW_CAMERA_LIMIT_MOVE_CLOSE": 401018,
+  "NEW_CAMERA_LINEAR_MOVE_SPEED": 401015,
+  "NEW_CAMERA_LINEAR_MOVE_TIME": 401014,
+  "NEW_CAMERA_LOOK_AT": 401027,
+  "NEW_CAMERA_PLAY_TIMELINE": 402009,
+  "NEW_CAMERA_ROTATE_PITCH_ANGLE_SPEED": 401005,
+  "NEW_CAMERA_ROTATE_PITCH_ANGLE_TIME": 401003,
+  "NEW_CAMERA_ROTATE_PITCH_TIME_SPEED": 401004,
+  "NEW_CAMERA_ROTATE_ROLL_ANGLE_SPEED": 401011,
+  "NEW_CAMERA_ROTATE_ROLL_ANGLE_TIME": 401009,
+  "NEW_CAMERA_ROTATE_ROLL_TIME_SPEED": 401010,
+  "NEW_CAMERA_ROTATE_YAW_ANGLE_SPEED": 401008,
+  "NEW_CAMERA_ROTATE_YAW_ANGLE_TIME": 401006,
+  "NEW_CAMERA_ROTATE_YAW_TIME_SPEED": 401007,
+  "NEW_CAMERA_SET_DISTANCE": 401017,
+  "NEW_CAMERA_SET_FOCUS_Y": 402003,
+  "NEW_CAMERA_SET_FOLLOW_UNIT": 402001,
+  "NEW_CAMERA_SET_MOVE_ENABLE": 402004,
+  "NEW_CAMERA_SET_MOVE_NOT_ENABLE": 402005,
+  "NEW_CAMERA_SET_PITCH": 401000,
+  "NEW_CAMERA_SET_ROLL": 401002,
+  "NEW_CAMERA_SET_TPS_FOLLOW_UNIT": 402007,
+  "NEW_CAMERA_SET_YAW": 401001,
+  "NEW_CAMERA_SHAKE_WITH_DECAY": 402006,
+  "NEW_CAMERA_SHAKE_XY": 401012,
+  "NEW_CAMERA_SHAKE_Z": 401013,
+  "NEW_CAMERA_STOP_TIMELINE": 402010,
+  "NEW_TIMER": 100181,
+  "NODE_ATTRIBUTE": 100087,
+  "NONE_ABILITY_KEY": 500002,
+  "NONE_ITEM": 500023,
+  "NONE_ITEM_KEY": 500003,
+  "NONE_MODIFIER_KEY": 500004,
+  "NONE_MOVER": 100274,
+  "NONE_PROJECTILE_KEY": 500005,
+  "NONE_ROUTE": 500033,
+  "NORMAL_ABILITY_SLOT": 100132,
+  "NORMAL_KEY": 100254,
+  "NOT": 300002,
+  "NUMBER_COMPARE": 300003,
+  "NUMBER_RANGE": 300004,
+  "OBJECT_NAME_DESC_TYPE": 500601,
+  "OBJECT_TYPE": 500600,
+  "ONCE_OR_LOOP": 100049,
+  "ON_OR_OFF": 100048,
+  "OPEN_OR_CLOSE_TIME_SPEED": 400316,
+  "OR": 300001,
+  "ORTHOGONAL_CAMERA": 100155,
+  "PANEL": 100103,
+  "PANEL_BIND_UNIT": 400197,
+  "PANEL_BIND_UNIT_GROUP": 400211,
+  "PANEL_BIND_UNIT_KEY": 400210,
+  "PAN_CAMERA_TIMED": 400108,
+  "PATROL_MODE": 100051,
+  "PAUSE_BEHAVIOUR_TREE": 400174,
+  "PAUSE_GAME": 400184,
+  "PAUSE_TIMER": 400323,
+  "PAUSE_UI_ANIMATION": 400168,
+  "PAUSE_UNIT_LIFE_CYCLE": 4004355,
+  "PHYSICS_CREATE_MOVER_CURVE": 4004519,
+  "PHYSICS_CREATE_MOVER_PHYSICS": 4004518,
+  "PHYSICS_CREATE_MOVER_STRAIGHT": 4004517,
+  "PHYSICS_ENTITY": 100297,
+  "PHYSICS_ENTITY_ACTIVE": 500302,
+  "PHYSICS_ENTITY_CREATE": 500301,
+  "PHYSICS_ENTITY_DEACTIVE": 500303,
+  "PHYSICS_ENTITY_DESTROY": 500307,
+  "PHYSICS_ENTITY_KEY": 100304,
+  "PHYSICS_ENTITY_LOSE": 500404,
+  "PHYSICS_ENTITY_OBTAIN": 500401,
+  "PHYSICS_ENTITY_PAUSE": 500305,
+  "PHYSICS_ENTITY_RESET": 500306,
+  "PHYSICS_ENTITY_RUNNING": 500304,
+  "PHYSICS_ENTITY_STATE": 100322,
+  "PHYSICS_ENTITY_STOP_USE": 500403,
+  "PHYSICS_ENTITY_USE": 500402,
+  "PHYSICS_EVENT": 500300,
+  "PHYSICS_FILTER": 100314,
+  "PHYSICS_OBJECT": 100296,
+  "PHYSICS_OBJECT_KEY": 100303,
+  "PICK_ABILITY_KEY_PRE_CONDITION_DO_ACTION": 401116,
+  "PICK_GET_EFFECT_ON_MODIFIER_DO_ACTION": 402204,
+  "PICK_ITEM_DO_ACTION": 400267,
+  "PICK_ITEM_KEY_PRE_CONDITION_DO_ACTION": 401118,
+  "PICK_ITEM_NAME_COMPOSE_LIST_DO_ACTION": 401087,
+  "PICK_ITEM_NAME_COMPOSE_ROLE_ATTR_LIST_DO_ACTION": 401088,
+  "PICK_ITEM_NAME_UNIT_ATTR_LIST_DO_ACTION": 401090,
+  "PICK_ITEM_UNIT_ATTR_LIST_DO_ACTION": 401091,
+  "PICK_LOCAL_UNIT_DO_ACTION": 100350,
+  "PICK_LOSS_EFFECT_ON_MODIFIER_DO_ACTION": 402205,
+  "PICK_MODEL_ON_MODIFIER_DO_ACTION": 402203,
+  "PICK_PROJECTILE_DO_ACTION": 401046,
+  "PICK_ROLE_DO_ACTION": 400098,
+  "PICK_ROLE_RES_DO_ACTION": 401068,
+  "PICK_UNIT_DO_ACTION": 400079,
+  "PICK_UNIT_KEY_PRE_CONDITION_DO_ACTION": 401117,
+  "PLATFORM_COMMUNITY_TYPE": 100292,
+  "PLATFORM_DECO_TYPE": 100290,
+  "PLATFORM_SIGNIN_TYPE": 100291,
+  "PLATFORM_TRIGGER": 1000674,
+  "PLAYERS_IS_ALLIANCE": 400337,
+  "PLAYERS_IS_ENEMY": 400338,
+  "PLAY_3D_SOUND_FOR_PLAYER": 4004704,
+  "PLAY_ANIMATION": 400017,
+  "PLAY_HIT_SOUND_EFFECT": 400150,
+  "PLAY_LINK_SFX": 400064,
+  "PLAY_OPERATION": 100316,
+  "PLAY_SCENE_ANIM": 4000230,
+  "PLAY_SFX": 400061,
+  "PLAY_SFX_ON_CAMERA": 400118,
+  "PLAY_SFX_ON_POINT": 400068,
+  "PLAY_SOUND_BY_ABILITY_FOR_ROLE_RELATION": 401072,
+  "PLAY_SOUND_BY_ITEM_FOR_ROLE_RELATION": 401071,
+  "PLAY_SOUND_BY_MOD_FOR_ROLE_RELATION": 401073,
+  "PLAY_SOUND_BY_PROJ_FOR_ROLE_RELATION": 401074,
+  "PLAY_SOUND_BY_UNIT_FOR_ROLE_RELATION": 401070,
+  "PLAY_SOUND_EFFECT": 400149,
+  "PLAY_SOUND_FOR_PLAYER": 4004703,
+  "PLAY_SOUND_FOR_ROLE_RELATION": 401069,
+  "PLAY_UI_ANIMATION": 400167,
+  "PLAY_UI_COMP_ANIM": 4004634,
+  "PLAY_UI_IN_ABILITY_INDEX": 400119,
+  "PLAY_UI_MODEL_ANIM": 401089,
+  "PLAY_UNIT_MODEL_SFX": 400161,
+  "POINT": 100004,
+  "POINT_IN_ROUTE": 500026,
+  "POINT_LIGHT": 1001550,
+  "POINT_LIGHT_ATTR": 1001551,
+  "POINT_LIST": 100024,
+  "POINT_ROTATE_Y": 500027,
+  "POLYGON_AREA": 100150,
+  "POST_EFFECT": 1001557,
+  "POS_IN_STR": 400405,
+  "PREVENT_OBTAIN_MODIFIER": 400429,
+  "PREVENT_UNIT_DIE": 4004361,
+  "PRIMARY_ATTR": 100500,
+  "PRINT_MESSAGE_ACTION_TO_DIALOG": 400298,
+  "PROBABILITY_DO_ACTION": 401039,
+  "PROGRESS_ATTRIBUTE": 100094,
+  "PROJECTILE": 100077,
+  "PROJECTILE_ADD_TAG": 500107,
+  "PROJECTILE_DELETE_MOVEMENT": 400053,
+  "PROJECTILE_DESTROY": 400056,
+  "PROJECTILE_DIRECTION_ARC_MOVEMENT": 400052,
+  "PROJECTILE_DIRECTION_STRAIGHT_MOVEMENT": 400050,
+  "PROJECTILE_EVENT": 100130,
+  "PROJECTILE_EVENT_TO_GLOBAL": 200030,
+  "PROJECTILE_GROUP": 100203,
+  "PROJECTILE_KEY": 100062,
+  "PROJECTILE_KEY_ADD_KV": 400058,
+  "PROJECTILE_KEY_DEL_KV": 400059,
+  "PROJECTILE_PARABOLA_MOVEMENT": 400051,
+  "PROJECTILE_RAISE_HEIGHT": 400060,
+  "PROJECTILE_REBOUND_MOVEMENT": 400054,
+  "PROJECTILE_REMOVE_TAG": 500108,
+  "PROJECTILE_SEND_GLOBAL_EVENT_WITH_INFO": 400181,
+  "PROJECTILE_SURROUND_MOVEMENT": 400055,
+  "PROJECTILE_TRIGGER": 1000670,
+  "RANDOM_LIST_FROM_LIST": 400084,
+  "RANDOM_POOL": 100201,
+  "RANDOM_POOL_DROP": 100334,
+  "RANK_LIST_ATTRIBUTE": 100113,
+  "REACTION": 100311,
+  "REACTION_GROUP": 100312,
+  "RECEIVE_EVENT": 200090,
+  "RECORD_ATK_ASSIST_SWITCH": 400206,
+  "RECORD_KEY": 100255,
+  "RECTANGLE_AREA": 100009,
+  "RECTANGLE_SHAPE": 100060,
+  "REG_ABILITY_TRIGGER": 400299,
+  "REG_DESTRUCTIBLE_TRIGGER": 4002491,
+  "REG_ITEM_TRIGGER": 400301,
+  "REG_MODIFIER_TRIGGER": 400303,
+  "REG_PLATFORM_TRIGGER": 4002492,
+  "REG_PROJECTILE_TRIGGER": 400302,
+  "REG_TRIGGER": 400249,
+  "REG_UNIT_TRIGGER": 400300,
+  "RELEASE_ABILITY_BY_INDEX": 400139,
+  "REMOVE_ABILITY": 400355,
+  "REMOVE_AREA_TAG": 400347,
+  "REMOVE_ITEM": 400223,
+  "REMOVE_LINK_SFX": 500204,
+  "REMOVE_MODIFIER": 400023,
+  "REMOVE_POLYGON_AREA": 400340,
+  "REMOVE_RANDOM_POOL_VALUE": 4004344,
+  "REMOVE_ROAD_LIST": 400326,
+  "REMOVE_ROAD_POINT_RES": 400328,
+  "REMOVE_ROAD_TAG": 400349,
+  "REMOVE_ROLE_FROM_GROUP": 400099,
+  "REMOVE_STATE": 400066,
+  "REMOVE_UNIT_IN_GROUP": 400016,
+  "REMOVE_UNIT_KEY_IN_GROUP": 400015,
+  "REMOVE_UNIT_MODEL": 400433,
+  "REMOVE_UNIT_MOVER": 4004504,
+  "REPLACE_POINT_TEXTURE": 4004713,
+  "RESCUER_TYPE": 101004,
+  "RESCUE_SEEKER_TYPE": 101003,
+  "RESET_DOWNLOAD_SAVE_DATA_CALLBACK": 400176,
+  "RESTART_COLDDOWN": 400185,
+  "RESTRICT_CAMERA_AREA": 400196,
+  "RESTRICT_CAMERA_POS_MOVE_AREA": 400225,
+  "RESUME_BEHAVIOUR_TREE": 400175,
+  "RESUME_TIMER": 400324,
+  "RETURN": 400304,
+  "REVIVE_DEST": 4004371,
+  "RIGHT_JOYSTICK_ATTRIBUTE": 100092,
+  "RIGID_BODY": 100298,
+  "RIGID_BODY_BOOL_ATTRS": 100307,
+  "RIGID_BODY_GROUP": 100306,
+  "RIGID_BODY_TYPE": 100310,
+  "ROAD_GROUP": 100149,
+  "ROLE": 100025,
+  "ROLE_ACTIVE_EXIT_GAME_EVENT": 200025,
+  "ROLE_ADD_KV": 400095,
+  "ROLE_ADD_TO_GROUP": 400097,
+  "ROLE_CHANGE_RES": 400092,
+  "ROLE_CHANGE_TECH_EVENT": 200046,
+  "ROLE_CHANGE_TECH_LEVEL": 400289,
+  "ROLE_DEL_KV": 400096,
+  "ROLE_DOWNGRADE_TECH_EVENT": 200045,
+  "ROLE_FORCE_QUIT": 400312,
+  "ROLE_GENERATE_RANDOM_NUMBER_WITH_ACTION": 200108,
+  "ROLE_GET_STORE_ITEM": 200032,
+  "ROLE_GROUP": 100027,
+  "ROLE_INPUT_ACTIVATION_CODE": 200035,
+  "ROLE_INPUT_MSG": 200039,
+  "ROLE_JOIN_GAME": 200002,
+  "ROLE_LOSE_CONNECT": 200024,
+  "ROLE_OPEN_CHARGE_ITEM_STORE": 400186,
+  "ROLE_RELATION": 1000204,
+  "ROLE_RES_KEY": 100037,
+  "ROLE_SET_RES": 400311,
+  "ROLE_SET_TECH_LEVEL": 400290,
+  "ROLE_STATUS": 100180,
+  "ROLE_STORE_ITEM_CNT": 500007,
+  "ROLE_TYPE": 100179,
+  "ROLE_UPGRADE_TECH_EVENT": 200044,
+  "ROLE_USE_RANDOM_POOL_WITH_ACTION": 200106,
+  "ROLE_USE_STORE_ITEM": 400187,
+  "ROLE_USE_STORE_ITEM_END": 200038,
+  "ROLE_USE_STORE_ITEM_WITH_ACTION": 200105,
+  "ROTATION": 100305,
+  "ROUND_MODE": 100345,
+  "ROUND_MOVER_DIRECTION_TYPE": 100208,
+  "ROUND_MOVER_READABLE_ATTR": 100267,
+  "ROUND_MOVER_WRITEABLE_ATTR": 100271,
+  "ROUND_RULE": 100343,
+  "ROUTE_END": 500018,
+  "ROUTE_INVERSION": 500019,
+  "ROUTE_JOIN": 500021,
+  "ROUTE_LOOP": 500020,
+  "ROUTE_NUM": 500022,
+  "RUN_BEHAVIOR_ONCE": 400127,
+  "RUN_COUNT_TIMER": 400322,
+  "RUN_COUNT_TIMER_BY_FRAME": 402102,
+  "RUN_COUNT_TIMER_BY_FRAME_NO_SAVE": 402105,
+  "RUN_COUNT_TIMER_NO_SAVE": 400333,
+  "RUN_LOOP_TIMER": 400321,
+  "RUN_LOOP_TIMER_BY_FRAME": 402101,
+  "RUN_LOOP_TIMER_BY_FRAME_NO_SAVE": 402104,
+  "RUN_LOOP_TIMER_NO_SAVE": 400334,
+  "RUN_ONCE_TIMER": 400320,
+  "RUN_ONCE_TIMER_BY_FRAME": 402100,
+  "RUN_ONCE_TIMER_BY_FRAME_NO_SAVE": 402103,
+  "RUN_ONCE_TIMER_NO_SAVE": 400335,
+  "SCENE_MODEL_MATERIAL_SET_FLOAT_VAR": 4000231,
+  "SCENE_PRESET": 100196,
+  "SCENE_SOUND": 100262,
+  "SCENE_UI": 100236,
+  "SCROLL_VIEW_ATTRIBUTE": 100099,
+  "SECTOR_SHAPE": 100059,
+  "SELECT_AREA_DEST_DO_ACTION": 4004375,
+  "SELECT_DEST_IN_SHAPER_DO_ACTION": 4004386,
+  "SELECT_POINT_RNG_DEST_DO_ACTION": 4004376,
+  "SELECT_UNIT": 401021,
+  "SELL_ITEM_EVENT": 200069,
+  "SEND_EVENT": 4004501,
+  "SEND_GLOBAL_EVENT": 400164,
+  "SEND_GLOBAL_EVENT_WITH_POINT": 400165,
+  "SEND_GLOBAL_EVENT_WITH_POINT_AND_THREE_INT32": 400166,
+  "SEND_TO_ROLE_GROUP_TEXT_TIME": 400292,
+  "SEND_TRIGGER_EVENT": 400091,
+  "SEQUENCE": 100295,
+  "SETTING_ATTRIBUTE": 100127,
+  "SET_ABILITY_BOOL_ATTR": 400135,
+  "SET_ABILITY_CAST_RANGE": 401078,
+  "SET_ABILITY_CD": 400411,
+  "SET_ABILITY_CD_ENABLE": 400154,
+  "SET_ABILITY_FLOAT_ATTR": 400133,
+  "SET_ABILITY_INT_ATTR": 400134,
+  "SET_ABILITY_LEVEL": 400408,
+  "SET_ABILITY_OBJECT_DESC": 400146,
+  "SET_ABILITY_OBJECT_NAME": 400145,
+  "SET_ABILITY_STACK": 400138,
+  "SET_ABILITY_STACK_TIME": 401067,
+  "SET_ACTOR_VARIABLE": 400293,
+  "SET_AREA_COLLISION": 400391,
+  "SET_ATTR": 4004551,
+  "SET_BLOOD_BAR_SHOW_TYPE": 401045,
+  "SET_BLOOD_BAR_TYPE": 400062,
+  "SET_BLOOD_SCALE_VISIBLE": 400247,
+  "SET_BTN_SHORT_CUT": 401031,
+  "SET_CAMERA_DRAGGABLE": 400238,
+  "SET_CAMERA_POS": 400244,
+  "SET_CIRCLE_AREA_RANGE": 400330,
+  "SET_CIRCLE_VISION_VISIBILITY": 400332,
+  "SET_COMPOSE_COMP_REFRESH": 4004622,
+  "SET_CUR_DAMAGE": 400067,
+  "SET_CUR_HP": 4004553,
+  "SET_CUR_HP_DEST": 4004373,
+  "SET_CUR_MP": 4004555,
+  "SET_DAMAGE_RATIO": 100402,
+  "SET_DAY_AND_NIGHT_TIME_SPEED": 400314,
+  "SET_DAY_AND_NIGHT_TIME_SPEED_PER": 400315,
+  "SET_DEST_ANGLE": 4004380,
+  "SET_DEST_NAME": 4004377,
+  "SET_DEST_SIZE": 4004379,
+  "SET_DEST_SOURCE_NUMS": 4004378,
+  "SET_EXP_IN_GAIN_EXP_EVENT": 402202,
+  "SET_FOG_ATTR": 4004715,
+  "SET_FUNC_RETURN": 400342,
+  "SET_GAME_DAY_AND_NIGHT_TIME": 400313,
+  "SET_GHOST_COLOR": 401063,
+  "SET_GHOST_TIME": 401064,
+  "SET_ITEM_ATTR": 400430,
+  "SET_ITEM_BUY_PRICE": 400284,
+  "SET_ITEM_CAN_SELL": 400279,
+  "SET_ITEM_CHARGE": 400295,
+  "SET_ITEM_CREATOR": 4004362,
+  "SET_ITEM_DESC": 401019,
+  "SET_ITEM_DROPPABLE": 400424,
+  "SET_ITEM_FACE_ANGLE": 400437,
+  "SET_ITEM_HP": 400426,
+  "SET_ITEM_LEVEL": 400427,
+  "SET_ITEM_MAX_CHARGE": 4002951,
+  "SET_ITEM_NAME": 401020,
+  "SET_ITEM_POSITION": 400435,
+  "SET_ITEM_SCALE": 400436,
+  "SET_ITEM_SELLABLE": 400425,
+  "SET_ITEM_STACK": 400294,
+  "SET_LINK_SFX_ANIMATION_SPEED": 500231,
+  "SET_LINK_SFX_POINT": 500206,
+  "SET_LINK_SFX_SCALE": 500230,
+  "SET_LINK_SFX_UNIT_SOCKET": 500216,
+  "SET_LOCAL_VARIABLE": 400002,
+  "SET_MAX_HP_DEST": 4004374,
+  "SET_MINIMAP_VIEW_RECT": 400208,
+  "SET_MODIFIER_LEFT_DURATION": 400415,
+  "SET_MOUSE_FOLLOWER": 402201,
+  "SET_OBJECT_KV": 400147,
+  "SET_PLAYERS_HOSTILITY": 400336,
+  "SET_PLAYER_CAMP_ID": 400308,
+  "SET_PLAYER_EXP_RATE": 400306,
+  "SET_PLAYER_GROUP_NAVIGATE_MODE": 401044,
+  "SET_PLAYER_NAME": 400309,
+  "SET_PLAYER_SPAWN_POINT": 400307,
+  "SET_POINT_COLLISION": 400390,
+  "SET_PREFAB_UI_VISIBLE": 4004619,
+  "SET_PROJECTILE_ANIMATION_SPEED": 500104,
+  "SET_PROJECTILE_DURATION": 500105,
+  "SET_PROJECTILE_FACE_ANGLE": 500101,
+  "SET_PROJECTILE_POSITION": 500100,
+  "SET_PROJECTILE_ROTATE_XYZ": 500102,
+  "SET_PROJECTILE_SCALE_XYZ": 500103,
+  "SET_RANDOM_POOL_VALUE": 4004343,
+  "SET_RANDOM_SEED": 500109,
+  "SET_RECT_AREA_RANGE": 400329,
+  "SET_RECT_VISION_VISIBILITY": 400331,
+  "SET_ROLE_HIT_POINT_DATA": 401086,
+  "SET_ROLE_MOUSE_LEFT_CLICK": 500110,
+  "SET_ROLE_MOUSE_MOVE_SELECT": 500111,
+  "SET_ROLE_MOUSE_WHEEL": 500112,
+  "SET_ROLE_RANK_SCORE": 400105,
+  "SET_SAVE_DATA": 400106,
+  "SET_SFX_ANGLE": 500208,
+  "SET_SFX_ANIMATION_SPEED": 500212,
+  "SET_SFX_DURATION": 500213,
+  "SET_SFX_HEIGHT": 500210,
+  "SET_SFX_POSITION": 500211,
+  "SET_SFX_ROTATE": 500207,
+  "SET_SFX_SCALE": 500209,
+  "SET_SHOP_COMP_BIND_SHOP_UNIT": 4004621,
+  "SET_SKILL_BTN_ACTIVE_EFFECT": 401032,
+  "SET_SLAVE_COEFF": 100501,
+  "SET_SMART_CAST_ABILITY": 4004714,
+  "SET_TRIGGER_ENABLED": 400089,
+  "SET_UI_COMP_BIND_ATTR": 401082,
+  "SET_UI_COMP_BIND_PLAYER_PROP": 401083,
+  "SET_UI_COMP_BIND_VAR": 401081,
+  "SET_UI_COMP_DISABLED_IMAGE": 4004639,
+  "SET_UI_COMP_DRAG": 4004627,
+  "SET_UI_COMP_ENABLE": 4004609,
+  "SET_UI_COMP_FONT_COLOR": 4004624,
+  "SET_UI_COMP_FONT_SIZE": 4004611,
+  "SET_UI_COMP_IMAGE": 4004606,
+  "SET_UI_COMP_INPUT_FIELD_FOCUS": 4004612,
+  "SET_UI_COMP_INPUT_FIELD_LOSE_FOCUS": 4004613,
+  "SET_UI_COMP_ITEM_SLOT_INDEX": 4004618,
+  "SET_UI_COMP_LOADINGBAR_CURRENT_VALUE": 4004608,
+  "SET_UI_COMP_LOADINGBAR_MAX_VALUE": 4004607,
+  "SET_UI_COMP_OPACITY": 4004615,
+  "SET_UI_COMP_POSITION": 4004603,
+  "SET_UI_COMP_PRESS_IMAGE": 4004638,
+  "SET_UI_COMP_ROTATION": 4004625,
+  "SET_UI_COMP_SCALE": 4004632,
+  "SET_UI_COMP_SIZE": 4004604,
+  "SET_UI_COMP_SUSPEND_IMAGE": 4004637,
+  "SET_UI_COMP_SWALLOW": 4004626,
+  "SET_UI_COMP_TEXT": 4004610,
+  "SET_UI_COMP_UNIT_EQUIP_SLOT": 4004623,
+  "SET_UI_COMP_VISIBLE": 4004600,
+  "SET_UI_COMP_WORLD_POS": 4004628,
+  "SET_UI_COMP_WORLD_ROTATION": 4004630,
+  "SET_UI_COMP_WORLD_SCALE": 4004631,
+  "SET_UI_COMP_Z_ORDER": 4004605,
+  "SET_UI_MODEL_BACKGROUND_COLOR": 401033,
+  "SET_UI_MODEL_FOCUS_POS": 4004640,
+  "SET_UI_MODEL_ID": 4004620,
+  "SET_UNIT_ABILITY_POINT": 401037,
+  "SET_UNIT_BUY_PRICE": 400285,
+  "SET_UNIT_DAY_VISION": 401048,
+  "SET_UNIT_DESC": 100503,
+  "SET_UNIT_EXP": 4004353,
+  "SET_UNIT_HP_BAR_VISIBLE": 400220,
+  "SET_UNIT_LIFE_CYCLE": 4004354,
+  "SET_UNIT_MODEL_OPACITY": 400160,
+  "SET_UNIT_MODEL_POS": 400159,
+  "SET_UNIT_MOVE_CHANNEL_AIR": 400229,
+  "SET_UNIT_MOVE_CHANNEL_LAND": 400228,
+  "SET_UNIT_MOVE_COLLISION": 4004700,
+  "SET_UNIT_NAME": 4004360,
+  "SET_UNIT_NAME_VISIBLE": 400219,
+  "SET_UNIT_NIGHT_VISION": 401049,
+  "SET_UNIT_SCALE": 400434,
+  "SET_UNIT_TITLE_VISIBLE": 400218,
+  "SET_UNIT_TURN_SPEED": 4004037,
+  "SET_VARIABLE": 400000,
+  "SET_VARIABLE_NONE": 400155,
+  "SET_VARIABLE_STRUCTURE": 400003,
+  "SET_VARIABLE_STR_LIST": 400237,
+  "SET_VARIABLE_TABLE": 400001,
+  "SET_VAR_FROM_PARAM": 4004502,
+  "SFX_ENTITY": 100148,
+  "SFX_KEY": 100066,
+  "SFX_ROTATE_TYPE": 500220,
+  "SFX_VISIBLE_TYPE": 100131,
+  "SHAKE_CAMERA": 400121,
+  "SHAKE_PHONE": 400104,
+  "SHARE_SOURCE_PLAYER_VISION_TO_TARGET": 400418,
+  "SHARE_SOURCE_UNIT_VISION_TO_TARGET": 400420,
+  "SHIELD_TYPE": 100245,
+  "SHIFT_ITEM": 400224,
+  "SHOP_ATTRIBUTE": 100104,
+  "SHOW_HEAD_BAR_COUNT_DOWN": 400043,
+  "SHOW_HIDE_DEST": 4004372,
+  "SHOW_ITEM_KV_PROPERTY": 400117,
+  "SHOW_TIME_LINE_PANEL": 400200,
+  "SHOW_UI_COMP_WITH_ANIMATION": 4004601,
+  "SHOW_UNIT_KV_PROPERTY": 400116,
+  "SHOW_UNIT_TEXT_TO_ROLE": 400114,
+  "SIGNAL_TYPE": 100275,
+  "SIGNAL_VISIBLE_TYPE": 100286,
+  "SIMPLE_ATTACK_BOOL_ATTRS": 101007,
+  "SIMPLE_ATTACK_FLOAT_ATTRS": 101006,
+  "SIMPLE_ATTACK_INT_ATTRS": 101009,
+  "SIMPLE_ATTACK_TYPE": 101008,
+  "SINGLE_ROLE_PLAY_BGM": 400100,
+  "SINGLE_ROLE_STOP_BGM": 400102,
+  "SITE_STATE": 402216,
+  "SKILL_BTN_ATTRIBUTE": 100187,
+  "SKILL_INDICATOR_EFFECT": 100287,
+  "SKILL_POINTER_TYPE": 100258,
+  "SLAVE_ATTR": 100502,
+  "SLIDER_ATTRIBUTE": 100100,
+  "SLOT_TYPE": 100135,
+  "SNAPSHOT_DETAIL_LEVEL": 101017,
+  "SNAPSHOT_TRACEBACK_LEVEL": 101016,
+  "SORT_TYPE": 100251,
+  "SOUND_ENTITY": 100214,
+  "SPECIAL_ABILITY_EVENT": 200021,
+  "SPECIAL_DEST_EVENT": 200079,
+  "SPECIAL_MODIFIER_EVENT": 200022,
+  "SPECIAL_PHYSICS_ENTITY_EVENT": 500406,
+  "SPECIAL_PROJECTILE_EVENT": 200023,
+  "SPECIAL_UNIT_EVENT": 200007,
+  "SPINE": 100339,
+  "SPOT_LIGHT": 1001552,
+  "SPOT_LIGHT_ATTR": 1001553,
+  "START_ACTOR_TIMER": 400087,
+  "START_ACTOR_TIMER_NEW": 400204,
+  "START_GHOST": 401061,
+  "START_MODE": 100246,
+  "START_TIMER": 400085,
+  "START_TIMER_NEW": 400202,
+  "STATISTIC_ATTR": 100145,
+  "STOP_ACTOR_TIMER": 400088,
+  "STOP_ACTOR_TIMER_NEW": 400205,
+  "STOP_ANIMATION": 400018,
+  "STOP_CUR_ANIMATION": 400214,
+  "STOP_GHOST": 401062,
+  "STOP_SOUND": 4004706,
+  "STOP_TIMER": 400086,
+  "STOP_TIMER_NEW": 400203,
+  "STOP_UI_ANIMATION": 400169,
+  "STOP_UI_COMP_ANIM": 4004635,
+  "STOP_UI_IN_ABILITY_INDEX": 400120,
+  "STOP_UNIT_PICK_ITEM": 402206,
+  "STORE_ITEM_EVENT": 100226,
+  "STORE_ITEM_TYPE": 101005,
+  "STORE_KEY": 100134,
+  "STRAIGHT_MOVER_READABLE_ATTR": 100265,
+  "STRAIGHT_MOVER_WRITEABLE_ATTR": 100270,
+  "STRING": 100003,
+  "STRUCTRUE": 100012,
+  "STRUCTRUE_LIST": 100013,
+  "STR_LIST_NO_INDEX": 100167,
+  "STR_SAVE": 100231,
+  "STR_TO_FLOAT": 500040,
+  "STR_TO_INT": 500039,
+  "STR_TO_UPPER_LOWER": 400404,
+  "SWITCH_ABILITY": 400406,
+  "SWITCH_EARPHONE": 400193,
+  "SWITCH_MICROPHONE": 400194,
+  "TABLE": 100011,
+  "TABLE_ORDER": 100319,
+  "TABLE_SAVE": 100247,
+  "TAB_PAGE_ATTRIBUTE": 100098,
+  "TAB_WIDGET_ATTRIBUTE": 100097,
+  "TAG_ABILITY": 100057,
+  "TAG_ITEM": 100056,
+  "TAG_MODIFIER": 100124,
+  "TAG_PROJECTILE": 100123,
+  "TAG_ROAD": 100168,
+  "TAG_UNIT": 100055,
+  "TD_WEATHER_CHANGED": 900001,
+  "TECH_KEY": 100172,
+  "TEXTURE": 100115,
+  "TEXTURE_ATTRIBUTE": 100093,
+  "TEXTURE_TYPE": 100212,
+  "TIMER_EXPIRE": 200006,
+  "TIMER_EXPIRE_NEW": 200041,
+  "TIMER_NAME": 100029,
+  "TIME_LAPSE_ONCE": 200004,
+  "TIME_LAPSE_REPEAT": 200005,
+  "TIME_LINE_PANEL": 100140,
+  "TIME_LINE_PANEL_PROGRESS": 400201,
+  "TOUCH_BEGIN": 200018,
+  "TOUCH_END": 200020,
+  "TOUCH_END_3D_DIS": 200040,
+  "TOUCH_MOVE": 200019,
+  "TRANSMIT_UNIT": 400006,
+  "TRAVERSE_RANDOM_POOL": 4004350,
+  "TRIGGER_EVENT": 200001,
+  "TRIGONOMETRIC_OPERATOR": 100018,
+  "TYPE_ITEM_CHARGE_CHANGED_EVENT": 200056,
+  "TYPE_ITEM_STACK_CHANGED_EVENT": 200052,
+  "UI_ANIM_CURVE": 100313,
+  "UI_ANIM_KEY": 100239,
+  "UI_ANIM_PLAY_MODE": 100340,
+  "UI_BTN_STATUS": 1001563,
+  "UI_CHAT_RECV_CHANNEL": 1001576,
+  "UI_CHAT_SEND_CHANNEL": 1001575,
+  "UI_COMP_ALIGN_TYPE": 100192,
+  "UI_COMP_ATTR": 1001555,
+  "UI_COMP_EVENT_TYPE": 100072,
+  "UI_COMP_KEY": 100070,
+  "UI_COMP_TYPE": 100071,
+  "UI_DIRECTION": 100193,
+  "UI_ECA_ANIM_TYPE": 100344,
+  "UI_EFFECT_CAMERA_MODE": 1001572,
+  "UI_EQUIP_SLOT_DRAG_TYPE": 1001566,
+  "UI_EQUIP_SLOT_USE_TYPE": 1001565,
+  "UI_EVENT": 100067,
+  "UI_GRIDVIEW_BAR_TYPE": 1001571,
+  "UI_GRIDVIEW_TYPE": 1001570,
+  "UI_LAYOUT_CLIPPING_TYPE": 1001569,
+  "UI_MODEL_CAMERA_MOD": 1001562,
+  "UI_POINT": 101019,
+  "UI_POS_ADAPT_MODE": 1001573,
+  "UI_PREFAB": 1001556,
+  "UI_PREFAB_INS": 1001558,
+  "UI_PREFAB_INS_UID": 1001559,
+  "UI_SCROLLVIEW_TYPE": 1001564,
+  "UI_TEXT_FONT_NAME": 100342,
+  "UI_TEXT_OVER_LENGTH_HANDLING_TYPE": 1001568,
+  "UI_TRIGGER": 1000675,
+  "UNBIND_CAMERA": 400245,
+  "UNIT": 100006,
+  "UNIT_ADD_ABILITY": 400352,
+  "UNIT_ADD_EXP": 400172,
+  "UNIT_ADD_ITEM_EVENT": 200049,
+  "UNIT_ADD_ITEM_KEY": 400044,
+  "UNIT_ADD_ITEM_TO_BAR_EVENT": 200060,
+  "UNIT_ADD_ITEM_TO_PKG_EVENT": 200058,
+  "UNIT_ADD_SHOP_ITEM": 400268,
+  "UNIT_ADD_SHOP_UNIT": 400269,
+  "UNIT_ADD_TAG": 400422,
+  "UNIT_ADD_TECH": 400287,
+  "UNIT_ADD_TO_GROUP": 400011,
+  "UNIT_ADD_TYPE_ITEM_EVENT": 200053,
+  "UNIT_ANY_AREA_EVENT": 200010,
+  "UNIT_AREA_EVENT": 200008,
+  "UNIT_ATTR": 100142,
+  "UNIT_ATTR_EVENT": 200009,
+  "UNIT_BAR_SHOW_NAME_TYPE": 101010,
+  "UNIT_BAR_TEXT_TYPE": 100170,
+  "UNIT_BEHAVIOR": 100242,
+  "UNIT_BUY_ITEM": 400275,
+  "UNIT_BUY_UNIT": 400276,
+  "UNIT_CANCEL_CHANGE_ANIMATION": 400038,
+  "UNIT_CANCEL_CHANGE_MODEL": 400041,
+  "UNIT_CANCEL_REPLACE_MODEL": 400189,
+  "UNIT_CHANGE_ABILITY": 400009,
+  "UNIT_CHANGE_ANIMATION": 400037,
+  "UNIT_CHANGE_MODEL": 400040,
+  "UNIT_CHANGE_ROLE": 400014,
+  "UNIT_CHASE_MOVEMENT": 400029,
+  "UNIT_CLEAR_CHANGE_ANIMATION": 400039,
+  "UNIT_CLEAR_CHANGE_MODEL": 400042,
+  "UNIT_COMMAND": 100216,
+  "UNIT_COMMAND_TYPE": 100210,
+  "UNIT_COMPARABLE_ATTR": 100082,
+  "UNIT_COUNTDOWN_BAR_ATTR": 100162,
+  "UNIT_DELETE_ITEM_KEY": 400045,
+  "UNIT_DELETE_MOVEMENT": 400033,
+  "UNIT_DEL_KV": 400008,
+  "UNIT_DIRECTION_ARC_MOVEMENT": 400032,
+  "UNIT_DIRECTION_STRAIGHT_MOVEMENT": 400030,
+  "UNIT_DROP_ITEM": 400190,
+  "UNIT_EVENT": 100007,
+  "UNIT_EVENT_TO_GLOBAL": 200027,
+  "UNIT_FORBIDE_ABILITY": 4000228,
+  "UNIT_GRADUALLY_RAISE_HEIGHT": 4004039,
+  "UNIT_GROUP": 100026,
+  "UNIT_GROUP_COMMAND": 101001,
+  "UNIT_GROUP_COMMAND_TYPE": 101002,
+  "UNIT_HP_BAR_ATTR": 100159,
+  "UNIT_HP_BAR_SHOW_TYPE": 100163,
+  "UNIT_KEY": 100116,
+  "UNIT_KEY_ATTR": 100144,
+  "UNIT_KEY_DEL_KV": 400027,
+  "UNIT_KEY_POOL": 100038,
+  "UNIT_KEY_POOL_ADD": 400020,
+  "UNIT_KEY_POOL_REM": 400021,
+  "UNIT_KEY_READ_FLOAT_ATTRIBUTE": 100043,
+  "UNIT_KEY_SET_KV": 400026,
+  "UNIT_KILL": 400013,
+  "UNIT_LEARN_ABILITY": 401043,
+  "UNIT_MODEL_CLOSE_ABILITY_RANGE": 400163,
+  "UNIT_MODEL_SHOW_ABILITY_RANGE": 400162,
+  "UNIT_NAME_BAR_ATTR": 100160,
+  "UNIT_NAME_BAR_SHOW_TYPE": 100164,
+  "UNIT_PARABOLA_MOVEMENT": 400031,
+  "UNIT_RAISE_HEIGHT": 400047,
+  "UNIT_RANGE_ATTRIBUTE": 100137,
+  "UNIT_READ_FLOAT_ATTRIBUTE": 100041,
+  "UNIT_RELEASE_ABILITY_POSITION": 400221,
+  "UNIT_RELEASE_COMMAND": 4004712,
+  "UNIT_REMOVE_ABILITIES_IN_TYPE": 400354,
+  "UNIT_REMOVE_ABILITY": 400353,
+  "UNIT_REMOVE_ITEM": 400192,
+  "UNIT_REMOVE_ITEM_EVENT": 200050,
+  "UNIT_REMOVE_ITEM_FROM_BAR_EVENT": 200061,
+  "UNIT_REMOVE_ITEM_FROM_PKG_EVENT": 200059,
+  "UNIT_REMOVE_SHOP_ITEM": 400270,
+  "UNIT_REMOVE_SHOP_UNIT": 400271,
+  "UNIT_REMOVE_TAG": 400423,
+  "UNIT_REMOVE_TECH": 400288,
+  "UNIT_REMOVE_TYPE_ITEM_EVENT": 200054,
+  "UNIT_REPLACE_MODEL": 400188,
+  "UNIT_REVIVE": 400012,
+  "UNIT_SELL_ITEM": 400277,
+  "UNIT_SEND_GLOBAL_EVENT_WITH_INFO": 400178,
+  "UNIT_SET_ABILITY_LEVEL": 400010,
+  "UNIT_SET_HP_COLOR": 400171,
+  "UNIT_SET_IS_SHOP": 400274,
+  "UNIT_SET_KV": 400007,
+  "UNIT_SET_LEVEL": 400036,
+  "UNIT_SET_SHOP_DISCOUNT": 400280,
+  "UNIT_SET_SHOP_ITEM_DISCOUNT": 400282,
+  "UNIT_SET_SHOP_ITEM_STOCK": 400272,
+  "UNIT_SET_SHOP_TAB_DISCOUNT": 400281,
+  "UNIT_SET_SHOP_TARGET": 400278,
+  "UNIT_SET_SHOP_UNIT_DISCOUNT": 400283,
+  "UNIT_SET_SHOP_UNIT_STOCK": 400273,
+  "UNIT_SHOW_TOP_TEXT": 400182,
+  "UNIT_SLOT_ITEM": 500008,
+  "UNIT_STATUS": 100054,
+  "UNIT_STR_READ_ATTRIBUTE": 100063,
+  "UNIT_TEXTURE_ATTRIBUTE": 100117,
+  "UNIT_TEXT_BAR_ATTR": 100161,
+  "UNIT_TITLE_ATTR": 100156,
+  "UNIT_TITLE_STYLE_TYPE": 100158,
+  "UNIT_TRIGGER": 1000671,
+  "UNIT_TYPE": 100010,
+  "UNIT_UPGRADE_TECH": 400286,
+  "UNIT_USE_ITEM_EVENT": 200051,
+  "UNIT_USE_ITEM_KEY": 400191,
+  "UNIT_USE_TYPE_ITEM_EVENT": 200055,
+  "UNIT_WRITE_FLOAT_ATTRIBUTE": 100042,
+  "UNREG_TRIGGER": 400250,
+  "UPDATE_AREA_WEATHER": 4004708,
+  "UPDATE_GLOBAL_WEATHER": 4004709,
+  "UPLOAD_BILLBOARD_SCORE": 400183,
+  "UPLOAD_SAVE_DATA": 400107,
+  "VAR": 100030,
+  "VARIABLE": 500016,
+  "VAR_LIST": 100028,
+  "VAR_LIST_NO_INDEX": 100081,
+  "VECTOR": 100005,
+  "VECTOR3": 100294,
+  "VECTOR3_ARITHMETIC_OPERATOR": 100315,
+  "VISIBILITY_OF_UNIT": 500034,
+  "WATCHING_MODE_STATUS": 101012,
+  "WEATHER_TYPE": 100215,
+  "WHILE_LOOP": 400305,
+  "WIDGET": 100102,
+  "WIDGET_BOOL_ATTR": 100118,
+  "WIDGET_EVENT": 100086,
+  "WIDGET_STR_ATTR": 100119,
+  "WINDOW_TYPE_SETTING": 100507
+ },
+ "variable_subtype": {
+  "ABILITY": 2,
+  "ABILITY_CAST_TYPE": 2,
+  "ABILITY_NAME": "VARIABLE",
+  "ABILITY_TYPE": 2,
+  "ANGLE": 2,
+  "ATTACH_MODEL_ENTITY": 1,
+  "ATTR_ELEMENT": 2,
+  "ATTR_ELEMENT_READ": 2,
+  "AUDIO_CHANNEL": "VARIABLE",
+  "AUDIO_KEY": "VARIABLE",
+  "BOOL_SAVE": 2,
+  "CAMERA": 2,
+  "CAMLINE": 2,
+  "CHASING_MOVER_READABLE_ATTR": "VARIABLE",
+  "CHASING_MOVER_WRITEABLE_ATTR": "VARIABLE",
+  "COLLIDER": 1,
+  "CURSOR_KEY": 2,
+  "CURVED_MOVER_READABLE_ATTR": "VARIABLE",
+  "CURVED_MOVER_WRITEABLE_ATTR": "VARIABLE",
+  "CURVED_PATH": "VARIABLE",
+  "CURVED_PATH_3D": "VARIABLE",
+  "DAMAGE_ARMOR_TYPE": 2,
+  "DAMAGE_ATTACK_TYPE": 2,
+  "DAMAGE_TYPE": 2,
+  "DEBUG_SHAPE": 2,
+  "DECO_ENTITY": 2,
+  "DECO_NAME": 2,
+  "DESTRUCTIBLE_ENTITY": 2,
+  "DESTRUCTIBLE_NAME": 2,
+  "DYNAMIC_TRIGGER_INSTANCE": "VARIABLE",
+  "FLOAT": 2,
+  "FLOAT_SAVE": 2,
+  "FOG": 2,
+  "FORCE_ENTITY": "VARIABLE",
+  "GAME_MODE": 2,
+  "GLOBAL_ARCHIVE_SLOT": 2,
+  "GOODS_KEY": 2,
+  "IMAGE_KEY": 2,
+  "IMAGE_QUALITY": 2,
+  "INTEGER": 6,
+  "INT_SAVE": 2,
+  "ITEM_ENTITY": 4,
+  "ITEM_GROUP": "VARIABLE",
+  "ITEM_NAME": 2,
+  "JOINT": 2,
+  "KEYBOARD_KEY": 2,
+  "KNOCKUP_MOVER_READABLE_ATTR": "VARIABLE",
+  "KNOCKUP_MOVER_WRITEABLE_ATTR": "VARIABLE",
+  "LINK_SFX_KEY": 4,
+  "LIVE2D": 4,
+  "LOCAL_UNIT_ENTITY": 11,
+  "LOCAL_UNIT_GROUP": 14,
+  "MAP": 2,
+  "MODEL": 4,
+  "MODIFIER": 2,
+  "MODIFIER_EFFECT_SHOW_TYPE": "VARIABLE",
+  "MOVER_ENTITY": "VARIABLE",
+  "MOVER_TYPE": "VARIABLE",
+  "NEW_TIMER": "VARIABLE",
+  "PHYSICS_ENTITY": 2,
+  "PHYSICS_ENTITY_KEY": 2,
+  "PHYSICS_FILTER": 2,
+  "PHYSICS_OBJECT": 2,
+  "PHYSICS_OBJECT_KEY": 2,
+  "PLAYER": "VARIABLE",
+  "PLAYER_GROUP": 14,
+  "POINT": 19,
+  "POINT_LIGHT": 2,
+  "POINT_LIST": 2,
+  "PROJECTILE": "VARIABLE",
+  "PROJECTILE_ENTITY": "VARIABLE",
+  "PROJECTILE_GROUP": 14,
+  "RANDOM_POOL": 3,
+  "RANDOM_POOL_DROP": 2,
+  "REACTION": 1,
+  "REACTION_GROUP": 1,
+  "RECTANGLE": 7,
+  "RIGID_BODY": 2,
+  "RIGID_BODY_GROUP": 1,
+  "ROAD_GROUP": 500016,
+  "ROLE_RES_KEY": 2,
+  "ROLE_STATUS": 2,
+  "ROLE_TYPE": 2,
+  "ROTATION": 1,
+  "ROUND_AREA": 2,
+  "ROUND_MOVER_READABLE_ATTR": "VARIABLE",
+  "ROUND_MOVER_WRITEABLE_ATTR": "VARIABLE",
+  "SCENE_PRESET": 2,
+  "SCENE_UI": 3,
+  "SEQUENCE": 2,
+  "SFX_ENTITY": 4,
+  "SFX_KEY": 4,
+  "SOUND_ENTITY": 2,
+  "SPINE": 2,
+  "SPOT_LIGHT": 2,
+  "STORE_ITEM_TYPE": 2,
+  "STORE_KEY": 2,
+  "STRAIGHT_MOVER_READABLE_ATTR": "VARIABLE",
+  "STRAIGHT_MOVER_WRITEABLE_ATTR": "VARIABLE",
+  "STRING": 2,
+  "STR_SAVE": 2,
+  "TABLE": "VARIABLE",
+  "TABLE_SAVE": 2,
+  "TEAM": 4,
+  "TECH_KEY": 2,
+  "TEXTURE": 2,
+  "UI_ANIM": "VARIABLE",
+  "UI_ANIM_CURVE": "VARIABLE",
+  "UI_ANIM_PLAY_MODE": "VARIABLE",
+  "UI_BTN_STATUS": "VARIABLE",
+  "UI_CHAT_RECV_CHANNEL": "VARIABLE",
+  "UI_CHAT_SEND_CHANNEL": "VARIABLE",
+  "UI_COMP": "VARIABLE",
+  "UI_COMP_ALIGN_TYPE": "VARIABLE",
+  "UI_COMP_EVENT_TYPE": "VARIABLE",
+  "UI_COMP_TYPE": "VARIABLE",
+  "UI_DIRECTION": "VARIABLE",
+  "UI_ECA_ANIM_TYPE": "VARIABLE",
+  "UI_EFFECT_CAMERA_MODE": "VARIABLE",
+  "UI_EQUIP_SLOT_DRAG_TYPE": "VARIABLE",
+  "UI_EQUIP_SLOT_USE_TYPE": "VARIABLE",
+  "UI_GRIDVIEW_BAR_TYPE": "VARIABLE",
+  "UI_GRIDVIEW_TYPE": "VARIABLE",
+  "UI_LAYOUT_CLIPPING_TYPE": "VARIABLE",
+  "UI_MODEL_CAMERA_MOD": "VARIABLE",
+  "UI_POINT": 1,
+  "UI_POS_ADAPT_MODE": "VARIABLE",
+  "UI_PREFAB": "VARIABLE",
+  "UI_PREFAB_INSTANCE": "VARIABLE",
+  "UI_PREFAB_INS_UID": "VARIABLE",
+  "UI_SCROLLVIEW_TYPE": "VARIABLE",
+  "UI_TEXT_FONT_NAME": "VARIABLE",
+  "UI_TEXT_OVER_LENGTH_HANDLING_TYPE": "VARIABLE",
+  "UNIT_ENTITY": 11,
+  "UNIT_GROUP": 14,
+  "UNIT_NAME": 2,
+  "UNIT_NAME_POOL": "VARIABLE",
+  "UNIT_TYPE": 2,
+  "UNIT_WRITE_ATTRIBUTE": 2,
+  "VECTOR3": 1,
+  "WINDOW_TYPE_SETTING": 2
+ }
+}

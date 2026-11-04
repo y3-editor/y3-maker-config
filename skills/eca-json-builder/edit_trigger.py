@@ -100,6 +100,31 @@ def edit_global_trigger(trigger_dict, map_name, project_root, dry_run):
 
 CONTAINER_TYPES = {"unit", "ability", "modifier", "item", "projectile"}
 
+
+def find_local_point_writes(value, path="", out=None):
+    """找出 DSL 里对局部 POINT 变量的 SET_VARIABLE。
+
+    实测：技能触发器里写 `<局部 POINT> = 技能释放点` 会让整条触发器
+    `valid=false`，参数表面完好、静态 diff 也看不出。需要跨计时器保存区域时，
+    改用全局 `UNIT_GROUP` 保存单位组。
+    """
+    if out is None:
+        out = []
+    if isinstance(value, list):
+        if value and value[0] == "SET_VARIABLE" and len(value) > 1:
+            target = value[1]
+            if (isinstance(target, dict)
+                    and target.get("type") == "POINT"
+                    and target.get("scope") == "local"):
+                out.append((path, target.get("var", "?")))
+        for i, item in enumerate(value):
+            find_local_point_writes(item, "%s[%d]" % (path, i), out)
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            find_local_point_writes(item, "%s.%s" % (path, key), out)
+    return out
+
+
 def edit_obj_triggers(dsl, map_name, project_root, obj_key, dry_run, container="unit"):
     """Write triggers back to obj-edit JSON's trigger_dict.
     Supports unit/ability/modifier/item/projectile.
@@ -276,6 +301,8 @@ def main(argv=None):
     p.add_argument("--root", default=None, help="project root (auto-detected)")
     p.add_argument("--delete", help="trigger name to delete")
     p.add_argument("--map", default="EntryMap", help="map name (default: EntryMap)")
+    p.add_argument("--allow-local-point", action="store_true",
+                   help="允许 SET_VARIABLE 写局部 POINT（默认拦截；实测会让技能触发器 valid=false）")
     args = p.parse_args(argv)
 
     root = args.root or find_project_root()
@@ -300,6 +327,18 @@ def main(argv=None):
 
     with open(args.dsl, "r", encoding="utf-8") as f:
         dsl = json.load(f)
+
+    if not args.allow_local_point:
+        point_hits = []
+        for spec in dsl.get("triggers", []):
+            find_local_point_writes(spec.get("action"), spec.get("name", "?"), point_hits)
+        if point_hits:
+            print("error: DSL 里对局部 POINT 变量执行 SET_VARIABLE，实测会让触发器 valid=false：")
+            for where, name in point_hits[:10]:
+                print("  - %s -> %s" % (where, name))
+            print("  解决：跨计时器保存区域改用全局 UNIT_GROUP（施法瞬间存单位组，计时器遍历它）；")
+            print("        或显式加 --allow-local-point 仅用于实验。")
+            return 2
 
     # Obj-edit trigger mode
     if obj_key or dsl.get("unit"):

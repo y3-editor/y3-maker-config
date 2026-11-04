@@ -594,6 +594,7 @@ def cmd_validate(args):
     with open(args.file, "r", encoding="utf-8") as f:
         data = json.load(f)
     errors = []
+    warnings = []
     kind = args.kind or _guess_file_kind(args.file, data)
     ctx = {"function_ids": _load_map_function_ids(_infer_function_dir(args.file))}
     if kind in ("trigger_instance", "function_instance"):
@@ -610,12 +611,376 @@ def cmd_validate(args):
         _validate_mapper(data, os.path.basename(args.file), errors)
     else:
         errors.append(f"unknown kind '{kind}'")
+    if kind in ("trigger_instance", "function_instance", "trigger_element"):
+        _lint_editor_rejected_encodings(data, "$", errors, warnings, args.file)
+    if warnings:
+        for w in warnings:
+            print(f"[WARN] {w}")
     if errors:
         for e in errors:
             print(e)
         return 1
     print(f"OK ({kind})")
     return 0
+
+
+# ---------------------------------------------------------------------------
+# Lint: 编辑器会「静默清成 null」或标红的写法（均已实测）
+# ---------------------------------------------------------------------------
+
+# 全局变量读取的 sub_type（实测：写错会被编辑器清成 null）
+def _build_global_read_subtype():
+    """读取变量 sub_type 优先用源码派生表，避免手写表与生成器漂移。
+
+    背景（实测）：`eca_source_data.json` 里 UNIT_GROUP 的
+    variable_subtype 是 14，而旧手写表写的是 11。生成器按源码写出 14，
+    审计却按手写表报错，形成假红。这里改为以源码派生表为准。
+    """
+    fallback = {
+        "FLOAT": 2, "ANGLE": 2, "STRING": 2, "INTEGER": 6, "UNIT_ENTITY": 11,
+        "UNIT_GROUP": 11,
+        "BOOLEAN": "VARIABLE", "PLAYER": "VARIABLE",
+        "NEW_TIMER": "VARIABLE", "TABLE": "VARIABLE",
+    }
+    src_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "eca_source_data.json")
+    try:
+        with open(src_path, "r", encoding="utf-8") as fh:
+            src = json.load(fh)
+        for var_type, sub_type in (src.get("variable_subtype") or {}).items():
+            if isinstance(sub_type, (int, str)):
+                fallback[var_type] = sub_type
+    except (OSError, ValueError):
+        pass
+    return fallback
+
+
+_GLOBAL_READ_SUBTYPE = _build_global_read_subtype()
+# 参数类型 == 事件名的「包装类事件」，其参数 sub_type 必须写成事件名本身
+_WRAPPER_EVENTS = {"GENERIC_UNIT_EVENT"}
+_ENTITY_VAR_TYPES = {"UNIT_ENTITY": "NONE_UNIT", "UNIT_GROUP": "NONE_UNIT_GROUP"}
+# 变量类型 -> arg_type id（用于校验 SET_VARIABLE 值参数是否与目标变量类型一致）
+_VAR_TYPE_ARG_ID = {
+    "FLOAT": 100000, "BOOLEAN": 100001, "INTEGER": 100002, "STRING": 100003,
+    "POINT": 100004, "UNIT_ENTITY": 100006, "TABLE": 100011, "PLAYER": 100025,
+    "UNIT_GROUP": 100026, "UNIT_NAME": 100116, "NEW_TIMER": 100181,
+    "ANGLE": 100225, "UI_COMP": 100070, "UI_PREFAB_INSTANCE": 1001558,
+}
+
+_UI_INDEX_CACHE = {}
+
+
+def _ui_index(anchor):
+    """按触发器文件路径定位同地图的 maps/<map>/ui/*.json，建 uid -> 子节点数 索引。"""
+    if not anchor:
+        return {}
+    parts = os.path.abspath(anchor).replace("\\", "/").split("/")
+    if "maps" not in parts:
+        return {}
+    pos = parts.index("maps")
+    if pos + 1 >= len(parts):
+        return {}
+    root = "/".join(parts[:pos])
+    map_name = parts[pos + 1]
+    key = (root, map_name)
+    if key in _UI_INDEX_CACHE:
+        return _UI_INDEX_CACHE[key]
+    table = {}
+    ui_dir = os.path.join(root, "maps", map_name, "ui")
+    if os.path.isdir(ui_dir):
+        for fname in sorted(os.listdir(ui_dir)):
+            if not fname.endswith(".json"):
+                continue
+            try:
+                with open(os.path.join(ui_dir, fname), "r", encoding="utf-8") as f:
+                    stack = [json.load(f)]
+            except (ValueError, OSError):
+                continue
+            while stack:
+                node = stack.pop()
+                if not isinstance(node, dict):
+                    continue
+                uid = node.get("uid")
+                if uid:
+                    table[uid] = len(node.get("children") or [])
+                stack.extend(node.get("children") or [])
+    _UI_INDEX_CACHE[key] = table
+    return table
+
+
+def _tuple_items(node):
+    if isinstance(node, dict) and node.get("__tuple__") and isinstance(node.get("items"), list):
+        return node["items"]
+    return None
+
+
+# ---------------------------------------------------------------------------
+# diff：生成结果 vs 编辑器保存后（产品化「回读比对」验证法）
+# ---------------------------------------------------------------------------
+
+def _strip_eids(node):
+    if isinstance(node, dict):
+        return {k: _strip_eids(v) for k, v in node.items() if k != "element_id"}
+    if isinstance(node, list):
+        return [_strip_eids(v) for v in node]
+    return node
+
+
+def _diff_nodes(expected, actual, path, out, limit=200):
+    if len(out) >= limit:
+        return
+    if isinstance(expected, dict) and isinstance(actual, dict):
+        for key in sorted(set(expected) | set(actual)):
+            if key not in expected:
+                out.append(f"{path}.{key}: 编辑器新增 {json.dumps(actual[key], ensure_ascii=False)[:140]}")
+            elif key not in actual:
+                out.append(f"{path}.{key}: 编辑器删除（生成时是 {json.dumps(expected[key], ensure_ascii=False)[:140]}）")
+            else:
+                _diff_nodes(expected[key], actual[key], f"{path}.{key}", out, limit)
+    elif isinstance(expected, list) and isinstance(actual, list):
+        if len(expected) != len(actual):
+            out.append(f"{path}: 数量不同 生成 {len(expected)} / 编辑器 {len(actual)}")
+        for i in range(min(len(expected), len(actual))):
+            _diff_nodes(expected[i], actual[i], f"{path}[{i}]", out, limit)
+    elif expected != actual:
+        out.append(
+            f"{path}: 生成 {json.dumps(expected, ensure_ascii=False)[:140]}"
+            f" → 编辑器 {json.dumps(actual, ensure_ascii=False)[:140]}"
+        )
+
+
+def _collect_subs(node, out):
+    if isinstance(node, dict):
+        if isinstance(node.get("sub_trigger"), dict):
+            out.update(node["sub_trigger"])
+        for value in node.values():
+            _collect_subs(value, out)
+    elif isinstance(node, list):
+        for value in node:
+            _collect_subs(value, out)
+
+
+def cmd_diff(args):
+    """比对「生成结果」与「编辑器保存后的文件」，列出被编辑器改写/清空的节点。
+
+    编辑器不认识的写法不会报错，而是保存时把参数清成 null；因此回读比对是唯一可靠的验收手段。
+    忽略 element_id（每次重建）与键序（编辑器会重排）。
+    """
+    with open(args.expected, "r", encoding="utf-8") as f:
+        expected = json.load(f)
+    with open(args.actual, "r", encoding="utf-8") as f:
+        actual = json.load(f)
+
+    problems = []
+    exp_clean, act_clean = _strip_eids(expected), _strip_eids(actual)
+    if json.dumps(exp_clean, ensure_ascii=False, sort_keys=True) != \
+       json.dumps(act_clean, ensure_ascii=False, sort_keys=True):
+        _diff_nodes(exp_clean, act_clean, "$", problems)
+
+    exp_subs, act_subs = {}, {}
+    _collect_subs(expected, exp_subs)
+    _collect_subs(actual, act_subs)
+    for sid, sub in exp_subs.items():
+        label = f"sub_trigger[{sid}] {sub.get('trigger_name')}"
+        if sid not in act_subs:
+            problems.append(f"{label}: 编辑器保存后丢失")
+            continue
+        if json.dumps(_strip_eids(sub), ensure_ascii=False, sort_keys=True) != \
+           json.dumps(_strip_eids(act_subs[sid]), ensure_ascii=False, sort_keys=True):
+            _diff_nodes(_strip_eids(sub), _strip_eids(act_subs[sid]), label, problems)
+    for sid in act_subs:
+        if sid not in exp_subs:
+            problems.append(f"sub_trigger[{sid}]: 编辑器多出来的子触发器 {act_subs[sid].get('trigger_name')}")
+
+    if problems:
+        print(f"发现 {len(problems)} 处被编辑器改写/清空：")
+        for item in problems:
+            print(f"  {item}")
+        return 1
+    print("OK：编辑器保存后与生成结果一致（写法被接受）")
+    return 0
+
+
+def cmd_scan(args):
+    """扫描触发器目录：索引一致性 + 哪些文件含 sub_trigger（决定加载方式）+ 写法 lint。"""
+    directory = args.directory
+    files = sorted(f for f in os.listdir(directory) if f.endswith(".json"))
+    index_path = os.path.join(directory, "index.txt")
+    index = {}
+    if os.path.isfile(index_path):
+        with open(index_path, "r", encoding="utf-8") as f:
+            index = json.load(f)
+
+    print(f"目录: {directory}")
+    print(f"触发器文件 {len(files)} 个；index.txt 条目 {len(index)} 个")
+
+    missing = [f for f in files if f not in index]
+    orphan = [k for k in index if k not in files and not k.endswith(".folder")]
+    if missing:
+        print(f"  [WARN] 未登记到 index.txt: {', '.join(missing)}")
+    if orphan:
+        print(f"  [WARN] index.txt 有但文件不存在: {', '.join(orphan)}")
+
+    need_restart = []
+    importable = []
+    for name in files:
+        path = os.path.join(directory, name)
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        errors, warnings = [], []
+        _lint_editor_rejected_encodings(data, "$", errors, warnings, path)
+        subs = {}
+        _collect_subs(data, subs)
+        if subs:
+            need_restart.append(name)
+            load_hint = (
+                f"含 {len(subs)} 个子触发器 → 可用 import_eca 加载（实测新建/覆盖均保留），"
+                f"加载后务必用 diff 校验子触发器未被丢弃"
+            )
+        else:
+            importable.append(name)
+            load_hint = "可用 import_eca 串行加载"
+        flag = "OK" if not errors and not warnings else "问题"
+        print(f"  - {name}: {flag}；{load_hint}")
+        for e in errors:
+            print(f"      [ERROR] {e}")
+        for w in warnings:
+            print(f"      [WARN] {w}")
+
+    if need_restart:
+        print("  含子触发器的文件（import_eca 可用，但要用 diff 复查）:", ", ".join(need_restart))
+    if importable:
+        print("  可用 import_eca 的文件:", ", ".join(importable))
+    return 0
+
+
+def _lint_editor_rejected_encodings(node, path, errors, warnings, anchor=None):
+    if isinstance(node, list):
+        for i, value in enumerate(node):
+            _lint_editor_rejected_encodings(value, f"{path}[{i}]", errors, warnings, anchor)
+        return
+    if not isinstance(node, dict):
+        return
+
+    items = _tuple_items(node)
+    if items is not None and len(items) == 3 and items[2] == "global":
+        errors.append(f"{path}: 全局变量引用不能带 scope，应为 2 元组 [类型, 名字]")
+
+    args = node.get("args_list")
+    if isinstance(args, list) and len(args) == 1:
+        ref = _tuple_items(args[0]) if isinstance(args[0], dict) else None
+        if ref is not None and len(ref) == 2 and isinstance(ref[1], str) and ref[0] in _GLOBAL_READ_SUBTYPE:
+            sub = node.get("sub_type")
+            if node.get("arg_type") == 100030:
+                if sub != 1:
+                    errors.append(f"{path}: 全局变量写入 sub_type 应为 1，实际 {sub!r}")
+            else:
+                want = _GLOBAL_READ_SUBTYPE[ref[0]]
+                if sub != want:
+                    errors.append(
+                        f"{path}: 全局变量 '{ref[1]}'({ref[0]}) 读取 sub_type 应为 {want!r}，"
+                        f"实际 {sub!r}（编辑器会清成 null）"
+                    )
+
+    event_type = node.get("event_type")
+    if event_type in _WRAPPER_EVENTS:
+        first = (args or [None])[0]
+        if not (isinstance(first, dict) and first.get("sub_type") == event_type):
+            errors.append(
+                f"{path}: 包装事件 {event_type} 的第一个参数 sub_type 必须写成 {event_type!r}"
+                f"（写整数会被编辑器清成 null，触发器静默失效）"
+            )
+    if event_type == "TRIGGER_COMPONENT_EVENT":
+        first = (args or [None])[0]
+        # ⚠️ 修正：本条规则原先**方向反了**。
+        # 实测证据（runtime_pitfalls.md §1）：能被 ECA 收到的只有一条通道 ——
+        # 画板控件 `event_list` 里登记的**设计期具名事件** + 子触发器事件参数写
+        # **普通字符串字面量**（`{"arg_type":100067,"sub_type":1,"args_list":["bag"]}`）。
+        # 工程自带官方画板 GameHUD 的 `bag` / `focus_btn_click` 就是这么接的。
+        # 而 `CREATE_UI_COMP_EVENT_EX_EX` + `["STR_TO_UI_EVENT","事件名"]` 的运行期注册通道
+        # 虽然能通过编辑器保存、diff 全绿，**运行时收不到事件**（用官方按钮做对照实测）。
+        # 因此这里只对「包装类写法含糊」的情况给出提示，不再建议改用 STR_TO_UI_EVENT。
+        if isinstance(first, dict) and first.get("sub_type") == 1:
+            name = (first.get("args_list") or [None])[0]
+            if not isinstance(name, str):
+                warnings.append(
+                    f"{path}: UI 事件参数不是字符串字面量（收到 {name!r}）；"
+                    f"应为 arg_type=100067 / sub_type=1 / args_list=[事件名的字符串]"
+                )
+
+    if node.get("action_type") == "SET_VARIABLE" and isinstance(args, list) and len(args) == 2:
+        target_items = None
+        if isinstance(args[0], dict) and args[0].get("arg_type") == 100030:
+            inner = args[0].get("args_list") or [None]
+            target_items = _tuple_items(inner[0])
+        if target_items:
+            vtype = target_items[0]
+            value = args[1]
+            if vtype in _ENTITY_VAR_TYPES and isinstance(value, dict) and value.get("sub_type") == 1:
+                literal = (value.get("args_list") or [None])[0]
+                if literal in (0, 0.0):
+                    errors.append(
+                        f"{path}: {vtype} 变量赋空请用 {_ENTITY_VAR_TYPES[vtype]}，"
+                        f"字面量 0 会被编辑器清成 null"
+                    )
+            # 值参数 arg_type 必须与目标变量类型一致，否则保存时被清成 null
+            # （实测：MATH_OPERATION 写进 INTEGER 变量时 arg_type 用了 100000 被清空）
+            want_id = _VAR_TYPE_ARG_ID.get(vtype)
+            got_id = value.get("arg_type") if isinstance(value, dict) else None
+            if want_id is not None and got_id is not None and got_id != want_id:
+                errors.append(
+                    f"{path}: SET_VARIABLE 值参数 arg_type 应为 {want_id}({vtype})，实际 {got_id}"
+                    f"（与目标变量类型不一致会被编辑器清成 null）"
+                )
+
+    # MATH_OPERATION 的运算符枚举是 ARITHMETIC_OPERATOR(100016)，
+    # 不是 FLOAT_ARITHMETIC_OPERATOR(100017)（工程内编辑器样本 + 探针实测）
+    if node.get("sub_type") == "MATH_OPERATION":
+        op = (args or [None, None])[1] if isinstance(args, list) and len(args) > 1 else None
+        if isinstance(op, dict) and op.get("arg_type") != 100016:
+            errors.append(
+                f"{path}: MATH_OPERATION 的运算符 arg_type 应为 100016(ARITHMETIC_OPERATOR)，"
+                f"实际 {op.get('arg_type')}"
+            )
+
+    # UNIT_TYPE_COMPARE 的字面量必须是 UNIT_NAME(100116)：写 100010 不报错，但触发器 valid=false
+    # （探针实测：S1/S2/S4 无效，T1/T2 有效）
+    if node.get("condition_type") == "UNIT_TYPE_COMPARE" and isinstance(args, list) and len(args) == 3:
+        literal = args[2]
+        if isinstance(literal, dict) and literal.get("sub_type") == 1:
+            if literal.get("arg_type") != 100116:
+                errors.append(
+                    f"{path}: UNIT_TYPE_COMPARE 的字面量 arg_type 应为 100116(UNIT_NAME)，"
+                    f"实际 {literal.get('arg_type')}（写 100010 会让触发器 valid=false）"
+                )
+
+    # IF 不能嵌在 ELSE 的动作列表里：编辑器保存时会整体丢弃该嵌套 IF（实测）
+    if node.get("action_type") == "IF_THEN_ELSE" and isinstance(args, list) and len(args) == 3:
+        else_branch = args[2]
+        nested = else_branch.get("args_list") if isinstance(else_branch, dict) else None
+        if isinstance(nested, list):
+            for action in nested:
+                if isinstance(action, dict) and action.get("action_type") == "IF_THEN_ELSE":
+                    errors.append(
+                        f"{path}: IF_THEN_ELSE 不能嵌在 ELSE 分支里（编辑器保存时会整体丢弃）；"
+                        f"请平铺成同层级多个 IF_THEN_ELSE"
+                    )
+                    break
+
+    # ITER_UI_COMP_DO 遍历的是「该控件的子节点」；用在无子节点控件上会静默不执行
+    if node.get("action_type") == "ITER_UI_COMP_DO" and isinstance(args, list) and len(args) >= 2:
+        target = args[1]
+        if isinstance(target, dict) and target.get("sub_type") == 1:
+            uid = (target.get("args_list") or [None])[0]
+            if isinstance(uid, str):
+                child_count = _ui_index(anchor).get(uid)
+                if child_count == 0:
+                    errors.append(
+                        f"{path}: ITER_UI_COMP_DO 的目标控件（uid {uid}）没有子节点，遍历为空 → "
+                        f"内部动作一条都不会执行（实测）"
+                    )
+
+    for key, value in node.items():
+        _lint_editor_rejected_encodings(value, f"{path}.{key}", errors, warnings, anchor)
 
 
 def _guess_file_kind(path, data):
@@ -759,6 +1124,21 @@ def main(argv=None):
     p_l.add_argument("eca_name")
     p_l.add_argument("--path", help="path to trigger_new.py")
     p_l.set_defaults(func=cmd_lookup)
+
+    p_d = sub.add_parser(
+        "diff",
+        help="比对生成结果与编辑器保存后的文件（产品化「回读比对」：编辑器不认的写法会被清成 null）",
+    )
+    p_d.add_argument("expected", help="生成的 JSON（gen_trigger.py --dry-run 的输出或生成时的文件副本）")
+    p_d.add_argument("actual", help="编辑器 save_editor 之后回读的 JSON")
+    p_d.set_defaults(func=cmd_diff)
+
+    p_s = sub.add_parser(
+        "scan",
+        help="扫描触发器目录：index 一致性 / 哪些文件含 sub_trigger（决定加载方式）/ 写法 lint",
+    )
+    p_s.add_argument("directory", help="maps/<地图>/global_trigger/trigger 目录")
+    p_s.set_defaults(func=cmd_scan)
 
     args = p.parse_args(argv)
     return args.func(args)

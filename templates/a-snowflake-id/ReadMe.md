@@ -6,7 +6,7 @@
 |------|------|
 | 等级 | **A** |
 | 名称 | 雪花全局唯一 ID |
-| 路径 | `.codemaker/templates/a-snowflake-id/` |
+| 路径 | `<agent>/templates/a-snowflake-id/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `id`, `snowflake`, `unique-id`, `sequence`, `instance-id` |

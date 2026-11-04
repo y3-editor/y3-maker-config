@@ -8,6 +8,11 @@ Converts a structured HTML preview file into Y3 editor-compatible UI panel JSON.
 Usage:
     python html_to_y3_ui.py <input.html> <output.json> [--panel-name PanelName] [--zorder 300]
 
+UID stability:
+    If <output.json> already exists, existing UIDs are reused by name path.
+    New nodes get new UIDs. This keeps ECA references alive across regeneration.
+    Use --no-reuse-uids to force a full UID refresh.
+
 The HTML must follow a specific convention using data-* attributes to describe
 Y3 UI nodes. See the SKILL.md for the HTML authoring guide.
 
@@ -44,6 +49,7 @@ TYPE_MAP = {
     "panel": 2,
     "label": 3,
     "image": 4,
+    "progress": 5,  # 进度条（血条/蓝条等）
     "3dmodel": 6,  # 模型控件
     "layout": 7,
     "grid": 25,    # GridView
@@ -509,7 +515,7 @@ class Y3UIHTMLParser(HTMLParser):
 
         node = {
             "children": [],
-            "event_list": [],
+            "event_list": self._parse_event_list(attrs),
             "name": name,
             "open_adapter": any([adapt_top, adapt_bottom, adapt_left, adapt_right]),
             "adapter_option": [
@@ -563,6 +569,8 @@ class Y3UIHTMLParser(HTMLParser):
             self._add_list_fields(node, attrs)
         elif data_type == "3dmodel":
             self._add_3dmodel_fields(node, attrs)
+        elif data_type == "progress":
+            self._add_progress_fields(node, attrs)
 
         return node
 
@@ -578,6 +586,41 @@ class Y3UIHTMLParser(HTMLParser):
             'left' in parts or 'all' in parts,
             'right' in parts or 'all' in parts,
         )
+
+    # 控件具名事件：ECA 接 UI 点击的唯一可用通道（设计期 event_list）
+    #
+    # 背景：ECA 的 UI 交互靠控件上的 event_list 具名事件 +
+    # 触发器里的 TRIGGER_COMPONENT_EVENT（事件参数写普通字符串字面量）。
+    # 运行时用 CREATE_UI_COMP_EVENT_EX_EX + STR_TO_UI_EVENT 注册的写法
+    # 虽然能通过编辑器保存，但运行时收不到（详见 eca-json-builder/runtime_pitfalls.md §1）。
+    # 工程自带官方画板（GameHUD）就是用 event_list 接的：type=1 表示「点击」。
+    EVENT_TYPE_CLICK = 1
+
+    def _parse_event_list(self, attrs):
+        """把 data-event="名字[,名字2...]" 解析成 event_list 条目。
+
+        可选 data-event-type 覆盖事件类型（默认 1 = 点击）。
+        """
+        raw = attrs.get('data-event') or ''
+        names = [s.strip() for s in raw.split(',') if s.strip()]
+        if not names:
+            return []
+        etype = attrs.get('data-event-type')
+        try:
+            etype = int(etype) if etype not in (None, '') else self.EVENT_TYPE_CLICK
+        except ValueError:
+            etype = self.EVENT_TYPE_CLICK
+        return [
+            {
+                "action_list": [],
+                "enabled": True,
+                "name": nm,
+                "not_wait_network": False,
+                "sound_id": None,
+                "type": etype,
+            }
+            for nm in names
+        ]
 
     def _parse_color(self, color_str):
         """Parse color string '#rrggbb' or '#rrggbbaa' into [r, g, b, a]."""
@@ -706,6 +749,25 @@ class Y3UIHTMLParser(HTMLParser):
         # Swallow touches (block input)
         if attrs.get('data-block', '').lower() == 'true':
             node["swallow_touches"] = True
+
+    def _add_progress_fields(self, node, attrs):
+        """Add progress bar fields (type=5, 进度条).
+
+        Uses the same keys the editor writes for progress controls:
+          - data-image  / data-preset  → 前景填充图 (image)
+          - data-bg-image              → 底图 (bg_image)
+        """
+        preset = attrs.get('data-preset', '')
+        if preset and preset in IMAGE_PRESETS:
+            node["image"] = IMAGE_PRESETS[preset]
+        else:
+            image_str = attrs.get('data-image', '')
+            if image_str:
+                node["image"] = int(image_str)
+
+        bg_image = attrs.get('data-bg-image', '')
+        if bg_image:
+            node["bg_image"] = int(bg_image)
 
     def _add_3dmodel_fields(self, node, attrs):
         """Add 3D model control-specific fields (type=6).
@@ -1704,7 +1766,116 @@ def _verify_structure(html_nodes, json_nodes, panel_name):
 # Main
 # =============================================================================
 
-def convert(html_path, output_path, panel_name="NewPanel", zorder=300):
+def _load_existing_uid_map(path):
+    """读取旧画板，按「从根节点开始的名称路径」建立 path -> uid 映射。"""
+    if not os.path.isfile(path):
+        return {}
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+    mapping = {}
+
+    def walk(node, prefix):
+        if not isinstance(node, dict):
+            return
+        name = node.get('name', '')
+        path_key = prefix + '/' + name
+        uid = node.get('uid')
+        if isinstance(uid, str) and uid:
+            mapping[path_key] = uid
+        for child in node.get('children') or []:
+            walk(child, path_key)
+
+    walk(data, '')
+    return mapping
+
+
+def _apply_stable_uids(panel, output_path):
+    """重生成画板时复用旧 uid（按名称路径匹配），避免 ECA 引用全部失效。
+
+    只复用「名称路径完全相同」的节点；新增节点继续使用新 uid。
+    同时把模板内部的 uid 引用字段（如 type=17 的 skill_cd_label）从
+    新 uid 反向映射回旧 uid，保证引用不会被改断。
+    """
+    old_map = _load_existing_uid_map(output_path)
+    if not old_map:
+        return {"reused": 0, "new": 0}
+
+    new_to_old = {}
+    used_old = set()
+    stats = {"reused": 0, "new": 0}
+
+    def assign(node, prefix):
+        if not isinstance(node, dict):
+            return
+        name = node.get('name', '')
+        path_key = prefix + '/' + name
+        current_uid = node.get('uid')
+        old_uid = old_map.get(path_key)
+        if old_uid and old_uid not in used_old:
+            if isinstance(current_uid, str) and current_uid != old_uid:
+                new_to_old[current_uid] = old_uid
+            node['uid'] = old_uid
+            used_old.add(old_uid)
+            stats["reused"] += 1
+        else:
+            stats["new"] += 1
+        for child in node.get('children') or []:
+            assign(child, path_key)
+
+    assign(panel, '')
+
+    if new_to_old:
+        def patch_refs(node):
+            if isinstance(node, dict):
+                for key, value in list(node.items()):
+                    if key == 'uid':
+                        continue
+                    if isinstance(value, str) and value in new_to_old:
+                        node[key] = new_to_old[value]
+                    else:
+                        patch_refs(value)
+            elif isinstance(node, list):
+                for value in node:
+                    patch_refs(value)
+
+        patch_refs(panel)
+
+    return stats
+
+
+def _rename_progress_labels(panel):
+    """把 hp_bar / mp_bar 内部的 progress_percent_label 改成唯一名字。
+
+    技能格 type=17 内部也有同名的 progress_percent_label；按名字取控件会撞车。
+    在生成器内完成改名，保证重生成时名称路径稳定、ECC 引用不会断。
+    """
+    renamed = 0
+
+    def walk(node):
+        nonlocal renamed
+        if not isinstance(node, dict):
+            return
+        parent_name = node.get('name', '')
+        for child in node.get('children') or []:
+            if isinstance(child, dict) and child.get('name') == 'progress_percent_label':
+                if parent_name == 'hp_bar':
+                    child['name'] = 'hp_percent_label'
+                    renamed += 1
+                elif parent_name == 'mp_bar':
+                    child['name'] = 'mp_percent_label'
+                    renamed += 1
+            walk(child)
+
+    walk(panel)
+    return renamed
+
+
+def convert(html_path, output_path, panel_name="NewPanel", zorder=300, reuse_uids=True,
+            strip_root_bg=False):
     """Convert an HTML file to Y3 UI JSON."""
     with open(html_path, 'r', encoding='utf-8') as f:
         html_content = f.read()
@@ -1717,7 +1888,7 @@ def convert(html_path, output_path, panel_name="NewPanel", zorder=300):
     # Post-process: recalculate margins with correct parent dimensions
     post_process_tree(children, DESIGN_WIDTH, DESIGN_HEIGHT)
 
-    # NOTE: Overlap auto-resolve disabled by user request (2026-04-02)
+    # NOTE: Overlap auto-resolve disabled by user request
     # The Step 2.5 layout check in SKILL.md now handles overlap detection manually.
     # auto_resolve_overlaps(children, DESIGN_WIDTH, DESIGN_HEIGHT)
 
@@ -1733,6 +1904,20 @@ def convert(html_path, output_path, panel_name="NewPanel", zorder=300):
     _strip_temp_fields(children)
 
     panel = build_panel_json(children, panel_name, zorder)
+    _rename_progress_labels(panel)
+
+    if strip_root_bg and panel.get('children'):
+        root_layout = panel['children'][0]
+        targets = {'block_bg', panel_name + '_bg'}
+        root_layout['children'] = [
+            c for c in (root_layout.get('children') or [])
+            if c.get('name') not in targets
+        ]
+
+    if reuse_uids:
+        uid_stats = _apply_stable_uids(panel, output_path)
+        if uid_stats["reused"] or uid_stats["new"]:
+            print(f"     UID: reused={uid_stats['reused']}, new={uid_stats['new']}")
 
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(panel, f, indent=4, ensure_ascii=False)
@@ -1804,7 +1989,7 @@ def convert_prefab(html_path, output_path, prefab_name="NewPrefab"):
         # Remove uid for prefab nodes (prefab format uses prefab_sub_key instead)
         node.pop('uid', None)
         # Add comp_type based on type
-        comp_type_map = {1: "Button", 3: "TextLabel", 4: "Image", 7: "Layout", 25: "GridView", 10: "ScrollView"}
+        comp_type_map = {1: "Button", 3: "TextLabel", 4: "Image", 5: "Progress", 7: "Layout", 25: "GridView", 10: "ScrollView"}
         node_type = node.get('type', 7)
         if 'comp_type' not in node:
             node['comp_type'] = comp_type_map.get(node_type, "Layout")
@@ -1870,12 +2055,18 @@ def main():
     parser.add_argument('--zorder', type=int, default=300, help='Z-order (default: 300)')
     parser.add_argument('--prefab', action='store_true', help='Output as prefab JSON instead of panel JSON')
     parser.add_argument('--prefab-name', default='NewPrefab', help='Prefab name (default: NewPrefab)')
+    parser.add_argument('--no-reuse-uids', action='store_true',
+                        help='不要复用输出文件里同名路径的旧 uid（默认复用，避免 ECA 引用失效）')
+    parser.add_argument('--strip-root-bg', action='store_true',
+                        help='删除画板根 layout 的全屏底图（常驻 HUD / 物品栏用）')
     args = parser.parse_args()
 
     if args.prefab:
         convert_prefab(args.input, args.output, args.prefab_name)
     else:
-        convert(args.input, args.output, args.panel_name, args.zorder)
+        convert(args.input, args.output, args.panel_name, args.zorder,
+                reuse_uids=not args.no_reuse_uids,
+                strip_root_bg=args.strip_root_bg)
 
 
 if __name__ == '__main__':

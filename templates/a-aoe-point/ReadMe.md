@@ -12,7 +12,7 @@
 |------|------|
 | 等级 | **A** |
 | 名称 | 点范围AOE视觉管线 |
-| 路径 | `.codex/templates/a-aoe-point/` |
+| 路径 | `<agent>/templates/a-aoe-point/` |
 | 状态 | `draft` |
 | 版本 | `v1.0.0` |
 | 能力标签 | `aoe`, `area-damage`, `skill-visual`, `particle-pipeline`, `circle-aoe`, `rect-aoe`, `zero-dependency` |

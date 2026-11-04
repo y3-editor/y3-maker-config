@@ -12,7 +12,7 @@
 |------|------|
 | 等级 | **A** |
 | 名称 | 浮动文本提示 |
-| 路径 | `.codemaker/templates/a-float-tips/` |
+| 路径 | `<agent>/templates/a-float-tips/` |
 | 状态 | `validated` |
 | 版本 | `v0.2.0` |
 | 能力标签 | `浮动提示`, `弹字`, `渐隐动画`, `伤害数字` |

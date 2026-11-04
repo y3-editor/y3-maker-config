@@ -133,7 +133,10 @@ def _get_root(args=None):
 
 def _global_var_path(map_name, root=None):
     r = root or _get_root()
-    return os.path.join(r, "maps", map_name, "project_trigger_var.json")
+    # 地图级全局变量存在 globaltriggervariable.json（编辑器读写的就是它，
+    # 里面通常还有工程自带的变量）。写 project_trigger_var.json 编辑器不认，
+    # 触发器里引用会显示「无效的变量」。
+    return os.path.join(r, "maps", map_name, "globaltriggervariable.json")
 
 
 def _unit_var_path(map_name, unit_key, root=None):
@@ -161,6 +164,22 @@ def _save_json(path, data):
     print(f"Saved: {path}  (backup: {bak})")
 
 
+_EDITOR_SYNC_HINT = """
+⚠️ 变量表已写到磁盘，但**编辑器内存还是旧的**。必须严格按下面顺序继续，否则会白做：
+
+  1) ⛔ 现在开始**不要再调用 save_editor**（save_editor 以编辑器内存为准写回，
+     会把刚加的变量删掉，随后引用它的触发器全部 valid=false，症状是「触发器静默失效」）
+  2) restart_editor(save_before_restart=false)      ← 让编辑器重新读盘，载入新变量表
+  3) 逐个串行 import_eca 各触发器
+  4) 等 3 秒 → save_editor
+  5) 复查：变量三字段（variable_dict / variable_group_info / variable_length_dict）齐全，
+     且引用它的触发器 valid=true
+
+正确的前置顺序是「先 save_editor 落盘编辑器修改 → 再执行本命令」。
+详见 runtime_pitfalls.md §4.2（新增全局变量会被 save_editor 裁剪）。
+"""
+
+
 # ---------------------------------------------------------------------------
 # Global variable operations
 # ---------------------------------------------------------------------------
@@ -168,7 +187,7 @@ def _save_json(path, data):
 def global_list(map_name, root=None):
     path = _global_var_path(map_name, root)
     if not os.path.isfile(path):
-        print("(no project_trigger_var.json — project has no global variables)")
+        print("(no globaltriggervariable.json — map has no global variables)")
         return []
     data = _load_json(path)
     vdict = data.get("variable_dict", {})
@@ -191,7 +210,7 @@ def global_list(map_name, root=None):
 def global_add(map_name, name, vtype, root=None):
     path = _global_var_path(map_name, root)
     if not os.path.isfile(path):
-        data = {"variable_dict": {}, "variable_length_dict": {}, "variable_group_info": []}
+        data = {"variable_dict": {}, "variable_group_info": [], "variable_length_dict": {}}
     else:
         data = _load_json(path)
 
@@ -216,6 +235,7 @@ def global_add(map_name, name, vtype, root=None):
 
     _save_json(path, data)
     print(f"Added global variable: {name} ({vtype})")
+    print(_EDITOR_SYNC_HINT)
 
 
 def global_remove(map_name, name, root=None):
@@ -254,12 +274,13 @@ def global_remove(map_name, name, root=None):
 
     _save_json(path, data)
     print(f"Removed global variable: {name} (was {found_type})")
+    print(_EDITOR_SYNC_HINT)
 
 
 def global_show(map_name, name, root=None):
     path = _global_var_path(map_name, root)
     if not os.path.isfile(path):
-        print("(no project_trigger_var.json)")
+        print("(no globaltriggervariable.json)")
         return
     data = _load_json(path)
 

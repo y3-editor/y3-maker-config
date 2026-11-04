@@ -5,6 +5,7 @@ Usage:
   py -3 lookup.py <name>            full JSON (title/desc/lua/api)
   py -3 lookup.py <name> --brief    one-line: type | sub_type | param | op_param
   py -3 lookup.py <name1> <name2> ... --brief   batch mode
+  py -3 lookup.py --search <关键词>  按关键词搜名称/标题/描述（中英文都行，找不到精确名时用它）
   py -3 lookup.py --global-events   list events for global triggers
 """
 import json, os, sys
@@ -66,6 +67,34 @@ if __name__ == "__main__":
             params = ", ".join(info["param"]) if info["param"] else "无"
             print(f"{name} ({info['sub_type']})  args: {params}")
         sys.exit(0)
+
+    if args[0] == "--search":
+        if len(args) < 2 or not args[1].strip():
+            print("error: --search 需要一个关键词，例如 --search 镜头震动")
+            sys.exit(1)
+        keyword = args[1].strip().lower()
+        data = _load()
+        hits = []
+        for name, entry in data.items():
+            hay = " ".join([
+                name,
+                str(entry.get("title", "")),
+                str(entry.get("cont", "")),
+                str(entry.get("desc", "")),
+            ]).lower()
+            if keyword in hay:
+                hits.append((name, entry))
+        # 动作排前面，其余按名字排
+        hits.sort(key=lambda kv: (0 if "ACTION" in kv[1].get("t", []) else 1, kv[0]))
+        print(f"匹配「{args[1].strip()}」：{len(hits)} 条")
+        for name, entry in hits:
+            types = "/".join(entry.get("t", []))
+            params = ",".join(entry.get("p", [])) or "-"
+            print(f"  {name}\t{types}\t{entry.get('s')}\t{params}\t{entry.get('title', '')}")
+        # 提示：有些能力的中文名在 title/cont 里，英文名未必含关键词，反之亦然
+        if hits:
+            print("\n提示：拿到名字后可用 `lookup.py <name>` 看完整参数与 cont 模板。")
+        sys.exit(0 if hits else 1)
 
     brief = "--brief" in args
     names = [a for a in args if not a.startswith("--")]

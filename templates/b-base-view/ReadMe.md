@@ -6,7 +6,7 @@
 |------|------|
 | 等级 | **B** |
 | 名称 | UI 视图基类 |
-| 路径 | `.codemaker/templates/b-base-view/` |
+| 路径 | `<agent>/templates/b-base-view/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `ui`, `view`, `base-class`, `lifecycle`, `gc`, `show-hide` |
@@ -37,7 +37,7 @@ View 基类封装 UI 面板的四段式生命周期 + GC 事件管理：
 ## 集成指南
 
 ```lua
-local ViewTemplate = include '.codemaker.templates.b-base-view.logic'
+local ViewTemplate = include '<agent>.templates.b-base-view.logic'
 
 -- 创建基类
 local BView = ViewTemplate.setup({

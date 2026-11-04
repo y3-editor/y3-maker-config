@@ -12,7 +12,7 @@
 |------|------|
 | 等级 | **A** |
 | 名称 | 直线投射物视觉管线 |
-| 路径 | `.codemaker/templates/a-projectile-line/` |
+| 路径 | `<agent>/templates/a-projectile-line/` |
 | 状态 | `draft` |
 | 版本 | `v1.0.0` |
 | 能力标签 | `projectile-line`, `mover-line`, `skill-visual`, `particle-pipeline`, `fan-spread`, `zero-dependency` |

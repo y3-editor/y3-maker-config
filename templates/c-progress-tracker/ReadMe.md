@@ -6,7 +6,7 @@
 |------|------|
 | 等级 | **C** |
 | 名称 | 通用进度追踪框架 |
-| 路径 | `.codemaker/templates/c-progress-tracker/` |
+| 路径 | `<agent>/templates/c-progress-tracker/` |
 | 状态 | `verified` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `progress`, `achievement`, `task`, `mission`, `quest`, `collection`, `daily`, `weekly` |
@@ -139,7 +139,7 @@ local adapter = {
 ### 3. 启动并业务接入
 
 ```lua
-local Tracker = include '.codemaker.templates.c-progress-tracker.logic'
+local Tracker = include '<agent>.templates.c-progress-tracker.logic'
 MyGame.tracker = Tracker.setup(adapter, { defs = defs })
 
 -- 业务事件触发

@@ -11,7 +11,7 @@
 |------|------|
 | 等级 | **C** |
 | 名称 | 单商店购买流程模板 |
-| 路径 | `.codemaker/templates/c-shop-system/` |
+| 路径 | `<agent>/templates/c-shop-system/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `shop`, `purchase`, `currency`, `discount`, `restock`, `cargo` |

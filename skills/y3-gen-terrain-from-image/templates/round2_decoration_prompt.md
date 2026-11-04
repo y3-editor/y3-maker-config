@@ -101,6 +101,8 @@
    - 东西向连接 → `yaw: 90`
    - 对角线 → `yaw: 45` 或 `yaw: 135`
 
+> 这里的 `yaw` 是**脚本输入角度（度）**；`decoration_postprocess.py` 输出 entity 时会转成弧度。
+
 ### 输出格式
 
 ```json
@@ -332,6 +334,7 @@
 ```
 
 > ⚠️ **注意**：不再有 `style` 字段！模型选择由脚本根据纹理自动匹配。
+> 桥梁高度由脚本参数 `--bridge-relative-height <米>` 控制；默认 0 表示贴脚下地形，跨水桥需实测后传入。
 
 保存为 `decoration_input.json`。
 

@@ -6,7 +6,7 @@
 |------|------|
 | 等级 | **A** |
 | 名称 | 动态 Prefab 组件基类 |
-| 路径 | `.codemaker/templates/a-dync-component/` |
+| 路径 | `<agent>/templates/a-dync-component/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `ui`, `prefab`, `component`, `dynamic`, `base-class` |

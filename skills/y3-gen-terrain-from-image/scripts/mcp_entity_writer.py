@@ -3,6 +3,7 @@
 """
 mcp_entity_writer.py
 批量装饰物实体写入脚本 — 读取 decoration_entities.json，通过 HTTP 直接调用 MCP Server 的 entity_create_block。
+写入前会检查 rotation / stick_to_ground / absolute_height 等容易导致高度或旋转丢失的参数。
 
 用法:
   python mcp_entity_writer.py <decoration_entities.json> [options]
@@ -187,6 +188,22 @@ def main():
     print(f"   模型 ID: {sorted(model_ids)}")
     for mid, cnt in sorted(type_counts.items(), key=lambda x: -x[1]):
         print(f"     model {mid}: {cnt} 个")
+
+    warnings = []
+    for idx, ent in enumerate(entities):
+        if "rotation" in ent:
+            warnings.append(f"[{idx}] 含 rotation 数组；entity_create_block 只认 yaw/pitch/roll，rotation 会被忽略")
+        stick = ent.get("stick_to_ground", True)
+        if not isinstance(stick, bool):
+            warnings.append(f"[{idx}] stick_to_ground={stick!r} 不是 JSON 布尔值；必须写 true/false")
+        if stick is False and "relative_height" in ent:
+            warnings.append(f"[{idx}] stick_to_ground=false 时 relative_height 不生效")
+        if stick is False and ent.get("absolute_height") is None:
+            warnings.append(f"[{idx}] stick_to_ground=false 且未提供 absolute_height；最终高度会变成 0")
+    if warnings:
+        print(f"\n⚠️ 发现 {len(warnings)} 条参数警告：")
+        for warning in warnings:
+            print(f"   - {warning}")
 
     total_batches = (len(entities) + args.batch_size - 1) // args.batch_size
     print(f"   将分 {total_batches} 批写入（每批 {args.batch_size} 个）")

@@ -4,13 +4,15 @@ decoration_postprocess.py — 装饰物后处理脚本
 功能: 对 AI 输出的装饰物坐标做精修，输出可直接传给 entity_create_block 的 JSON entity list。
   - 树木: 泊松圆盘采样替代矩形填充，水域过滤，随机 yaw/scale
   - 桥梁: 水域吸附 + yaw 自动推算（垂直于河流方向）
+    * 输入 yaw 使用角度制；输出 entity 时统一转弧度
+    * 桥高由 --bridge-relative-height 指定（米），不再写死
   - 山石: 泊松散布，混用山峰+岩石模型，水域过滤
 
 输入:
   - decoration_input.json: AI 输出的装饰物数据
       {
         "trees": [{"x_min":..,"z_min":..,"x_max":..,"z_max":..}, ...],
-        "bridges": [{"x":..,"z":..,"yaw"(optional):..}, ...],
+        "bridges": [{"x":..,"z":..,"yaw"(optional, 度):..}, ...],
         "mountains": [{"x_min":..,"z_min":..,"x_max":..,"z_max":..}, ...]
       }
   - water_mask_grid.npy: 修正后的水域 mask (bool 矩阵)
@@ -18,9 +20,12 @@ decoration_postprocess.py — 装饰物后处理脚本
 
 输出:
   - decoration_entities.json: entity list，可直接传给 entity_create_block
+    * yaw/pitch/roll 输出为弧度
+    * pos[1] 固定为 0 占位，实际高度由 relative_height 控制
 
 用法:
-    python decoration_postprocess.py <input_json> <water_mask_npy> <map_w> <map_h> <origin_x> <origin_z> <grid_size> <output_json>
+    python decoration_postprocess.py <input_json> <water_mask_npy> <output_json> \
+        [--bridge-relative-height <米>]
 """
 
 import sys
@@ -34,6 +39,7 @@ from collections import deque
 # 模型 ID — 桥梁保持固定，树木/山石从 catalog 动态加载
 # ---------------------------------------------------------------------------
 BRIDGE_MODEL = 100463
+DEFAULT_BRIDGE_RELATIVE_HEIGHT_M = 0.0
 
 # 以下变量在 main() 中由 _load_catalog() 填充，模块级保留声明供函数引用
 TREE_MODELS = []
@@ -200,20 +206,23 @@ def is_water(x, z, water_mask, map_w, map_h):
 
 def make_entity(pos_world, model_id, yaw=0, pitch=0, roll=0, scale=1.0,
                 stick_to_ground=True, relative_height=0):
-    """构造 entity_create_block 所需的 entity dict"""
+    """构造 entity_create_block 所需的 entity dict。
+
+    yaw/pitch/roll 入参为角度制，输出时转弧度。
+    pos_world 只提供 x/z，pos[1] 固定写 0；实际高度由 relative_height 控制。
+    """
     s = scale if isinstance(scale, list) else [scale, scale, scale]
     entity = {
         "type": ENTITY_TYPE,
         "pos": [pos_world[0], 0, pos_world[1]],
         "model_id": model_id,
-        "yaw": round(yaw, 1),
-        "pitch": pitch,
-        "roll": roll,
+        "yaw": round(math.radians(yaw), 6),
+        "pitch": round(math.radians(pitch), 6),
+        "roll": round(math.radians(roll), 6),
         "scale": [round(v, 2) for v in s],
         "stick_to_ground": stick_to_ground,
+        "relative_height": relative_height,
     }
-    if relative_height:
-        entity["relative_height"] = relative_height
     return entity
 
 
@@ -341,12 +350,13 @@ def _infer_bridge_yaw(x, z, water_mask, map_w, map_h):
 
 
 def process_bridges(bridges, water_mask, map_w, map_h, origin_x, origin_z,
-                    grid_size):
+                    grid_size, bridge_relative_height=0.0):
     """
     处理桥梁列表，水域吸附 + yaw 推算。
 
     Args:
         bridges: list of {x, z, yaw(optional)}
+        bridge_relative_height: 桥梁相对脚下地形的离地高度（米）
 
     Returns:
         (entities, stats)
@@ -379,13 +389,16 @@ def process_bridges(bridges, water_mask, map_w, map_h, origin_x, origin_z,
                 yaw = round(ai_yaw / 45) * 45
 
         wx, wz = grid_to_world(bx, bz, origin_x, origin_z, grid_size)
-        entities.append(make_entity((wx, wz), BRIDGE_MODEL, yaw=yaw,
-                                    stick_to_ground=False, relative_height=400))
+        entities.append(make_entity(
+            (wx, wz), BRIDGE_MODEL, yaw=yaw,
+            stick_to_ground=True,
+            relative_height=bridge_relative_height))
 
     stats = {
         "placed": len(entities),
         "snapped": snapped,
         "discarded": discarded,
+        "relative_height_m": bridge_relative_height,
     }
     return entities, stats
 
@@ -459,16 +472,28 @@ def _load_map_info(output_dir):
     return map_w, map_h, origin_x, origin_z, grid_size
 
 
+def _read_optional_float_arg(flag, default):
+    if flag not in sys.argv:
+        return default
+    idx = sys.argv.index(flag)
+    if idx + 1 >= len(sys.argv):
+        raise SystemExit(f"{flag} 需要一个数值")
+    return float(sys.argv[idx + 1])
+
+
 def main():
     if len(sys.argv) < 4:
         print("Usage: python decoration_postprocess.py "
-              "<input_json> <water_mask_npy> <output_json>")
+              "<input_json> <water_mask_npy> <output_json> "
+              "[--bridge-relative-height <米>]")
         print("  地图参数自动从同目录下的 map_info.json 读取")
         sys.exit(1)
 
     input_json = sys.argv[1]
     water_mask_npy = sys.argv[2]
     output_json = sys.argv[3]
+    bridge_relative_height = _read_optional_float_arg(
+        "--bridge-relative-height", DEFAULT_BRIDGE_RELATIVE_HEIGHT_M)
 
     # 自动从 map_info.json 读取地图参数
     output_dir = os.path.dirname(os.path.abspath(water_mask_npy))
@@ -509,9 +534,13 @@ def main():
     # 桥梁
     bridge_list = data.get("bridges", [])
     if bridge_list:
+        if bridge_relative_height == 0:
+            print("[bridge] relative_height=0；若水面高于脚下地形，"
+                  "请用 --bridge-relative-height 指定实测高度")
         bridge_entities, bridge_stats = process_bridges(
             bridge_list, water_mask, map_w, map_h,
-            origin_x, origin_z, grid_size)
+            origin_x, origin_z, grid_size,
+            bridge_relative_height=bridge_relative_height)
         all_entities.extend(bridge_entities)
         print(f"[bridges] 放置 {bridge_stats['placed']}, "
               f"吸附 {bridge_stats['snapped']}, "

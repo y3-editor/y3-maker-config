@@ -133,7 +133,7 @@ python scripts/check_cv_deps.py
 所有轮次的中间文件和最终 CSV **统一输出到** `<skill_dir>/output/` 目录：
 
 ```
-<dir> = .codemaker/skills/y3-gen-terrain-from-image/output/
+<dir> = <agent>/skills/y3-gen-terrain-from-image/output/
 ```
 
 后续所有脚本的 `--output-dir` 参数统一使用此路径。
@@ -383,6 +383,8 @@ AI 看原图 + 大陆裁剪图 + `continent_subregions.json`，按照 `templates
 }
 ```
 
+> `bridges[].yaw` 是脚本输入角度（度）；`decoration_postprocess.py` 输出 entity 时会转成弧度。
+
 ### Step 2.3：纹理组映射（脚本自动完成）
 
 脚本内部加载 `texture_grid.csv` + `references/texture_group_catalog.json`，构建纹理 ID → 纹理组反查表。每个采样点根据脚下纹理自动匹配模型池（草地配绿树，沙漠配枯树/仙人掌，冰雪配松树等）。
@@ -407,6 +409,7 @@ python scripts/decoration_postprocess.py \
 
 > 地图尺寸自动从 `<dir>/map_info.json` 读取。
 > `--texture-grid` 可选，不提供时所有采样点使用 grassland fallback 模型。
+> 桥梁高度用 `--bridge-relative-height <米>` 指定；默认 0 表示贴脚下地形。跨水桥请先实测水面/河床高度再传值。
 
 输出 `decoration_entities.json`，可直接传给 `entity_create_block` MCP 调用。
 
@@ -515,16 +518,21 @@ python scripts/mcp_entity_writer.py <dir>/decoration_entities.json --download-mo
   "type": 16777216,
   "pos": [world_x, 0, world_z],
   "model_id": 201669,
-  "yaw": 90,
-  "pitch": 0,
-  "roll": 0,
+  "yaw": 1.5708,
+  "pitch": 0.0,
+  "roll": 0.0,
   "scale": [2.5, 2.5, 2.5],
-  "stick_to_ground": true
+  "stick_to_ground": true,
+  "relative_height": 0.0
 }
 ```
 
 > ⚠️ **type 必须是 `16777216`**（2^24 = RESOURCE_MODEL），不是 16！
-> ⚠️ **旋转使用 yaw/pitch/roll 独立字段**，不是 rotation 数组！
+> ⚠️ **`pos[1]` 对 `RESOURCE_MODEL` 会被引擎覆盖**，写 0 只是占位；实际高度由 `relative_height` 或 `absolute_height` 控制。
+> ⚠️ **`stick_to_ground: true` 时高度 = 脚下地形高度 + `relative_height`**；`relative_height` 单位是米，和 `pos` 同单位，不要乘 100。
+> ⚠️ **`stick_to_ground: false` 时 `relative_height` 不生效**，改用 `absolute_height`；未传时等价于 0。
+> ⚠️ **`yaw/pitch/roll` 使用弧度**，不是角度，也不是 `rotation` 数组；90° 应写 `math.radians(90)` 或 `1.5708`。
+> ⚠️ **`stick_to_ground` 必须是 JSON 的 `true/false`**，不要写 `1/0`。
 > ⚠️ **不要自己生成 entity JSON**，必须使用 `decoration_postprocess.py` 脚本的输出！
 
 **植被类装饰物** → 使用 `terrain_vegetation_draw_block`（⚠️ 植被坐标系与地形格点不同）

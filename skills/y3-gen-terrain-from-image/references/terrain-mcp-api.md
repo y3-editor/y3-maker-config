@@ -37,6 +37,37 @@
 
 ---
 
+## 实体创建（entity_create_block）参数口径
+
+| 字段 | 口径 |
+|------|------|
+| `type` | 模型资源用 `16777216`（`RESOURCE_MODEL = 2^24`） |
+| `pos` | 世界坐标 `[x, y, z]`；`RESOURCE_MODEL` 的 `pos[1]` 会被引擎覆盖，不能用来指定高度 |
+| `yaw` / `pitch` / `roll` | **弧度**，不是角度，也不是 `rotation` 数组；90° 要写 `math.radians(90)` |
+| `stick_to_ground` | 默认 `true`；必须是 JSON 布尔值 |
+| `relative_height` | 相对脚下地形的高度，与 `pos` 同单位（米），仅 `stick_to_ground=true` 时生效 |
+| `absolute_height` | 绝对世界高度，与 `pos` 同单位（米），仅 `stick_to_ground=false` 时生效 |
+
+```json
+{
+  "type": 16777216,
+  "pos": [x, 0, z],
+  "model_id": 201669,
+  "yaw": 1.5708,
+  "pitch": 0,
+  "roll": 0,
+  "scale": [1, 1, 1],
+  "stick_to_ground": true,
+  "relative_height": 2.0
+}
+```
+
+> `relative_height` 是每个实体在自己 `(x, z)` 处取局部地形高度后叠加，不是全局固定基准。水域桥梁的具体高度需实测水面/河床后确定。
+
+**最小验证**：在平地上用同一 `model_id` 分别放 `relative_height=0` 和 `relative_height=2`，读回 `pos_m[1]` 的差值应为 2；`yaw=1.5708` 读回应按弧度换算为约 90°。注意 `get_scene_decorations` 的 `yaw_deg` 字段名现在已按角度返回。
+
+---
+
 ## 注意事项
 
 1. `COVER_DRAW`（已有 MCP）vs `DRAW_TEXTURE`（缺失）：前者是材质层整格替换，后者是混合纹理层支持渐变

@@ -1,6 +1,6 @@
  # 🧠 全局记忆系统
 
-> **最后更新**：2026-09-23  
+> **最后更新**：2026-10-12  
 > **项目状态**：Y3游戏引擎项目  
 
 ## 📋 项目概览
@@ -12,6 +12,30 @@
 ---
 
 ---
+
+## 🔖 文档路径前缀统一为 `<agent>` + skills/README 补录 (2026-10-12)
+
+- **触发**：用户报两处维护项 —— ① `skills/README.md` 过时（缺 5 技能 + 目录结构重复 `y3-lua-pipeline`）② 文档前缀三写法混用（`<agent>` / `.codemaker/` / `<codemaker>`）
+- **目录名事实**：本工程磁盘上**只有 `.codemaker/`**；`.y3maker` 是外放版目录名，其旧克隆已于 r770051 `svn delete` 移除 → 「`.y3maker` 是本工程实际目录」系误判
+- **决策（用户 3 次确认）**：① 统一保留 `<agent>` 占位符 ② 只改活跃文档（`openspec/` 归档 + `memory/sessions/` 历史不动）③ 代码块内也全换（代价：执行前须先探测真实目录名）
+- **风险点**：`.codemaker/` 大量出现在**可执行代码块**（`y3-game-spec/SKILL.md` 的 python f-string、`eca-json-builder` 的 cmd、`templates/*/ReadMe.md` 的 `include`），盲替换会破坏可用性
+- **执行**：一次性脚本 `<agent>/memory/sandbox/migrate_agent_prefix.py`（字节级读写保留 BOM/CRLF、显式排除清单、`--apply` 开关）→ **57 文件 / 226 处**
+- **手工改写**：`rules/rules.mdc` 章节改名「`<agent>` 路径前缀规则」+ 新增「全仓统一 `<agent>/`」+ 第 46 行命令路径；`skills/README.md` 目录结构去重 + 补录 `y3-lua-review`/`y3-gen-terrain-from-image`/`y3-terrain-template`/`y3-template-export`/`eca-json-builder`/`y3-memory-distill` + 路由表 4 行 + 决策树 4 分支
+- **刻意保留**：`rules.mdc:186-188` 的 `.codemaker`/`.y3maker` 是**真实目录名**说明，非占位符，不替换
+- **验证**：复跑 dry-run 归零；`grep <codemaker>|\.codemaker` over `*.mdc` 仅剩上述刻意保留处
+- **环境坑**：本机 `python` = **2.7.18**，无 `py` 启动器 → `_health_check.py`（pathlib + f-string，需 Py3）**无法运行**；迁移脚本已写成 py2 安全版
+- **session 报告**：`<agent>/memory/sessions/session-2026.10.12-18.19-doc-prefix-unify/report.md`
+
+## 🔖 MCP 导入 FBX 支持材质球选择 + 贴图替换表 (2026-10-12)
+
+- **问题**：MCP `import_editor_fbx_model` 走 silent_import（静默导入，跳过 `ModelImportDialog`），只能沿用 FBX 自带材质，无法像导入对话框那样选内置材质球（不透明/半透/NPR/双面裁切）
+- **载体决策**：材质选择挂进 `resource_map_json`（不新增 MCP 参数）→ 顶层 `material`（全局默认）+ `meshes[].material`（单 mesh 优先）；材质描述支持 4 种写法：id / 材质路径 / 材质文件名 / 材质名
+- **实现**（`dm/editor/mcp/handlers/resource_handlers.py`）：新增 `_apply_import_material()` —— ShaderGraph 材质取 `LayerName = guid`，fx shader 取 `shader_fx_name`，贴图参数先灌材质球模板默认值；`_load_resource_map()` 增解析 material 并返回 5 元组
+- **贴图落槽**：D/M/N 按**新材质**的 `replace_info` 映射真实槽位（NPR：`tMixMap→tRampMap`；M_UDK_Phone：`tMixMap→tSpecMap`），`import_material_texture` 用映射后类型；缺失槽位保留模板默认 → 原材质参数兜底
+- **新工具**：`get_model_import_materials`（无参，列内置材质球 id/路径/名称/是否 ShaderGraph/replace_info），已加进 `dm/editor/mcp/tools.py` TOOLS + dispatch，并按 `y3mcp/scripts/gen_tool_stubs.py` 重新生成 stub（`y3mcp/y3mcp/tools/get_model_import_materials*.py`，已 svn add）
+- **坑**：`Package/Script/Python` 与 `Server/server/engine` 是 **hardlink 同一物理文件** → 改一处即两处生效，`copy` 覆盖会报「另一个程序正在使用此文件」
+- **生效条件**：handler 改动需重启编辑器；新增 MCP 工具需重启 MCP server（y3mcp）
+- **文档同步**：`skills/y3-resource-import/SKILL.md`（§2.1 字段、新增 §5.2.1 材质球替换、FAQ）、`rules/mcp-rules.mdc`（工具表）、`skills/README.md`（子技能路由 / 决策树 / 目录结构 / 速查表补 y3-resource-import）
 
 ## 🔖 地编模板 zip 瘦身 → terrain-only 模式 (2026-09-23)
 
@@ -238,7 +262,7 @@
 - **核心变更**：
   - 水域后处理（连通区分析填回孤立水域）
   - 装饰物后处理（泊松采样树木、桥梁水域吸附+yaw推算、山石散布）
-  - MCP entity_create_block rotation bug 修复（rotation → yaw/pitch/roll）
+  - MCP entity_create_block rotation bug 修复（rotation → yaw/pitch/roll；三者单位均为弧度）
 - **关键原则**：不做 AI 无法做好的事（高度/多纹理/道路），用确定性后处理兜底
 - **状态**：13/16 tasks 完成，3 个测试任务待验证
 - **OpenSpec change**：`optimize-terrain-gen-skill`

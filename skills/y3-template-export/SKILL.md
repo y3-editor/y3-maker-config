@@ -1,8 +1,8 @@
 ---
 name: y3-template-export
 description: |
-  Y3 功能模板导出器。把项目中现有模块自动化打包为 `.codemaker/templates/<id>/` 三件套
-  （`logic.lua` + `<id>.upui` + `ReadMe.md`），并追加 `draft` 条目到 `.codemaker/templates/ReadMe.md`。
+  Y3 功能模板导出器。把项目中现有模块自动化打包为 `<agent>/templates/<id>/` 三件套
+  （`logic.lua` + `<id>.upui` + `ReadMe.md`），并追加 `draft` 条目到 `<agent>/templates/ReadMe.md`。
 
   支持 4 个等级（A/B/C/D，详见 §3 与 `templates/ReadMe.md §0`）：
   - A 通用模板（单层 params）
@@ -18,7 +18,7 @@ description: |
 
 # y3-template-export
 
-把"现有模块"按 `.codemaker/templates/ReadMe.md §6` 自动化打包为 `draft` 模板候选。
+把"现有模块"按 `<agent>/templates/ReadMe.md §6` 自动化打包为 `draft` 模板候选。
 
 ## 1. 流程总图（先看这张）
 
@@ -70,7 +70,7 @@ description: |
 | 5 类硬编码识别 + 用户确认后改写 | 模板应用到新地图 → `y3-game-spec` |
 | 核心代码提炼（去外部业务依赖） | 升级状态为 `validated` → 用户手工 |
 | `y3editor.export_ui` 精确导出 UI | UI JSON 生成 → `y3-ui-pipeline` |
-| 在 `.codemaker/templates/ReadMe.md` 追加条目 | lua 风格审查 → `y3-lua-review` |
+| 在 `<agent>/templates/ReadMe.md` 追加条目 | lua 风格审查 → `y3-lua-review` |
 
 ### 解耦红线（硬性）
 - ❌ 禁止 `use_skill("y3-lua-pipeline")` / `use_skill("y3-ui-pipeline")`
@@ -80,8 +80,8 @@ description: |
 ### 写入边界
 | 类型 | 路径 | 方式 |
 |---|---|---|
-| 白名单 | `.codemaker/templates/<id>/` | 新建目录 |
-| 白名单 | `.codemaker/templates/ReadMe.md` | **仅追加** |
+| 白名单 | `<agent>/templates/<id>/` | 新建目录 |
+| 白名单 | `<agent>/templates/ReadMe.md` | **仅追加** |
 | 黑名单 | `editor_table/` / `global_script/` / `maps/` | **严禁修改**（只读阅读） |
 
 ## 3. 模板等级机制（强制）
@@ -121,7 +121,7 @@ description: |
 用户说「导出模板 / 打包模块 / 做成模板 / 模块复用 / 模板化 / export template / package module」→ 激活本 skill。
 
 激活后**第一句话必须是**：
-> "好，我将把 `<module>` 打包为模板。按 `.codemaker/templates/ReadMe.md §6` 的 9 步流程执行，其中 4 个人工卡点需要你确认。请先告诉我：**模板等级**（A/B/C/D，见 §3）？**模板 ID 是什么**（kebab-case，带等级前缀如 `c-pick-one-of-many`）？**模块入口文件在哪里**？**模板的唯一主功能是什么**（一句话）？"
+> "好，我将把 `<module>` 打包为模板。按 `<agent>/templates/ReadMe.md §6` 的 9 步流程执行，其中 4 个人工卡点需要你确认。请先告诉我：**模板等级**（A/B/C/D，见 §3）？**模板 ID 是什么**（kebab-case，带等级前缀如 `c-pick-one-of-many`）？**模块入口文件在哪里**？**模板的唯一主功能是什么**（一句话）？"
 
 ## 5. 输入校验（启动后立即做）
 
@@ -134,7 +134,7 @@ description: |
     - `-score` → 首字符为连字符
     - `a` → 长度不足
     - `pick-one` 且等级=C → 等级与前缀不匹配，建议 `c-pick-one`
-- [ ] `.codemaker/templates/<id>/` **不存在**（避免覆盖既有模板）
+- [ ] `<agent>/templates/<id>/` **不存在**（避免覆盖既有模板）
 - [ ] 模块入口文件：路径存在 + 后缀 `.lua` + 位于 `maps/` 或 `global_script/`
 - [ ] `y3editor` MCP 可用（`get_ui_list` 试探）
 
@@ -195,7 +195,7 @@ description: |
 ### 调用规约（`y3editor.export_ui`）
 
 ```
-output_path          = <ABS .codemaker/templates/<id>/>   必填，绝对路径
+output_path          = <ABS <agent>/templates/<id>/>   必填，绝对路径
 output_filename      = "<template-id>.upui"                禁止用默认 clicli_export.upui
 layer_names          = [...]                               步骤 3 扫描 ∩ get_ui_list
 prefab_names         = [...]                               同上
@@ -548,7 +548,7 @@ return M
 
 ## 12. 步骤 7：模板 ReadMe.md 确认 🔒
 
-### 14 字段（严格对齐 `.codemaker/templates/ReadMe.md §1`）
+### 14 字段（严格对齐 `<agent>/templates/ReadMe.md §1`）
 
 ```markdown
 # <人类可读模板名称>
@@ -564,7 +564,7 @@ return M
 |------|------|
 | 等级 | **A** / **B** / **C** / **D**（必须与 ID 前缀一致） |
 | 名称 | <中文名，例：HUD 状态栏模板> |
-| 路径 | `.codemaker/templates/<template-id>/` |
+| 路径 | `<agent>/templates/<template-id>/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `<tag1>`, `<tag2>`, `<tag3>` |
@@ -615,7 +615,7 @@ C 级 ReadMe **必须**在「参数详述」前追加三段（详见 `templates/
 
 ## 13. 步骤 8：追加登记入口
 
-**定位策略**：在 `.codemaker/templates/ReadMe.md` 中找 `## 7. 当前可用模板`
+**定位策略**：在 `<agent>/templates/ReadMe.md` 中找 `## 7. 当前可用模板`
 - **首选**：在该标题**之前**插入新条目（与既有示例同格式）
 - **次选**：找不到 → 追加到文件末尾 + 日志记录警告 + 提示用户手工调整
 
@@ -635,8 +635,8 @@ C 级 ReadMe **必须**在「参数详述」前追加三段（详见 `templates/
 ### 提示文本
 ```
 ✅ 模板 `<template-id>` 已打包为 draft：
-   - 目录：.codemaker/templates/<template-id>/
-   - 登记：.codemaker/templates/ReadMe.md
+   - 目录：<agent>/templates/<template-id>/
+   - 登记：<agent>/templates/ReadMe.md
 
 下一步（需你手工完成，本 skill 不做）：
   1. 打开"模板测试工程"（专用空工程，如 test321321）
@@ -665,17 +665,17 @@ C 级 ReadMe **必须**在「参数详述」前追加三段（详见 `templates/
 
 **通用项（A/B/C/D 全适用）**
 
-- [ ] `.codemaker/templates/<id>/ReadMe.md` 存在且 14 字段齐全（含「等级」「入口签名」字段）
-- [ ] `.codemaker/templates/<id>/logic.lua` 存在，是唯一 `.lua` 文件
+- [ ] `<agent>/templates/<id>/ReadMe.md` 存在且 14 字段齐全（含「等级」「入口签名」字段）
+- [ ] `<agent>/templates/<id>/logic.lua` 存在，是唯一 `.lua` 文件
 - [ ] `logic.lua` 头部含 `@template-id` / `@grade` / `@version` / `@entry`
 - [ ] **等级前缀一致**：B→`b-*` / C→`c-*` / D→`d-*` / A→可省略
-- [ ] `.codemaker/templates/<id>/<id>.upui` 存在 + 体积合理（纯 Lua 模板可豁免）
+- [ ] `<agent>/templates/<id>/<id>.upui` 存在 + 体积合理（纯 Lua 模板可豁免）
 - [ ] 模板目录无其它文件（无 `.bak` / `.tmp` / `.log`）
 - [ ] 5 类硬编码 grep `logic.lua` 无残留（或残留均带 `-- TODO`）
 - [ ] **自包含合规**：`logic.lua` 所有 require 仅匹配 `^y3[\./]`，无业务模块 require
 - [ ] **无外部业务全局**：`logic.lua` 无 `EventBus.` / `Analytics.` / `GameState.` / `Utils.`（除非已 params/adapter 化）
 - [ ] **无调试残留**：无未参与主功能的 `print(...)` / `logger.*(...)` / `debug.*(...)`
-- [ ] `.codemaker/templates/ReadMe.md` 比流程前多一个条目，其它内容字节级不变
+- [ ] `<agent>/templates/ReadMe.md` 比流程前多一个条目，其它内容字节级不变
 - [ ] 条目状态 = `draft`，测试状态 = `not tested`
 - [ ] `editor_table/` / `global_script/` / `maps/` 下 `git status` 清洁
 
@@ -702,5 +702,5 @@ C 级 ReadMe **必须**在「参数详述」前追加三段（详见 `templates/
 
 ## 16. 唯一权威规范
 
-`.codemaker/templates/ReadMe.md` —— 本 skill 所有规则均派生自此文件 §0-§6（§0 等级机制 / §1-§6 模板规范）。
-冲突时以 `.codemaker/templates/ReadMe.md` 为准。
+`<agent>/templates/ReadMe.md` —— 本 skill 所有规则均派生自此文件 §0-§6（§0 等级机制 / §1-§6 模板规范）。
+冲突时以 `<agent>/templates/ReadMe.md` 为准。

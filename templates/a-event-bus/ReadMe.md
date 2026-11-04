@@ -6,7 +6,7 @@
 |------|------|
 | 等级 | **A** |
 | 名称 | 纯 Lua 订阅发布事件总线 |
-| 路径 | `.codemaker/templates/a-event-bus/` |
+| 路径 | `<agent>/templates/a-event-bus/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `event`, `pubsub`, `subscribe`, `publish`, `decouple`, `bus` |
@@ -56,7 +56,7 @@ M.setup({
 ### 1. 创建全局 Bus
 
 ```lua
-local EventBus = include '.codemaker.templates.a-event-bus.logic'
+local EventBus = include '<agent>.templates.a-event-bus.logic'
 MyGame.bus = EventBus.setup({
     debug    = y3.game.get_start_mode() == 1,  -- 编辑器环境开 debug
     on_error = log.error,

@@ -2,6 +2,10 @@
 
 本目录是 Y3 项目的「功能模板库」入口。每个子目录为一个**功能模板**，由 `y3-template-export` skill 从现有模块打包产出，由 `y3-game-spec` 在 Phase 2 做模板匹配后通过 `y3-ui-pipeline` / `y3-lua-pipeline` 复用。
 
+> ⚠️ **路径占位符**：文档中的 `<agent>/` 代指当前配置目录（本地为 `.codemaker`，外放版可能为 `.y3maker`）。
+> 代码块里的 `<agent>` 不能直接执行，需先替换为实际目录名。
+> 例如 Lua：`include '<agent>.templates.a-event-bus.logic'` 应写成 `include '.codemaker.templates.a-event-bus.logic'`。
+
 ---
 
 ## 0. 模板等级机制（强制）
@@ -37,7 +41,7 @@
 |------|------|---------|
 | 等级 | A/B/C/D 等级标识 | 必填，与 ID 前缀一致 |
 | 名称 | 面向人类的中文模板名 | 简洁可识别 |
-| 路径 | 模板目录路径 | `.codemaker/templates/<template-id>/` |
+| 路径 | 模板目录路径 | `<agent>/templates/<template-id>/` |
 | 状态 | 模板可用性状态 | `draft` / `validated` |
 | 版本 | 模板版本 | 语义化版本，首次导出 `v0.1.0`，首个正式版 `v1.0.0` |
 | 能力标签 | 用于 `y3-game-spec` 模板匹配的短 tag | 3-5 个为宜 |
@@ -56,7 +60,7 @@
 每个模板目录**必须**包含且**仅**包含以下文件：
 
 ```
-.codemaker/templates/<template-id>/
+<agent>/templates/<template-id>/
 ├── <template-id>.upui   ← UI 导出文件（纯 Lua 模板可省略）
 ├── logic.lua            ← 唯一 Lua 入口（强制单文件 + 自包含）
 └── ReadMe.md            ← 模板自身说明（含 13 字段表 + 参数详述 + 接入步骤 + 已知限制 + 源工程溯源）
@@ -196,7 +200,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **A** |
 | 名称 | 点范围AOE视觉管线 |
-| 路径 | `.codemaker/templates/a-aoe-point/` |
+| 路径 | `<agent>/templates/a-aoe-point/` |
 | 状态 | `validated` |
 | 版本 | `v1.0.0` |
 | 能力标签 | `aoe`, `area-damage`, `skill-visual`, `particle-pipeline`, `circle-aoe`, `rect-aoe`, `zero-dependency` |
@@ -218,7 +222,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **A** |
 | 名称 | 贝塞尔弹道模板 |
-| 路径 | `.codemaker/templates/a-bezier-trajectory/` |
+| 路径 | `<agent>/templates/a-bezier-trajectory/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `trajectory`, `projectile`, `bezier` |
@@ -240,7 +244,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **A** |
 | 名称 | 时间格式化与判定工具集 |
-| 路径 | `.codemaker/templates/a-date-time/` |
+| 路径 | `<agent>/templates/a-date-time/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `time`, `timestamp`, `format`, `date`, `countdown`, `cross-day`, `cross-week` |
@@ -262,7 +266,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **A** |
 | 名称 | 二次确认弹窗模板 |
-| 路径 | `.codemaker/templates/a-double-check-dialog/` |
+| 路径 | `<agent>/templates/a-double-check-dialog/` |
 | 状态 | `validated` |
 | 版本 | `v1.0.0` |
 | 能力标签 | `ui`, `dialog`, `confirm`, `double-check`, `popup` |
@@ -284,7 +288,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **A** |
 | 名称 | 纯 Lua 订阅发布事件总线 |
-| 路径 | `.codemaker/templates/a-event-bus/` |
+| 路径 | `<agent>/templates/a-event-bus/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `event`, `pubsub`, `subscribe`, `publish`, `decouple`, `bus` |
@@ -306,7 +310,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **A** |
 | 名称 | 浮动文本提示 |
-| 路径 | `.codemaker/templates/a-float-tips/` |
+| 路径 | `<agent>/templates/a-float-tips/` |
 | 状态 | `validated` |
 | 版本 | `v0.2.0` |
 | 能力标签 | `浮动提示`, `弹字`, `渐隐动画`, `伤害数字` |
@@ -328,7 +332,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **A** |
 | 名称 | 三层时间轴回调调度器 |
-| 路径 | `.codemaker/templates/a-game-timer/` |
+| 路径 | `<agent>/templates/a-game-timer/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `timer`, `clock`, `frame`, `second`, `minute`, `global-timer`, `game-timer` |
@@ -350,7 +354,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **A** |
 | 名称 | 通用父子状态机 |
-| 路径 | `.codemaker/templates/a-game-fsm/` |
+| 路径 | `<agent>/templates/a-game-fsm/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `fsm`, `state-machine`, `flow`, `game-stage`, `parent-child` |
@@ -372,7 +376,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **A** |
 | 名称 | 直线投射物视觉管线 |
-| 路径 | `.codemaker/templates/a-projectile-line/` |
+| 路径 | `<agent>/templates/a-projectile-line/` |
 | 状态 | `validated` |
 | 版本 | `v1.0.0` |
 | 能力标签 | `projectile-line`, `mover-line`, `skill-visual`, `particle-pipeline`, `fan-spread`, `zero-dependency` |
@@ -394,7 +398,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **A** |
 | 名称 | 加权随机池 |
-| 路径 | `.codemaker/templates/a-random-pool/` |
+| 路径 | `<agent>/templates/a-random-pool/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.1` |
 | 能力标签 | `random`, `weight`, `pool`, `gacha`, `drop`, `loot`, `weighted-random` |
@@ -416,7 +420,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **A** |
 | 名称 | 雪花全局唯一 ID |
-| 路径 | `.codemaker/templates/a-snowflake-id/` |
+| 路径 | `<agent>/templates/a-snowflake-id/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `id`, `snowflake`, `unique-id`, `sequence`, `instance-id` |
@@ -438,7 +442,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **A** |
 | 名称 | HTTP 上报通道 |
-| 路径 | `.codemaker/templates/a-trace-report/` |
+| 路径 | `<agent>/templates/a-trace-report/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `report`, `trace`, `error`, `http`, `webhook`, `analytics`, `cooldown` |
@@ -459,7 +463,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **A** |
 | 名称 | 通用补间动画时间线模板 |
-| 路径 | `.codemaker/templates/a-tween-timeline/` |
+| 路径 | `<agent>/templates/a-tween-timeline/` |
 | 状态 | `validated` |
 | 版本 | `v1.0.0` |
 | 能力标签 | `ui`, `animation`, `tween`, `easing`, `kikito-tween` |
@@ -481,7 +485,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **A** |
 | 名称 | 通用对象池 |
-| 路径 | `.codemaker/templates/a-ui-pool/` |
+| 路径 | `<agent>/templates/a-ui-pool/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `pool`, `reuse`, `ui-object-pool`, `performance` |
@@ -503,7 +507,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **A** |
 | 名称 | 动态 Prefab 组件基类 |
-| 路径 | `.codemaker/templates/a-dync-component/` |
+| 路径 | `<agent>/templates/a-dync-component/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `ui`, `prefab`, `component`, `dynamic`, `base-class` |
@@ -525,7 +529,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **A** |
 | 名称 | 数字缩写格式化 |
-| 路径 | `.codemaker/templates/a-number-abbr/` |
+| 路径 | `<agent>/templates/a-number-abbr/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `number`, `format`, `abbreviate`, `display`, `damage-text`, `currency` |
@@ -547,7 +551,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **A** |
 | 名称 | 难度选择模板 |
-| 路径 | `.codemaker/templates/difficulty-select/` |
+| 路径 | `<agent>/templates/difficulty-select/` |
 | 状态 | `validated` |
 | 版本 | `v1.0.0` |
 | 能力标签 | `level-select`, `difficulty`, `game-start` |
@@ -569,7 +573,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **B** |
 | 名称 | UI 视图基类 |
-| 路径 | `.codemaker/templates/b-base-view/` |
+| 路径 | `<agent>/templates/b-base-view/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `ui`, `view`, `base-class`, `lifecycle`, `gc`, `show-hide` |
@@ -591,7 +595,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **B** |
 | 名称 | 单位动画播放+帧事件调度 |
-| 路径 | `.codemaker/templates/b-anim-helper/` |
+| 路径 | `<agent>/templates/b-anim-helper/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.1` |
 | 能力标签 | `animation`, `frame-event`, `cast`, `skill`, `action-frame` |
@@ -612,7 +616,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **B** |
 | 名称 | 通用属性系统 |
-| 路径 | `.codemaker/templates/b-attribute-system/` |
+| 路径 | `<agent>/templates/b-attribute-system/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `attribute`, `stat-system`, `formula-dsl`, `reactive`, `rpg` |
@@ -634,7 +638,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **B** |
 | 名称 | GM 调试指令系统 |
-| 路径 | `.codemaker/templates/b-gm-command/` |
+| 路径 | `<agent>/templates/b-gm-command/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `gm`, `debug`, `command`, `console`, `recording`, `replay` |
@@ -655,7 +659,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **B** |
 | 名称 | HUD 顶部信息栏模板 |
-| 路径 | `.codemaker/templates/b-hud-top-info/` |
+| 路径 | `<agent>/templates/b-hud-top-info/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.1` |
 | 能力标签 | `HUD`, `信息栏`, `货币`, `波次`, `倒计时`, `日夜` |
@@ -677,7 +681,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **B** |
 | 名称 | HUD 右侧统计面板模板 |
-| 路径 | `.codemaker/templates/b-hud-statistic/` |
+| 路径 | `<agent>/templates/b-hud-statistic/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.1` |
 | 能力标签 | `HUD`, `统计`, `伤害排行`, `技能统计`, `DPS` |
@@ -699,7 +703,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **B** |
 | 名称 | HUD 底部控制台模板 |
-| 路径 | `.codemaker/templates/b-hud-main-console/` |
+| 路径 | `<agent>/templates/b-hud-main-console/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.1` |
 | 能力标签 | `HUD`, `控制台`, `英雄状态`, `技能栏`, `物品栏`, `Buff` |
@@ -721,7 +725,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **B** |
 | 名称 | 暂停弹窗模板 |
-| 路径 | `.codemaker/templates/b-pause-popup/` |
+| 路径 | `<agent>/templates/b-pause-popup/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.2` |
 | 能力标签 | `pause-menu`, `popup`, `multiplayer-aware`, `ui-popup` |
@@ -743,7 +747,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **B** |
 | 名称 | 区域单位选择器（缓存版） |
-| 路径 | `.codemaker/templates/b-selector-cache/` |
+| 路径 | `<agent>/templates/b-selector-cache/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `selector`, `area`, `unit`, `cache`, `range`, `enemy`, `distance` |
@@ -764,7 +768,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **B** |
 | 名称 | 标签计数器 |
-| 路径 | `.codemaker/templates/b-tag-counter/` |
+| 路径 | `<agent>/templates/b-tag-counter/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.1` |
 | 能力标签 | `标签`, `计数器`, `羁绊`, `阶梯`, `计数` |
@@ -786,7 +790,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **B** |
 | 名称 | UI 面板基类（`_` 前缀控件自动绑定） |
-| 路径 | `.codemaker/templates/b-base-panel/` |
+| 路径 | `<agent>/templates/b-base-panel/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `ui`, `panel`, `control-binding`, `convention`, `show-hide`, `lifecycle` |
@@ -808,7 +812,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **B** |
 | 名称 | 优先级护盾栈 |
-| 路径 | `.codemaker/templates/b-shield-stack/` |
+| 路径 | `<agent>/templates/b-shield-stack/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `shield`, `damage`, `absorb`, `priority`, `stack`, `defense` |
@@ -830,7 +834,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **C** |
 | 名称 | 属性显示面板 |
-| 路径 | `.codemaker/templates/c-attr-display-panel/` |
+| 路径 | `<agent>/templates/c-attr-display-panel/` |
 | 状态 | `validated` |
 | 版本 | `v0.2.0` |
 | 能力标签 | `attr-display`, `stat-panel`, `grid-view`, `auto-refresh`, `rpg-hud`, `zero-prefab` |
@@ -852,7 +856,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **C** |
 | 名称 | 多背包槽位管理系统 |
-| 路径 | `.codemaker/templates/c-bag-system/` |
+| 路径 | `<agent>/templates/c-bag-system/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `bag`, `inventory`, `slot`, `item-stack`, `pickup`, `item-move` |
@@ -874,7 +878,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **C** |
 | 名称 | 通用结算面板模板 |
-| 路径 | `.codemaker/templates/c-game-settle/` |
+| 路径 | `<agent>/templates/c-game-settle/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `settle`, `game-end`, `reward-summary`, `player-stats`, `result-screen` |
@@ -896,7 +900,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **C** |
 | 名称 | 通用多选一抽卡模板 |
-| 路径 | `.codemaker/templates/c-pick-one-of-many/` |
+| 路径 | `<agent>/templates/c-pick-one-of-many/` |
 | 状态 | `validated` |
 | 版本 | `v1.0.0` |
 | 能力标签 | `pick-one-of-many`, `random-pick`, `card-select`, `slot-pick`, `weighted-random` |
@@ -918,7 +922,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **C** |
 | 名称 | 单商店购买流程模板 |
-| 路径 | `.codemaker/templates/c-shop-system/` |
+| 路径 | `<agent>/templates/c-shop-system/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `shop`, `purchase`, `currency`, `discount`, `restock`, `cargo` |
@@ -940,7 +944,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **C** |
 | 名称 | 通用进度追踪框架 |
-| 路径 | `.codemaker/templates/c-progress-tracker/` |
+| 路径 | `<agent>/templates/c-progress-tracker/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `progress`, `achievement`, `task`, `mission`, `quest`, `collection`, `daily`, `weekly` |
@@ -962,7 +966,7 @@ C 级的「接入步骤」段必须以**完整可运行的 demo**（30-50 行）
 |------|------|
 | 等级 | **C** |
 | 名称 | 时间轴关卡调度器 |
-| 路径 | `.codemaker/templates/c-wave-scheduler/` |
+| 路径 | `<agent>/templates/c-wave-scheduler/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `wave`, `schedule`, `spawn`, `boss`, `stage`, `level`, `tower-defense`, `roguelike` |

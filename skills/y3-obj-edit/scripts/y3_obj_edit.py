@@ -4,6 +4,7 @@
 import argparse
 import json
 import os
+import shutil
 import sys
 import mmh3
 
@@ -68,10 +69,37 @@ UNIT_ATTRIBUTES = {
     "turn_speed": float,
     "sight_range": float,
     "attack_range": float,
+    # 索敌/警戒/视野相关字段（实测补充）
+    # 单位均为「米」（实测换算：运行时 `unit:get_attr('vision_rng')` = 物编值 × 100，与
+    # attack_range 2.5 → 250 一致）。
+    #
+    # ⭐ alarm_range / cancel_alarm_range 才是「警戒索敌」范围：
+    #   证据：怪物模板 data/jz.json 中 alarm_range=8.0、cancel_alarm_range=10.0，
+    #   且 default_behaviour_type="caution"（警戒行为）。
+    #   实测：alarm_range=8 时，距目标 6m 的怪物会主动前压，
+    #   而距 20m 的怪物 100 秒内完全不动（不索敌、不移动）。
+    #   把 alarm_range 调到覆盖全图后，远处怪物即可主动扑向目标。
+    #   对照实验还证明以下字段「不是」索敌半径（调大后 20m 仍静止）：
+    #     vision_rng / vision_night（仅视野，运行时 set_attr 也改不动 AI 取值）、
+    #     counterattack_range（模板默认 0；运行时 set_attr 完全无效）。
+    #   ⚠️ 这些字段都只能改物编，运行时 `set_attr` 无效。
+    "alarm_range": float,
+    "cancel_alarm_range": float,
+    "vision_rng": float,
+    "vision_night": float,
+    "counterattack_range": float,
     "reward_exp": float,
     "reward_official_res_1": float,
     "hero_ability_list": "tuple",
     "common_ability_list": "tuple",
+    "build_time": float,
+    "move_channel": int,
+    "build_ignore_dyn_collision": bool,
+    "dynamic_collision_r": float,
+    "collision_radius_2": float,
+    "collision_points": "json",
+    "collision_box_turning_enable": bool,
+    "path_finding_external_size": int,
 }
 
 
@@ -105,6 +133,8 @@ ABILITY_ATTRIBUTES = {
     "arrow_width": "tuple_str",
     # 整数数组类型（tuple_int）
     "required_level": "tuple_int",
+    "build_list": "tuple_int",
+    "ability_build_subtype": int,
 }
 
 
@@ -345,6 +375,142 @@ def save_unit_json(map_path: str, unit_id: int, data: dict):
     print(f"✅ 已保存单位物编: {unit_path}")
 
 
+# ---------------------------------------------------------------------------
+# 普攻「有效字段」同步 + 写入后回读校验（新增）
+#
+# 背景（踩坑取证）：单位实际生效的普攻射程 / 攻击间隔在 simple_common_atk 里，
+# 根级 attack_range / attack_interval 只是镜像。只写根级时命令照样"成功"，
+# MCP 回读根级也确实变了，但真正生效的是模板自带的 simple_common_atk.*，
+# 表现就是"改了没效果"。
+# 另外 common_atk_range 不在 UNIT_ATTRIBUTES 表里，所以 -create 的通用循环会
+# 直接跳过它（-edit 有专门分支才生效）—— 这是"同参数 create 无效、edit 有效"的根因。
+# ---------------------------------------------------------------------------
+
+_SIMPLE_ATK_SYNC = {
+    # 命令行参数名 -> simple_common_atk 内的字段名
+    "common_atk_range": "attack_range",
+    "attack_range": "attack_range",
+    "attack_interval": "attack_interval",
+}
+
+
+def sync_simple_common_atk(data: dict, args: argparse.Namespace) -> list:
+    """把根级普攻字段同步进 simple_common_atk；返回给调用方打印的说明行。"""
+    atk = data.get("simple_common_atk")
+    if not isinstance(atk, dict):
+        return ["   ⚠️ 该模板没有 simple_common_atk，跳过普攻有效字段同步"]
+    lines = []
+    for arg_name, atk_key in _SIMPLE_ATK_SYNC.items():
+        value = getattr(args, arg_name, None)
+        if value is None:
+            continue
+        v = float(value)
+        if arg_name == "common_atk_range":
+            data["attack_range"] = v
+        old = atk.get(atk_key)
+        atk[atk_key] = v
+        lines.append(f"   ↳ simple_common_atk.{atk_key}: {old} → {v}（实际生效值）")
+    return lines
+
+
+def _num_eq(a, b) -> bool:
+    try:
+        return abs(float(a) - float(b)) < 1e-4
+    except (TypeError, ValueError):
+        return False
+
+
+def _existing_object_keys(map_path: str, table: str):
+    """返回某类物编已存在的 Key 集合；目录不存在时返回 None（表示无法校验，不误报）。"""
+    d = os.path.join(map_path, "editor_table", table)
+    if not os.path.isdir(d):
+        return None
+    return {os.path.splitext(f)[0] for f in os.listdir(d) if f.endswith(".json")}
+
+
+def verify_unit_saved(map_path: str, unit_id: int, args: argparse.Namespace):
+    """保存后回读校验：请求值 vs 落盘值（含 simple_common_atk 有效值），不一致就报警。"""
+    try:
+        data = load_unit_json(map_path, unit_id)
+    except FileNotFoundError:
+        return
+    atk = data.get("simple_common_atk")
+    atk = atk if isinstance(atk, dict) else {}
+
+    # 引用物编 Key 的存在性校验。
+    # 证据（实测）：`-hero_ability_list` 里写了**不存在的技能 ID**（把 100001*1000+1
+    # 误写成字符串拼接 1000011），脚本照单全收、回读也"通过"，但英雄身上挂的是空技能
+    # → 技能栏空白、QWER 无反应。这里必须校验引用的 Key 真的在 editor_table 里。
+    ref_ids = []
+    for field in ("hero_ability_list", "common_ability_list", "passive_ability_list"):
+        tup = data.get(field)
+        items = tup.get("items") if isinstance(tup, dict) else None
+        for it in (items or []):
+            if isinstance(it, list) and it:
+                ref_ids.append(it[0])
+            elif isinstance(it, (int, str)):
+                ref_ids.append(it)
+    known_abilities = _existing_object_keys(map_path, "abilityall")
+    if ref_ids and known_abilities is not None:
+        missing = [i for i in ref_ids if str(i) not in known_abilities]
+        print("\n🔎 引用校验（`hero_ability_list` / `common_ability_list` 等引用的技能 Key）")
+        if missing:
+            print("  ⚠️ 有 %d/%d 个技能 Key 在 editor_table/abilityall 里找不到：%s"
+                  % (len(missing), len(ref_ids), missing))
+            print("     → 单位身上会挂空技能：界面不显示、快捷键无反应。请先确认技能物编已生成。")
+        else:
+            print("  ✅ %d 个技能 Key 全部存在" % len(ref_ids))
+
+    rows, bad = [], []
+    for attr_name, attr_type in UNIT_ATTRIBUTES.items():
+        if attr_type == "tuple" or attr_name in ("name", "description", "model", "icon"):
+            continue
+        want = getattr(args, attr_name, None)
+        if want is None:
+            continue
+        got = data.get(attr_name)
+        if attr_type == "json":
+            try:
+                want_parsed = json.loads(want)
+            except (TypeError, ValueError):
+                want_parsed = want
+            got_items = got.get("items") if isinstance(got, dict) else got
+            ok = got_items == want_parsed
+            rows.append((attr_name, want_parsed, got_items, None, None, ok, True))
+            if not ok:
+                bad.append(attr_name)
+            continue
+        ok = _num_eq(got, want)
+        eff_key = _SIMPLE_ATK_SYNC.get(attr_name)
+        eff = atk.get(eff_key) if eff_key else None
+        eff_ok = True if eff_key is None else _num_eq(eff, want)
+        rows.append((attr_name, want, got, eff_key, eff, ok, eff_ok))
+        if not ok or not eff_ok:
+            bad.append(attr_name)
+
+    cr = getattr(args, "common_atk_range", None)
+    if cr is not None:
+        eff_ok = _num_eq(atk.get("attack_range"), cr)
+        rows.append(("common_atk_range", cr, data.get("attack_range"),
+                     "attack_range", atk.get("attack_range"),
+                     _num_eq(data.get("attack_range"), cr), eff_ok))
+        if not eff_ok:
+            bad.append("common_atk_range")
+
+    if not rows:
+        return
+    print("\n🔎 回读校验（请求值 vs 落盘值）")
+    for attr_name, want, got, eff_key, eff, ok, eff_ok in rows:
+        mark = "✅" if (ok and eff_ok) else "⚠️"
+        eff_txt = "" if eff_key is None else f"｜实际生效 simple_common_atk.{eff_key}={eff}"
+        print(f"   {mark} {attr_name}: 请求={want} 落盘={got}{eff_txt}")
+    if bad:
+        print("\n⚠️ 以下字段与请求值不一致，编辑器里可能看不到预期效果：" + ", ".join(bad))
+        print("   排查：① 是否被模板默认值覆盖（用 -edit 二次应用）；② 真正生效的字段是否在 simple_common_atk 内。")
+    else:
+        print("   ✅ 全部一致")
+
+
 def apply_unit_attributes(data: dict, args: argparse.Namespace, unit_id: int = None, map_path: str = None):
     """应用单位属性到数据"""
     for attr_name, attr_type in UNIT_ATTRIBUTES.items():
@@ -352,6 +518,8 @@ def apply_unit_attributes(data: dict, args: argparse.Namespace, unit_id: int = N
         if value is not None:
             if attr_type == "tuple":
                 data[attr_name] = parse_tuple_string(value)
+            elif attr_type == "json":
+                data[attr_name] = {"__tuple__": True, "items": json.loads(value)}
             elif attr_name in ("name", "description"):
                 # 名称和描述需要更新多语言文件
                 if map_path and unit_id:
@@ -364,15 +532,12 @@ def apply_unit_attributes(data: dict, args: argparse.Namespace, unit_id: int = N
                         data["description"] = desc_tid
             else:
                 data[attr_name] = attr_type(value)
+    if getattr(args, "unit_type", None) is not None:
+        data["type"] = int(args.unit_type)
 
-    # 特殊处理：common_atk_range 同步写入 simple_common_atk.attack_range（实际战斗射程）
-    common_atk_range = getattr(args, "common_atk_range", None)
-    if common_atk_range is not None:
-        rng = float(common_atk_range)
-        data["attack_range"] = rng  # 根级也同步
-        if "simple_common_atk" in data and isinstance(data["simple_common_atk"], dict):
-            data["simple_common_atk"]["attack_range"] = rng
-            print(f"   ↳ 同步更新 simple_common_atk.attack_range = {rng}")
+    # 特殊处理：根级字段同步进 simple_common_atk（真正生效的普攻技能字段）
+    for line in sync_simple_common_atk(data, args):
+        print(line)
 
 
 def create_unit(args: argparse.Namespace):
@@ -414,12 +579,21 @@ def create_unit(args: argparse.Namespace):
         if value is not None:
             if attr_type == "tuple":
                 data[attr_name] = parse_tuple_string(value)
+            elif attr_type == "json":
+                data[attr_name] = {"__tuple__": True, "items": json.loads(value)}
             else:
                 data[attr_name] = attr_type(value)
-    
+    if getattr(args, "unit_type", None) is not None:
+        data["type"] = int(args.unit_type)
+
+    # 普攻有效字段同步（-common_atk_range 不在 UNIT_ATTRIBUTES 里，必须在这里补）
+    for line in sync_simple_common_atk(data, args):
+        print(line)
+
     # 保存
     save_unit_json(args.map, unit_id, data)
-    
+    verify_unit_saved(args.map, unit_id, args)
+
     return unit_id
 
 
@@ -437,7 +611,9 @@ def edit_unit(args: argparse.Namespace):
     
     # 保存
     save_unit_json(args.map, unit_id, data)
-    
+
+    verify_unit_saved(args.map, unit_id, args)
+
     return unit_id
 
 
@@ -797,21 +973,28 @@ def create_modifier(args: argparse.Namespace):
     if desc_tid:
         data["description"] = desc_tid
     
-    # 应用可选属性（排除 name 和 description，因为已经处理过）
-    for attr_name, attr_type in MODIFIER_ATTRIBUTES.items():
-        if attr_name in ("name", "description", "modifier_icon"):
-            continue
-        value = getattr(args, attr_name, None)
-        if value is not None:
-            if attr_type == "tuple_int":
-                data[attr_name] = parse_tuple_int_array(value)
-            elif attr_type == bool:
-                data[attr_name] = value.lower() in ("true", "1", "yes") if isinstance(value, str) else bool(value)
-            else:
-                data[attr_name] = attr_type(value)
+    # 走与 -edit 相同的属性应用逻辑，避免 create / edit 两套代码漂移。
+    apply_modifier_attributes(data, args, modifier_id, args.map)
     
     # 保存
     save_modifier_json(args.map, modifier_id, data)
+
+    # 回读关键字段。物编热更/保存时若模板覆盖了新对象，这里能第一时间暴露。
+    saved = load_modifier_json(args.map, modifier_id)
+    print("🔎 回读校验（魔法效果关键字段）")
+    for key in ("modifier_type", "modifier_effect", "shield_value", "shield_type", "layer_max"):
+        print(f"   {key}: {saved.get(key)}")
+    if getattr(args, "shield_value", None) is not None:
+        try:
+            expected = float(args.shield_value)
+            actual = float(saved.get("shield_value", 0) or 0)
+            if abs(expected - actual) > 1e-6:
+                print(
+                    f"   ⚠️ shield_value 请求={expected} 落盘={actual}；"
+                    f"请在热更/保存后再执行一次 -edit {modifier_id} -shield_value {expected}"
+                )
+        except (TypeError, ValueError):
+            pass
     
     return modifier_id
 
@@ -979,6 +1162,34 @@ def edit_projectile(args: argparse.Namespace):
 # 主函数
 # ============================================================================
 
+_OBJECT_TABLE = {
+    "unit": "editorunit",
+    "ability": "abilityall",
+    "item": "editoritem",
+    "modifier": "modifierall",
+    "projectile": "projectileall",
+}
+
+
+def delete_object(args: argparse.Namespace):
+    """删除物编文件，并保留一份备份。"""
+    object_id = str(args.delete).strip()
+    table = _OBJECT_TABLE[args.type]
+    object_path = os.path.join(args.map, "editor_table", table, f"{object_id}.json")
+    if not os.path.isfile(object_path):
+        raise FileNotFoundError(f"物编文件不存在: {object_path}")
+
+    backup_dir = os.path.join(args.map, ".deleted_object_backup")
+    os.makedirs(backup_dir, exist_ok=True)
+    backup_path = os.path.join(backup_dir, f"{table}_{object_id}.json")
+    shutil.copy2(object_path, backup_path)
+    os.remove(object_path)
+    print(f"🗑️ 已删除物编: {object_path}")
+    print(f"   备份: {backup_path}")
+    print("⚠️ 编辑器内存里可能仍保留该物编；请立刻 restart_editor(save_before_restart=false)，")
+    print("   并在那之前不要 save_editor，否则它会被写回磁盘。")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Y3 物编编辑脚本")
     
@@ -989,6 +1200,7 @@ def main():
     # 操作模式（二选一）
     parser.add_argument("-create", help="创建物编 (unit: ID,名称,类型,模型ID,头像ID; 其他: ID,名称,图标ID)")
     parser.add_argument("-edit", help="编辑物编：物编ID")
+    parser.add_argument("-delete", help="删除物编：物编ID（会备份到 maps/<地图>/.deleted_object_backup/）")
     
     # 收集所有已注册的参数名
     registered_attrs = set()
@@ -1002,6 +1214,7 @@ def main():
             parser.add_argument(f"-{attr_name}", type=int, help=f"[单位] {attr_name}")
         else:
             parser.add_argument(f"-{attr_name}", type=str, help=f"[单位] {attr_name}")
+    parser.add_argument("-unit_type", type=int, help="[单位] 单位分类（1=英雄，2=建筑，4=小怪）")
 
     # 单位特殊参数：同时更新 simple_common_atk.attack_range（实际战斗射程）
     parser.add_argument("-common_atk_range", type=float,
@@ -1069,14 +1282,18 @@ def main():
     args.map = resolve_map_path(args.map)
     
     # 验证操作模式
-    if not args.create and not args.edit:
-        parser.error("必须指定 -create 或 -edit 参数")
-    
-    if args.create and args.edit:
-        parser.error("-create 和 -edit 不能同时使用")
+    modes = [x for x in (args.create, args.edit, args.delete) if x]
+    if not modes:
+        parser.error("必须指定 -create、-edit 或 -delete 参数")
+    if len(modes) > 1:
+        parser.error("-create / -edit / -delete 不能同时使用")
     
     # 执行操作
     try:
+        if args.delete:
+            delete_object(args)
+            print("✅ 操作完成！")
+            return
         if args.type == "unit":
             if args.create:
                 create_unit(args)

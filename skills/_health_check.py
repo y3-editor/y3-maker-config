@@ -2,6 +2,7 @@
 # 用法：py -3 .codemaker/skills/_health_check.py
 # 输出：stdout 报告
 
+import glob
 import os
 import re
 from pathlib import Path
@@ -12,6 +13,8 @@ SKILLS_DIR = PROJECT_ROOT / "skills"
 RULES_DIR = PROJECT_ROOT / "rules"
 MEMORY_DIR = PROJECT_ROOT / "memory"
 TEMPLATES_DIR = PROJECT_ROOT / "templates"
+# 注意：PROJECT_ROOT 指的是 `.codemaker/` 本身（历史命名），工程根在它上一级。
+WORKSPACE_ROOT = PROJECT_ROOT.parent
 
 NOW = datetime.now().strftime("%Y%m%d")
 
@@ -201,6 +204,60 @@ def check_lua_issues():
     return issues
 
 
+# ── 8. 工程 JSON 字节格式 ───────────────────────
+def check_project_json_format():
+    """工程 JSON 的字节级硬规则（实测校准）。
+
+    为什么要查：工程 JSON 写坏时编辑器**保存失败**，报错只有一行摘要、真栈埋在编辑器日志里，
+    排查一次很贵（曾把 logicres.json 写坏过一次）。
+
+    硬规则只有一条：**无 UTF-8 BOM**（全工程无例外）。
+    「末尾没有换行符」与「同目录行尾不混用」只提示不判失败 —— 引擎自带的地图 JSON 里就有
+    带末尾换行的（GameHUD/LoadingPanel/loss/win 等官方画板），它们被编辑器正常读取；
+    按「引擎预制信任原则」不假设引擎的文件是错的，只在有人**自己写**工程 JSON 时给出提醒。
+    """
+    issues = []
+    bom_files, trailing_files = [], []
+    endings = {}   # dir -> {"lf": n, "crlf": n}
+    maps_dir = WORKSPACE_ROOT / "maps"
+    if not maps_dir.is_dir():
+        return ["maps/ 目录不存在（工程根不对？）"]
+
+    for fpath in glob.glob(str(maps_dir / "**" / "*.json"), recursive=True):
+        if fpath.endswith(".bak"):
+            continue
+        rel = os.path.relpath(fpath, WORKSPACE_ROOT)
+        try:
+            with open(fpath, "rb") as f:
+                raw = f.read()
+        except OSError as exc:
+            issues.append(f"{rel}: 读不了（{exc}）")
+            continue
+        if raw.startswith(b"\xef\xbb\xbf"):
+            bom_files.append(rel)
+        if raw.endswith(b"\n"):
+            trailing_files.append(rel)
+        bucket = endings.setdefault(os.path.dirname(rel), {"lf": 0, "crlf": 0})
+        bucket["crlf" if b"\r\n" in raw else "lf"] += 1
+
+    if bom_files:
+        issues.append(f"带 UTF-8 BOM 的文件 {len(bom_files)} 个（编辑器口径是无 BOM）："
+                      + "、".join(sorted(bom_files)[:5])
+                      + ("…" if len(bom_files) > 5 else ""))
+    if trailing_files:
+        print(f"  INFO 末尾带换行的文件 {len(trailing_files)} 个（自己写工程 JSON 时建议对齐"
+              f"编辑器口径：无末尾换行）：{'、'.join(sorted(trailing_files)[:5])}"
+              + ("…" if len(trailing_files) > 5 else ""))
+    # 行尾混用只提示不判失败：工程里 `maps/<地图>/editor/` 就有两个引擎自己写的 LF 文件
+    # （randomdecogroupinfo / tableeditorgroupinfo），其余是 CRLF —— 引擎预制内容不假设它错。
+    mixed = [d for d, b in sorted(endings.items()) if b["lf"] and b["crlf"]]
+    if mixed:
+        print(f"  INFO 同一目录内行尾混用（LF + CRLF）：{'、'.join(mixed[:5])}"
+              + ("…" if len(mixed) > 5 else "")
+              + "；自己生成的目录要对齐口径（open(..., newline='\\n')）")
+    return issues
+
+
 def main():
     print("=" * 60)
     print(f"  Y3 Agent Health Check — {datetime.now().strftime('%Y-%m-%d %H:%M')}")
@@ -214,6 +271,7 @@ def main():
         ("Dead links", check_dead_links),
         ("Template ReadMe", check_template_readme),
         ("Lua Issues", check_lua_issues),
+        ("Project JSON format", check_project_json_format),
     ]
 
     all_ok = True

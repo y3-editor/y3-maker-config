@@ -70,7 +70,8 @@
 ```
 
 > **⚠️ 坐标精度要求**：桥梁坐标 `(x, z)` **必须落在 `water_map.txt` 中标记为 `W` 的格子上**。请对照 `water_map.txt` 验证每座桥的坐标——如果 `water_map.txt` 中 `(x, z)` 处不是 `W`，请调整坐标到最近的 `W` 格子。
-> **yaw 字段（可选）**：桥梁朝向角度，0=朝北（南北向），90=朝东（东西向），顺时针为正。脚本会自动推算最佳 yaw，AI 给的 yaw 仅作为参考 fallback。
+> **yaw 字段（可选）**：桥梁朝向角度（度），0=朝北（南北向），90=朝东（东西向），顺时针为正。脚本会自动推算最佳 yaw，AI 给的 yaw 仅作为参考 fallback；输出 entity 时脚本会转成弧度。
+> **桥高参数**：`decoration_postprocess.py --bridge-relative-height <米>`，默认 0 表示贴脚下地形；跨水桥需实测水面/河床高度后传入。
 > 保存为 `bridge_positions.json`。
 
 ---

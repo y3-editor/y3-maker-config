@@ -13,7 +13,7 @@
 |------|------|
 | 等级 | **C** |
 | 名称 | 属性显示面板 |
-| 路径 | `.codemaker/templates/c-attr-display-panel/` |
+| 路径 | `<agent>/templates/c-attr-display-panel/` |
 | 状态 | `validated` |
 | 版本 | `v0.2.0` |
 | 能力标签 | `attr-display`, `stat-panel`, `grid-view`, `auto-refresh`, `rpg-hud`, `zero-prefab` |

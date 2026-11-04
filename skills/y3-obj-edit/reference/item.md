@@ -1,9 +1,9 @@
 ﻿# 物品脚本参数参考（Item）
 
-本文只说明 `.codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py` 当前对 `-type item` 实际处理的脚本参数。
-完整物品物编字段、字段语义和更细枚举请参考：`.codemaker/knowledge/物编系统/07-物品.md`（相对链接：[`../../../knowledge/物编系统/07-物品.md`](../../../knowledge/物编系统/07-物品.md)）。
+本文只说明 `<agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py` 当前对 `-type item` 实际处理的脚本参数。
+完整物品物编字段、字段语义和更细枚举请参考：`<agent>/knowledge/物编系统/07-物品.md`（相对链接：[`../../../knowledge/物编系统/07-物品.md`](../../../knowledge/物编系统/07-物品.md)）。
 
-- 对应脚本：`.codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py`
+- 对应脚本：`<agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py`
 - 对应类型：`-type item`
 
 
@@ -55,10 +55,10 @@
 
 ```bash
 # 创建物品
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type item -create "500001,生命药水,100000" [字段参数...]
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type item -create "500001,生命药水,100000" [字段参数...]
 
 # 编辑已有物品
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type item -edit 500001 [字段参数...]
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type item -edit 500001 [字段参数...]
 ```
 
 ## 创建参数格式
@@ -149,13 +149,13 @@ py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -t
 
 ```bash
 # 创建可堆叠消耗品
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type item -create "500001,生命药水,100000" -level 1 -maximum_stacking 10 -cur_stack 1 -use_consume 1 -discard_enable true
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type item -create "500001,生命药水,100000" -level 1 -maximum_stacking 10 -cur_stack 1 -use_consume 1 -discard_enable true
 
 # 创建装备并附加攻击力和生命
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type item -create "510001,勇气长剑,100010" -level 3 -attached_attack_phy "50,0,0,0,0" -attached_hp_max 200 -sale_enable true
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type item -create "510001,勇气长剑,100010" -level 3 -attached_attack_phy "50,0,0,0,0" -attached_hp_max 200 -sale_enable true
 
 # 编辑已有物品绑定技能
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type item -edit 510001 -attached_ability "100001001" -attached_passive_abilities "100001101,100001102"
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type item -edit 510001 -attached_ability "100001001" -attached_passive_abilities "100001101,100001102"
 ```
 
 

@@ -6,7 +6,7 @@
 |------|------|
 | 等级 | **B** |
 | 名称 | 区域单位选择器（缓存版） |
-| 路径 | `.codemaker/templates/b-selector-cache/` |
+| 路径 | `<agent>/templates/b-selector-cache/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `selector`, `area`, `unit`, `cache`, `range`, `enemy`, `distance` |

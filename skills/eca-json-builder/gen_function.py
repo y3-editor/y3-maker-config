@@ -17,6 +17,10 @@ DSL format:
     }
   ]
 }
+
+`actions` 可选：直接写 ECA 动作 DSL（与全局触发器 `action` 同语法），
+复用 `gen_trigger.build_action_list` 编译。函数会按「`lua_bind` 生成的赋值动作 +
+`actions`」的顺序拼接。`actions` 里引用的局部变量会自动登记进 `var_data`。
 """
 from __future__ import annotations
 
@@ -29,6 +33,8 @@ import uuid
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 
 ARG_TYPE_ID = {
@@ -66,9 +72,13 @@ DEFAULTS_BY_TYPE = {
     "STRING": "",
     "BOOLEAN": False,
     "FLOAT": 0.0,
+    "INTEGER": 0,
     "ANGLE": 0.0,
     "NEW_TIMER": -1,
     "TABLE": None,
+    # POINT 必须给 3 个分量，否则 save 时 EType.FPoint.to_value() 会抛
+    # TypeError: 'int' object is not subscriptable，整次保存中断。
+    "POINT": [0, 0, 0],
 }
 
 VARIABLE_READ_SUBTYPE = {
@@ -205,7 +215,7 @@ def normalize_returns(spec):
     return returns
 
 
-def build_var_data(params, returns):
+def build_var_data(params, returns, extra_vars=None):
     by_type = {"NEW_TIMER": {}}
     by_name = {}
     names = []
@@ -222,7 +232,43 @@ def build_var_data(params, returns):
         add_var(param["name"], param["type"])
     for ret in returns:
         add_var(ret["var"], ret["type"])
+    for name, vtype in (extra_vars or {}).items():
+        add_var(name, vtype)
     return [by_type, by_name, names]
+
+
+def collect_action_variables(actions):
+    """收集 actions DSL 里引用的局部变量（name -> type）。"""
+    found = {}
+
+    def walk(value):
+        if isinstance(value, dict):
+            if "var" in value and value.get("scope", "local") != "global":
+                found.setdefault(value["var"], value.get("type", "UNIT_ENTITY"))
+            for sub in value.values():
+                walk(sub)
+        elif isinstance(value, list):
+            for sub in value:
+                walk(sub)
+
+    walk(actions or [])
+    return found
+
+
+def build_actions(spec, eid_gen):
+    """把 DSL 动作编译成编辑器口径的动作列表。"""
+    actions = spec.get("actions") or []
+    if not actions:
+        return []
+    import gen_trigger  # 延迟导入：常见路径（纯 lua_bind 函数）不需要索引
+
+    idx_data = gen_trigger.load_index()
+    try:
+        return gen_trigger.build_action_list(actions, idx_data, eid_gen)
+    except Exception as exc:  # noqa: BLE001
+        raise ValueError(
+            "function '%s' 的 actions 编译失败：%s" % (spec.get("name", "?"), exc)
+        ) from exc
 
 
 def build_lua_bind_actions(spec, params, returns, eid_gen):
@@ -271,8 +317,10 @@ def build_function(spec, map_name):
     if not isinstance(func_id, str) or len(func_id) != 32 or any(c not in "0123456789abcdef" for c in func_id):
         raise ValueError(f"function '{spec['name']}' func_id must be 32 lowercase hex characters")
 
+    lua_actions = build_lua_bind_actions(spec, params, returns, eid_gen)
+    custom_actions = build_actions(spec, eid_gen)
     function = {
-        "action": build_lua_bind_actions(spec, params, returns, eid_gen),
+        "action": lua_actions + custom_actions,
         "call_enabled": bool(spec.get("call_enabled", True)),
         "condition": [],
         "enabled": bool(spec.get("enabled", True)),
@@ -289,7 +337,8 @@ def build_function(spec, map_name):
         "trigger_id": trigger_id,
         "trigger_name": spec["name"],
         "valid": bool(spec.get("valid", True)),
-        "var_data": build_var_data(params, returns),
+        "var_data": build_var_data(params, returns,
+                                   collect_action_variables(spec.get("actions"))),
     }
     if params:
         function["func_param_list"] = [tuple_node(param["name"], param["required"]) for param in params]

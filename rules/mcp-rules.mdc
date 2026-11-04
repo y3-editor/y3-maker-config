@@ -35,6 +35,30 @@ y3editor.hotfix_ui_editor
 y3editor.save_editor  ← 没有等待，可能数据不完整！
 ```
 
+## 📥 import_eca（触发器导入）串行与保存时序（强制）
+
+> 以下三条都与 `save_editor` 的「以编辑器内存为准写回」有关。
+
+### 三条硬规则
+
+| 规则 | 现象（踩过的坑） | 正确做法 |
+|------|----------------|---------|
+| **批量新增：先全部 import，再统一保存** | 中途保存时，**磁盘上存在但没 import 过**的触发器文件会被删除，`index.txt` 条目被清掉（`save_editor` 以编辑器内存为准裁剪） | ①先 `save_editor` 落盘编辑器当前修改 → ②生成全部文件 → ③逐个 `import_eca` → ④等 3 秒 → `save_editor` |
+| **保存后等 1~3 秒再 import** | `import_eca` 返回的不是 JSON（`payload=None`）、触发器没进编辑器，随后被裁剪 | 保存与导入之间留一拍；**必须校验 `success=true`**，否则显式报错（`verify_trigger.import_trigger()` 已内置） |
+| **删除触发器要连编辑器内存一起清** | 只删磁盘文件 + index，编辑器下次保存会把它**原样恢复**（俗称“复活”） | `edit_trigger.py --delete` 之后补 `restart_editor(save_before_restart=false)` |
+
+### 一键闭环（推荐，省掉手工时序）
+
+```bash
+py -3 <agent>/skills/eca-json-builder/verify_trigger.py "触发器名"
+py -3 <agent>/skills/eca-json-builder/verify_trigger.py --all
+```
+
+### 后果与恢复（`restart_editor(save_before_restart=false)` 之后）
+
+`save_before_restart=false` 会把编辑器地图会话搞脏，之后用 y3helper 启动游戏会**卡在 loading、客户端连接超时**；
+必须再补一次默认的 `restart_editor(save_before_restart=true)` 恢复会话。
+
 ## 📥 import_ui 串行约束（强制）
 
 > ⚠️ **`import_ui` 调用必须严格串行，且每次必须用户手动确认导入完成后才能进行后续操作！**
@@ -109,15 +133,18 @@ IndexError: list index out of range
 | `hotfix_ui_editor` | 热更 UI | 修改 UI JSON 后调用 |
 | `hotfix_object_editor` | 热更物编 | 修改物编 JSON 后调用 |
 | `save_editor` | 保存 | 热更后等待 3 秒再调用 |
+| `import_eca` | 导入触发器 JSON | **串行**导入；必须校验返回 `success=true`；批量时先全部导入再统一保存，保存后等 1~3 秒再导入下一个（详见 §import_eca 串行与保存时序） |
 | `import_ui` | 导入 .upui | **必须用户手动确认完成后才能继续，详见 §import_ui 串行约束** |
 | `import_object_editor` | 导入物编 | 同上，需用户确认 |
 | `get_editor_log` | 获取编辑器日志 | 调试用 |
 | `download_editor_*_resource` | 下载资源 | 模型/特效/图标/声音，批量 ID 列表 |
 | `import_editor_icon` | 导入本地图片为图标 | 支持 png/jpg/tga/bmp/dds/webp |
-| `import_editor_fbx_model` | 导入 FBX 模型 | 绝对路径 |
+| `import_editor_fbx_model` | 导入 FBX 模型 | 绝对路径；建议传 `resource_map_json` 绑定贴图/动画/材质球 |
 | `import_mdx` | 导入 MDX 模型 | 需提供 war3_path |
-| `get_official_editor_*` | 查询官方资源 | 按 ID 查模型/特效/图标/声音详情 |
-| `get_official_resource_associate_match` | 素材联想 | 按 ID + 类型查配套资源 |
+| `get_official_editor_*` | 查询官方资源 | 按 ID 查模型/特效/图标/声音详情；**声音额外返回 `时长`（毫秒）** |
+| `get_official_resource_associate_match` | 素材联想 | 按 ID + 类型查配套资源（声音条目同样带 `时长`） |
+| `get_model_animations` | 查模型动作列表与时长 | `model_id`（必填）+ `remove_after`（可选）：返回动作名 → 时长（毫秒）。⚠️ 动作信息不在模型表里，工具会把模型加载进资产预览控件再读引擎实例（**约 0.6~1s/次，无批量接口**），模型资源需已下载（商店模型先用 `download_editor_model_resource`），静态模型返回空表。`ok:false` = 加载失败（超时/控件未切到目标模型，看 `errors`），**不会返回别的模型的动作**；模型 id 不存在会兜底成空模型（`ok:true` + `count:0`），用前核对 id |
+| `get_model_import_materials` | 查询内置材质球 | 无参；返回 FBX 导入可选材质球清单，配合 resource_map_json 的 `material` 字段使用 |
 
 ## 🔄 游戏启动后刷新 y3runtime MCP 连接
 

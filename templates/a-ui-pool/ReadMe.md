@@ -6,7 +6,7 @@
 |------|------|
 | 等级 | **A** |
 | 名称 | 通用 UI/组件对象池 |
-| 路径 | `.codex/templates/a-ui-pool/` |
+| 路径 | `<agent>/templates/a-ui-pool/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `pool`, `reuse`, `ui-object-pool`, `performance` |

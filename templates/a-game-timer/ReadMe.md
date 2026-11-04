@@ -6,7 +6,7 @@
 |------|------|
 | 等级 | **A** |
 | 名称 | 三层时间轴回调调度器 |
-| 路径 | `.codemaker/templates/a-game-timer/` |
+| 路径 | `<agent>/templates/a-game-timer/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `timer`, `clock`, `frame`, `second`, `minute`, `global-timer`, `game-timer` |
@@ -69,7 +69,7 @@ M.setup({
 
 ```lua
 -- 在 main.lua 或 init.lua 中
-local GameTimer = include '.codemaker.templates.a-game-timer.logic'
+local GameTimer = include '<agent>.templates.a-game-timer.logic'
 
 -- 全局 timer（UI / 菜单 / 签到 用）
 MyGame.globalTimer = GameTimer.setup({ ltimer = y3.ltimer, name = "global" })

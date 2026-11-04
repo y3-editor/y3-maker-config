@@ -11,7 +11,7 @@
 | 字段 | 内容 |
 |------|------|
 | 名称 | 贝塞尔弹道模板 |
-| 路径 | `.codemaker/templates/a-bezier-trajectory/` |
+| 路径 | `<agent>/templates/a-bezier-trajectory/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `trajectory`, `projectile`, `bezier` |

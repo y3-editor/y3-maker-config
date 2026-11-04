@@ -50,7 +50,7 @@ Y3 JSON 使用 **特殊的 tuple 嵌套格式**：
 
 | 操作类型 | 正确入口 |
 |---------|---------|
-| 物编（创建/修改字段值） | `y3-obj-edit` 脚本：`py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py ...` |
+| 物编（创建/修改字段值） | `y3-obj-edit` 脚本：`py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py ...` |
 | 物编（特效/模型挂接等复杂字段） | **打开 Y3 编辑器手动配置 → MCP `hotfix_object_editor` + `save_editor`** |
 | UI 节点 | `y3-ui-pipeline` |
 | 场景逻辑节点（点/路径/区域） | MCP `add_point` / `add_point_path` / `add_rect_area` / `add_circle_area` |

@@ -6,7 +6,7 @@
 |------|------|
 | 等级 | **B** |
 | 名称 | 单位动画播放+帧事件调度 |
-| 路径 | `.codemaker/templates/b-anim-helper/` |
+| 路径 | `<agent>/templates/b-anim-helper/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.1` |
 | 能力标签 | `animation`, `frame-event`, `cast`, `skill`, `action-frame` |

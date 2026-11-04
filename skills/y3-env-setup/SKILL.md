@@ -5,12 +5,12 @@ description: >
   
   此 Skill 为一次性使用，完成后会创建标记文件，后续会话自动跳过。
   
-  检测条件：<codemaker>/env_setup_done 文件不存在时自动触发
+  检测条件：<agent>/env_setup_done 文件不存在时自动触发
 ---
 
 # Y3 环境配置助手（一次性）
 
-> ⚠️ **一次性 Skill**：完成后创建 `<codemaker>/env_setup_done` 标记，后续不再执行。
+> ⚠️ **一次性 Skill**：完成后创建 `<agent>/env_setup_done` 标记，后续不再执行。
 
 ## 🎯 功能说明
 
@@ -24,7 +24,7 @@ description: >
 ### Step 1: 智能检测环境状态
 
 ```
-1. 检查 <codemaker>/env_setup_done 是否存在
+1. 检查 <agent>/env_setup_done 是否存在
    ├─ 存在 → ✅ 跳过，继续处理用户请求
    └─ 不存在 → 继续检查步骤 2
 
@@ -92,11 +92,11 @@ description: >
 **跳过标记内容：**
 
 ```bash
-echo Environment setup SKIPPED by user on %DATE% %TIME% > <codemaker>\env_setup_done
-echo Status: SKIPPED >> <codemaker>\env_setup_done
+echo Environment setup SKIPPED by user on %DATE% %TIME% > <agent>\env_setup_done
+echo Status: SKIPPED >> <agent>\env_setup_done
 ```
 
-> 💡 用户选择跳过后，如需重新配置，删除 `<codemaker>/env_setup_done` 文件即可。
+> 💡 用户选择跳过后，如需重新配置，删除 `<agent>/env_setup_done` 文件即可。
 
 ### Step 3: 环境检测（每步向用户播报进度）⭐
 
@@ -249,12 +249,12 @@ git checkout 1.0
 所有检查通过后，创建标记文件：
 
 ```bash
-echo Environment setup completed on %DATE% %TIME% > <codemaker>\env_setup_done
-echo Status: OK >> <codemaker>\env_setup_done
-echo Python: OK >> <codemaker>\env_setup_done
-echo Git: OK >> <codemaker>\env_setup_done
-echo y3-lualib: OK >> <codemaker>\env_setup_done
-echo AutoSave: DISABLED >> <codemaker>\env_setup_done
+echo Environment setup completed on %DATE% %TIME% > <agent>\env_setup_done
+echo Status: OK >> <agent>\env_setup_done
+echo Python: OK >> <agent>\env_setup_done
+echo Git: OK >> <agent>\env_setup_done
+echo y3-lualib: OK >> <agent>\env_setup_done
+echo AutoSave: DISABLED >> <agent>\env_setup_done
 ```
 
 > ⚠️ **重要**：必须包含 `AutoSave: DISABLED` 标记，这是版本检查的依据。
@@ -275,7 +275,7 @@ echo AutoSave: DISABLED >> <codemaker>\env_setup_done
 ║    └─ 初始化脚本: ✅ 已执行                                   ║
 ║    └─ VSCode 插件: sumneko.y3-helper                         ║
 ╠══════════════════════════════════════════════════════════════╣
-║ 标记文件已创建：<codemaker>/env_setup_done                     ║
+║ 标记文件已创建：<agent>/env_setup_done                     ║
 ║ 后续会话将跳过环境检查。                                       ║
 ╚══════════════════════════════════════════════════════════════╝
 ```
@@ -312,7 +312,7 @@ y3-lualib 提供了演示代码，可用于学习：
 如果需要重新执行环境配置，删除标记文件即可：
 
 ```bash
-del <codemaker>\env_setup_done
+del <agent>\env_setup_done
 ```
 
 然后在新会话中 AI 会自动重新检查环境。

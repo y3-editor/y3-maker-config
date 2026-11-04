@@ -43,7 +43,7 @@ Y3 游戏编辑器地图工程，使用 **y3-lualib** 框架。
 
 > ⚠️ **版本兼容**：旧版本 env_setup_done 没有 AutoSave 标记，会触发一次性补丁操作。
 
-> 📋 **健康检查**（可选）：`py -3 .codemaker/skills/_health_check.py` 检查 U+FFFD、SKILL 段落、死链、references 行数、rules 索引一致性。建议每次 distill 后跑一次。
+> 📋 **健康检查**（可选）：`py -3 <agent>/skills/_health_check.py` 检查 U+FFFD、SKILL 段落、死链、references 行数、rules 索引一致性。建议每次 distill 后跑一次。
 
 ### 用户可见入口（唯一推荐入口）
 
@@ -62,6 +62,8 @@ Y3 游戏编辑器地图工程，使用 **y3-lualib** 框架。
 | `y3-obj-edit` | 物编 CRUD（单位/技能/Buff/物品/投射物） | y3-game-spec Phase 1 |
 | `y3-ui-pipeline` | UI 完整工作流（JSON + 节点树） | y3-game-spec Phase 2 |
 | `y3-ui-generator` | UI JSON 生成（HTML → Y3 JSON），不单独暴露给用户 | y3-ui-pipeline 内部 |
+| `y3-eca-pipeline` | 纯 ECA 开发的唯一入口（触发器 / ECA 函数 / ECA 变量） | y3-game-spec Phase 3/4；内部调用 `eca-json-builder` |
+| `eca-json-builder` | ECA 生成器脚本 / DSL / 参数类型 / 运行时陷阱（内部实现） | y3-eca-pipeline 内部 |
 | `y3-lua-pipeline` | 所有 Lua 代码（游戏逻辑 + UI 交互） | y3-game-spec Phase 3/4 |
 | `y3-lua-review` | Lua 代码审查 | y3-game-spec Phase 5 |
 | `y3-auto-test` | 自动化测试执行 | y3-game-spec Phase 6 |
@@ -73,7 +75,7 @@ Y3 游戏编辑器地图工程，使用 **y3-lualib** 框架。
 > ⚠️ **关键原则**：
 > 1. 终端用户一般只感知 `y3-game-spec` 一个入口
 > 2. 专业用户（L3）可直接调用单个子技能（如 "帮我只审查一下 Lua"），不强制走 y3-game-spec
-> 3. 所有 Lua 代码必须通过 `y3-lua-pipeline`，所有 UI 必须通过 `y3-ui-pipeline`，不可绕过
+> 3. 所有 Lua 代码必须通过 `y3-lua-pipeline`，所有 UI 必须通过 `y3-ui-pipeline`，所有 ECA 触发器 / ECA 函数 / ECA 变量必须通过 `y3-eca-pipeline`，不可绕过
 
 ## 🏭 编辑器预制系统信任原则
 
@@ -180,12 +182,13 @@ y3.const.KeyboardKey['1']
 
 ---
 
-## 🔗 `.codemaker` 路径解析规则
+## 🔗 `<agent>` 路径前缀规则
 
-文档中出现的 `.codemaker/` 路径前缀**不代表硬编码目录名**，而是代指**当前配置目录**：
+文档中出现的 `<agent>/` 路径前缀**不代表硬编码目录名**，而是代指**当前配置目录**：
 - 默认目录名为 `.codemaker`，外放版本可能为 `.y3maker`
-- AI 在执行 Shell 命令时，**必须先通过 `list_files_top_level` 检查项目根目录，确认实际配置目录名**（`.codemaker` 或 `.y3maker`），再拼接路径
-- 文档内交叉引用（如 `skills/xxx/SKILL.md`）使用相对路径，不依赖 `.codemaker` 前缀
+- 全仓文档统一使用 `<agent>/`，**不得**再混用 `.codemaker/` 或 `<codemaker>` 等旧写法
+- AI 在执行 Shell 命令时，**必须先通过 `list_files_top_level` 检查项目根目录，确认实际配置目录名**（`.codemaker` 或 `.y3maker`），再把 `<agent>/` 替换为该目录名，然后拼接路径
+- 文档内交叉引用（如 `skills/xxx/SKILL.md`）使用相对路径，不依赖 `<agent>` 前缀
 
 > Python 脚本中已通过 `__file__` 相对解析或 `_find_config_dir()` 探测实现目录名无关。
 

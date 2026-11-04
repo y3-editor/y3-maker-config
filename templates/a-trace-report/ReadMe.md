@@ -6,7 +6,7 @@
 |------|------|
 | 等级 | **A** |
 | 名称 | HTTP 上报通道（错误上报 + BI 埋点） |
-| 路径 | `.codemaker/templates/a-trace-report/` |
+| 路径 | `<agent>/templates/a-trace-report/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `report`, `trace`, `error`, `http`, `webhook`, `analytics`, `cooldown` |

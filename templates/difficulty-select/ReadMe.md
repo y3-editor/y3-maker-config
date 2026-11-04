@@ -8,7 +8,7 @@
 |------|------|
 | 等级 | **A** |
 | 名称 | 难度选择模板 |
-| 路径 | `.codemaker/templates/difficulty-select/` |
+| 路径 | `<agent>/templates/difficulty-select/` |
 | 状态 | `validated` |
 | 文档版本 | `v1.1.1` |
 | Lua 版本 | `logic.lua v0.3.0` |

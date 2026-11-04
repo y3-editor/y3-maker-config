@@ -1,11 +1,11 @@
 ﻿# Y3 Skills 索引（进阶文档）
 
 > 📘 **本文档面向专业用户 / 开发者**，用于深入了解各子技能、直接调用单个技能、或做产品定制。
-> 🆕 **新手用户请从 [USER_GUIDE.md](../../USER_GUIDE.md) 开始**，只需要记住一个入口：`y3-game-spec`。
+> 🆕 **新手用户请直接从 `y3-game-spec` 开始**，只需要记住一个入口。
 >
 > AI 技能路由入口。按需加载 `SKILL.md`，避免 token 浪费。
 
-**最后更新**: 2026-04-21
+**最后更新**: 2026-10-21
 
 ## 🚀 一次性技能（自动触发）
 
@@ -31,11 +31,17 @@
 | 用户表述 | 技能 | 输出格式 | 依赖/子技能 | 关键命令/目录 |
 |----------|------|----------|-------------|---------------|
 | "查询/生成/修改单位/物品/技能/Buff/投射物" | **y3-obj-edit** | JSON / MCP查询结果 | MCP y3editor | `editor_table/` |
+| "导入/下载/查询资源（模型/特效/图标/声音）、导入模型贴图动画材质" | **y3-resource-import** | resource_map JSON / MCP 查询结果 | MCP y3editor | `<agent>/skills/y3-resource-import/` |
 | "做个UI/面板/界面/HUD/血条/技能栏" | **y3-ui-pipeline** ⭐ | JSON + Lua | → y3-ui-generator, y3-lua-pipeline | - |
 | "写Lua逻辑代码" | **y3-lua-pipeline** | Lua | - | `script/` |
 | "审查/review 已有 Lua 代码" | **y3-lua-review** | 审查报告 + 自动修复 | - | `script/` |
 | "自动化测试/自动点击/UI自动化" | **y3-auto-test** 🖱️ | 坐标+操作 | MCP y3editor + desktop-automation | Editor MCP 获取控件坐标 |
 | "从图片生成地形" | **y3-gen-terrain-from-image** | 地形格子数据 | MCP y3editor | `maps/` |
+| "导出/导入地编模板（地形+装饰物）" | **y3-terrain-template** | 模板 ZIP + 还原报告 | MCP y3editor | `<agent>/skills/y3-terrain-template/library/` |
+| "导出/打包模块为功能模板" | **y3-template-export** | `logic.lua` + `.upui` + `ReadMe.md` | y3-lua-review（风格审查） | `<agent>/templates/` |
+| "纯 ECA 开发：触发器 / ECA 函数 / ECA 变量" | **y3-eca-pipeline** ⭐ | ECA JSON + 验证报告 | → eca-json-builder | `<agent>/skills/y3-eca-pipeline/` |
+| "生成 ECA 函数/触发器/物编触发器（底层）" | **eca-json-builder** | ECA trigger/function JSON | 无（零依赖脚本；由 y3-eca-pipeline 调用） | `<agent>/skills/eca-json-builder/` |
+| "记忆蒸馏 / 归纳高频问题" | **y3-memory-distill** | INDEX.md + distill 报告 | 无（内部工具） | `<agent>/memory/distill/` |
 
 > ⭐ **UI 统一入口**：所有 UI 相关需求都走 `y3-ui-pipeline`，内部自动路由。
 > `y3-ui-generator` 为 UI JSON 生成的内部实现，不直接暴露给用户。
@@ -67,11 +73,16 @@ py -3 gen_ui_tree.py <workspace_path>
   │
   └─ 专业用户明确只要单点能力
         ├─ 物编 CRUD            → y3-obj-edit
+        ├─ 资源查/下/导入       → y3-resource-import
         ├─ UI 开发              → y3-ui-pipeline
         ├─ Lua 代码             → y3-lua-pipeline
         ├─ Lua 审查             → y3-lua-review
         ├─ 自动化测试           → y3-auto-test
-        └─ 图片生成地形         → y3-gen-terrain-from-image
+        ├─ 图片生成地形         → y3-gen-terrain-from-image
+        ├─ 地编模板导出/导入    → y3-terrain-template
+        ├─ 功能模板导出         → y3-template-export
+        ├─ ECA 开发             → y3-eca-pipeline（内部调用 eca-json-builder）
+        └─ 记忆蒸馏             → y3-memory-distill
 ```
 
 ## 🗺️ 技能依赖关系图
@@ -105,17 +116,25 @@ py -3 gen_ui_tree.py <workspace_path>
 ## 📂 目录结构
 
 ```
-<agent>/skills/             ← 用户功能技能
-├── y3-game-spec/           ← 游戏开发指南
-├── y3-obj-edit/            ← 物编查询/生成/修改（支持 MCP 查询）
-├── y3-ui-pipeline/         ← UI 开发入口
-├── y3-ui-generator/        ← UI JSON 生成（HTML → Y3 JSON）
-├── y3-lua-pipeline/         ← UI Lua API
-├── y3-lua-pipeline/        ← 非 UI Lua 代码
-├── y3-env-setup/           ← 环境配置（一次性）
-└── y3-auto-test/           ← 自动化测试（桌面自动化+测试规则）
+<agent>/skills/               ← 用户功能技能
+├── y3-game-spec/             ← 游戏开发全流程入口（编排器）
+├── y3-obj-edit/              ← 物编查询/生成/修改（支持 MCP 查询）
+├── y3-resource-import/       ← 资源查询/下载/导入（FBX 贴图+动画+材质球、MDX、图标、物编 ZIP）
+├── y3-ui-pipeline/           ← UI 开发入口
+├── y3-ui-generator/          ← UI JSON 生成（HTML → Y3 JSON）※内部实现，不直接暴露
+├── y3-lua-pipeline/          ← 全部 Lua 代码（游戏逻辑 + UI 交互）
+├── y3-lua-review/            ← Lua 代码审查
+├── y3-auto-test/             ← 自动化测试（桌面自动化 + 测试规则）
+├── y3-gen-terrain-from-image/← 图片转地形
+├── y3-terrain-template/      ← 地编模板导出/导入（地形 + 装饰物 + 资源摆件）
+├── y3-template-export/       ← 功能模板导出（logic.lua + .upui + ReadMe.md 三件套）
+├── y3-eca-pipeline/          ← 纯 ECA 开发唯一入口（触发器 / 函数 / 变量）
+├── eca-json-builder/         ← ECA 生成器与 DSL（内部实现，含 eca_index 数据表）
+├── y3-memory-distill/        ← 记忆蒸馏（内部工具，无 SKILL.md）
+└── y3-env-setup/             ← 环境配置（一次性）
 
-<agent>/tools/              ← 辅助工具
+<agent>/templates/            ← 功能模板库
+<agent>/tools/                ← 辅助工具
 ├── screenshot_with_cursor.py  ← 截图并标记鼠标位置
 └── draw_grid.py               ← 在截图上绘制坐标网格
 ```
@@ -184,6 +203,7 @@ y3.const.KeyboardKey['1']
 
 | 文档 | 说明 |
 |------|------|
+| `skills/y3-resource-import/SKILL.md` | 资源查询/下载/导入流程（resource_map JSON、材质球替换、动画命名） |
 | `skills/y3-ui-generator/references/` | UI JSON 生成参考 |
 | `skills/y3-lua-pipeline/references/*.md` | Lua API 参考（player/unit/ability 等） |
 | `skills/y3-auto-test/SKILL.md` | 自动化测试流程（Editor MCP + 点击脚本 + 测试规则） |
@@ -205,5 +225,5 @@ y3.const.KeyboardKey['1']
 
 ---
 
-*最后更新: 2026-04-21（收敛为专业用户进阶文档；新手用户请看 USER_GUIDE.md）*
+*最后更新: 2026-10-21（收敛为专业用户进阶文档；新手用户请直接从 `y3-game-spec` 开始）*
 

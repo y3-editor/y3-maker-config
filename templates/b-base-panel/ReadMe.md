@@ -6,7 +6,7 @@
 |------|------|
 | 等级 | **B** |
 | 名称 | UI 面板基类（`_` 前缀控件自动绑定） |
-| 路径 | `.codemaker/templates/b-base-panel/` |
+| 路径 | `<agent>/templates/b-base-panel/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `ui`, `panel`, `control-binding`, `convention`, `show-hide`, `lifecycle` |

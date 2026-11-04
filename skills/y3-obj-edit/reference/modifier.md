@@ -1,8 +1,8 @@
 ﻿# 魔法效果脚本参数参考（Modifier / Buff）
 
-本文只说明 `.codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py` 当前对 `-type modifier` 开放的脚本参数。
+本文只说明 `<agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py` 当前对 `-type modifier` 开放的脚本参数。
 
-完整魔法效果物编字段、运行时机制、覆盖规则、光环配合关系等，请看：`.codemaker/knowledge/物编系统/02-魔法效果.md`（相对链接：[`../../../knowledge/物编系统/02-魔法效果.md`](../../../knowledge/物编系统/02-魔法效果.md)）。
+完整魔法效果物编字段、运行时机制、覆盖规则、光环配合关系等，请看：`<agent>/knowledge/物编系统/02-魔法效果.md`（相对链接：[`../../../knowledge/物编系统/02-魔法效果.md`](../../../knowledge/物编系统/02-魔法效果.md)）。
 
 > 注意：本文只解释脚本当前开放的参数；完整字段和机制请看上面的 knowledge 文档。
 
@@ -10,10 +10,10 @@
 
 ```bash
 # 创建魔法效果：create 参数固定为 "效果ID,名称,图标ID"
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type modifier -create "100001101,眩晕,100008" [可选参数...]
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type modifier -create "100001101,眩晕,100008" [可选参数...]
 
 # 修改已有魔法效果
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type modifier -edit 100001101 [可选参数...]
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type modifier -edit 100001101 [可选参数...]
 ```
 
 ## 创建参数
@@ -80,15 +80,15 @@ py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -t
 
 ```bash
 # 创建负面普通 Buff
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type modifier -create "100001101,眩晕,100008" -modifier_type 1 -modifier_effect 3 -material_color "255,100,100" -description "无法移动和攻击"
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type modifier -create "100001101,眩晕,100008" -modifier_type 1 -modifier_effect 3 -material_color "255,100,100" -description "无法移动和攻击"
 
 # 创建护盾 Buff
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type modifier -create "100001102,能量护盾,100009" -modifier_type 4 -modifier_effect 2 -shield_value 200 -shield_type 2 -material_color "100,100,255"
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type modifier -create "100001102,能量护盾,100009" -modifier_type 4 -modifier_effect 2 -shield_value 200 -shield_type 2 -material_color "100,100,255"
 
 # 创建光环 Buff（这里只设置脚本已开放的光环基础字段）
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type modifier -create "100001103,战斗光环,100010" -modifier_type 2 -modifier_effect 2 -influence_rng 8.0 -is_influence_self true
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type modifier -create "100001103,战斗光环,100010" -modifier_type 2 -modifier_effect 2 -influence_rng 8.0 -is_influence_self true
 
 # 修改已有 Buff 的脚本支持字段
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type modifier -edit 100001101 -layer_max 3 -shield_value 150
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type modifier -edit 100001101 -layer_max 3 -shield_value 150
 ```
 

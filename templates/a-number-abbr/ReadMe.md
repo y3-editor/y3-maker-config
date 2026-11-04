@@ -6,7 +6,7 @@
 |------|------|
 | 等级 | **A** |
 | 名称 | 数字缩写格式化 |
-| 路径 | `.codemaker/templates/a-number-abbr/` |
+| 路径 | `<agent>/templates/a-number-abbr/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `number`, `format`, `abbreviate`, `display`, `damage-text`, `currency` |

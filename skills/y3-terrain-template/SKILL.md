@@ -81,7 +81,7 @@ Y3 地编模板的「打包 / 还原」Skill。
 
 ```
 y3editor.export_object_editor(
-  output_path     = "<工程根>/.codemaker/skills/y3-terrain-template/library/.export_staging/<模板名>",
+  output_path     = "<工程根>/<agent>/skills/y3-terrain-template/library/.export_staging/<模板名>",
   object_types    = ["editor_decoration"],
   output_filename = "editor_decoration.zip",
   include_dependencies = true,
@@ -96,7 +96,7 @@ y3editor.export_object_editor(
 **Step 2 — Python 脚本组包**
 
 ```bash
-python .codemaker/skills/y3-terrain-template/scripts/export_terrain_template.py \
+python <agent>/skills/y3-terrain-template/scripts/export_terrain_template.py \
   --map-dir         "<工程根>/maps/<关卡名>" \
   --name            "<kebab-case 模板名>" \
   --description     "<人读说明，写入 readme>" \
@@ -171,14 +171,14 @@ Step 6  MCP y3editor.restart_editor(save_before_restart=false)
 
 **dry-run（默认，必须先跑）**：
 ```bash
-python .codemaker/skills/y3-terrain-template/scripts/import_terrain_template.py \
+python <agent>/skills/y3-terrain-template/scripts/import_terrain_template.py \
   --template "<模板名>" \
   --target-map-dir "<工程根>/maps/<关卡名>"
 ```
 
 **apply（用户确认后才能跑）**：
 ```bash
-python .codemaker/skills/y3-terrain-template/scripts/import_terrain_template.py \
+python <agent>/skills/y3-terrain-template/scripts/import_terrain_template.py \
   --template "<模板名>" \
   --target-map-dir "<工程根>/maps/<关卡名>" \
   --apply \
@@ -231,7 +231,7 @@ python .codemaker/skills/y3-terrain-template/scripts/import_terrain_template.py 
 
 详见 `references/file_manifest.md`。**速查**：
 
-- 模板库根：`.codemaker/skills/y3-terrain-template/library/<模板名>/`
+- 模板库根：`<agent>/skills/y3-terrain-template/library/<模板名>/`
 - 模板必含 **8 文件** + `template_meta.json` + `readme.md`
   - 8 文件：`terrain.json`、`texture.json`、`terrainedit.json`、`foliage.json`、`texturefoliage.json`、`decorationdata.data`、`resourceobjectdata.data`、`grid.data`
 - `editor_decoration.zip`（MCP 产物，含装饰物物编 + 装饰物 folderinfo）**可选**：

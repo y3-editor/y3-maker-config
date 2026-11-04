@@ -311,8 +311,41 @@ HTML 文件使用 `data-*` 属性来描述 Y3 UI 节点。每个 `<div>` 对应�
 |------|------|--------|
 | `data-adapter` | 适配方向（逗号分隔） | 无适配 |
 | `data-anchor` | 锚点 | 无 |
+| **`data-event`** | **控件具名事件（ECA 接 UI 交互的唯一可用通道）**，多个用逗号分隔 | 无（`event_list` 为空） |
+| `data-event-type` | 事件类型；`1` = 点击（默认） | `1` |
 
 **data-adapter 值**：`top`, `bottom`, `left`, `right` 任意组合（逗号分隔），或 `all`（全部开启）
+
+### 🔴 `data-event`：让 ECA 能收到这个控件的点击
+
+```html
+<!-- 点击卡 1 → 发送具名事件 card_1_click -->
+<div data-type="button" data-name="card_1" data-event="card_1_click" ...></div>
+
+<!-- 一个控件挂多个事件 -->
+<div data-type="button" data-name="btn_multi" data-event="ev_a,ev_b" ...></div>
+```
+
+生成结果与工程自带官方画板 GameHUD 完全同构（`type: 1` = 点击）：
+
+```json
+"event_list": [
+  { "action_list": [], "enabled": true, "name": "card_1_click",
+    "not_wait_network": false, "sound_id": null, "type": 1 }
+]
+```
+
+**ECA 侧对应写法**：子触发器的事件参数写**普通字符串字面量**，不是 `STR_TO_UI_EVENT(...)`。
+完整可用样例与反例见 `eca-json-builder/runtime_pitfalls.md §1`。
+
+> ⚠️ 三条硬约束：
+> 1. 不写 `data-event` 时 `event_list` 为空 → 该控件的点击**传不到 ECA**
+>    （运行时用 `CREATE_UI_COMP_EVENT_EX_EX` + `STR_TO_UI_EVENT` 注册的写法经实测**运行时无效**，
+>    虽然它能通过编辑器保存、`diff` 全绿）。
+> 2. 具名事件的 `name` 就是 ECA 的事件契约，**改名即断**，交付前必须登记控件命名契约表。
+> 3. UI 点击类用例**必须人工点击验证**：`y3.ui` 的 `send_event`（命名事件注入）驱动不了 ECA；
+>    能否用 `y3runtime.trigger_ui_touch_event_by_path`（真实触摸注入）驱动**尚待复核**
+>    （旧文档把它判为"不行"，但那次对照只覆盖了命名事件注入这一条通道）。
 
 ## 适配规则速查
 
@@ -393,6 +426,12 @@ HTML 文件使用 `data-*` 属性来描述 Y3 UI 节点。每个 `<div>` 对应�
 | `data-block` | 吞噬点击事件 | false |
 
 **自动背景图注入 **：
+
+> ⚠️ **画板根 layout 也是 layout**：它是 1920×1080，所以**常驻画板**（HUD / 背包 / 状态栏）会被注入一张
+> **全屏半透明底图**，表现是「进入对局后整张地图像蒙了一层灰黑遮罩」。
+> 常驻画板生成时直接加 `--strip-root-bg`（推荐）；已有画板也可以后处理删除**根 layout 的直接子节点** `<画板名>_bg`（只删这一个节点、不动 uid，ECA 控件引用不受影响）；
+> 内层面板自己的 `*_bg` 保留，弹窗仍有正常底板。全屏选择/加载界面保留根底图是对的。
+> 细节见 `../eca-json-builder/runtime_pitfalls.md §9.4`。
 
 转换器会自动检查每个 layout (type=7) 节点，如果没有背景图片子节点，则在 children 列表的开头（index=0，最底层）插入一个默认背景图。如果不想让某个 layout 自动注入背景，在 HTML 中手动添加一个 `image_xxx_bg` 子节点即可。
 
@@ -707,7 +746,7 @@ python scripts/html_to_y3_ui.py <preview.html> <output.json> --panel-name <Panel
 
 为每个 prefab 生成独立的 HTML 预览文件：
 
-- **文件名**：使用最终名称，如 `HeroSelectPanel-block-main_frame-hero_list-template_preview.html`
+- **文件名**：使用最终名称，如 `MyPanel-block-main_frame-hero_list-template_preview.html`
 - **canvas 尺寸**：父控件（grid/list）的 `data-item-w` × `data-item-h`（而非 1920×1080）
 - **根节点 data-name**：使用最终名称
 
@@ -716,7 +755,7 @@ python scripts/html_to_y3_ui.py <preview.html> <output.json> --panel-name <Panel
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Prefab Preview: HeroSelectPanel-block-main_frame-hero_list-template</title>
+    <title>Prefab Preview: MyPanel-block-main_frame-hero_list-template</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #1a1a2e; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
@@ -736,7 +775,7 @@ python scripts/html_to_y3_ui.py <preview.html> <output.json> --panel-name <Panel
 <body>
 <div class="canvas">
     <!-- Prefab 根节点：使用最终名称 -->
-    <div data-type="layout" data-name="HeroSelectPanel-block-main_frame-hero_list-template"
+    <div data-type="layout" data-name="MyPanel-block-main_frame-hero_list-template"
          data-x="0" data-y="0" data-w="100" data-h="100"
          style="left:0; top:0; width:100px; height:100px;">
 
@@ -778,7 +817,7 @@ python scripts/html_to_y3_ui.py <prefab_name>_preview.html maps/EntryMap/ui/pref
 **示例**：
 
 ```bash
-python scripts/html_to_y3_ui.py HeroSelectPanel-block-main_frame-hero_list-template_preview.html maps/EntryMap/ui/prefab/HeroSelectPanel-block-main_frame-hero_list-template.json --prefab --prefab-name HeroSelectPanel-block-main_frame-hero_list-template
+python scripts/html_to_y3_ui.py MyPanel-block-main_frame-hero_list-template_preview.html maps/EntryMap/ui/prefab/MyPanel-block-main_frame-hero_list-template.json --prefab --prefab-name MyPanel-block-main_frame-hero_list-template
 ```
 
 转换完成后，**立即删除 Prefab HTML 临时文件**，然后继续处理下一个 prefab 或进入 Step 8。
@@ -897,4 +936,3 @@ del "<HTML临时文件的绝对路径>"
 ```bash
 python scripts/html_to_y3_ui.py confirm_preview.html maps/EntryMap/ui/ConfirmPopup.json --panel-name ConfirmPopup --zorder 500
 ```
-

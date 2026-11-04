@@ -289,8 +289,8 @@ end)
 
 > ⚠️ **修正历史 / 编辑器预制系统信任原则**：
 > 早期文档曾评估认为 Y3 建造技能 `cast_type=4` "不可用"，需要用 `cast_type=1` 模拟。
-> 实际验证后发现配置正确即可工作（见塔防工程 `700001/134236443/134283151/134231230`）。
-> 本次已迁移到原生方案。**遵循根规则「🏭 编辑器预制系统信任原则」：默认信任引擎预制功能，先排查使用方法是否正确，不假设引擎 bug。**
+> 实际验证后发现配置正确即可工作。
+> 现已迁移到原生方案。**遵循根规则「🏭 编辑器预制系统信任原则」：默认信任引擎预制功能，先排查使用方法是否正确，不假设引擎 bug。**
 
 #### 物编配置（以箭塔建造技能为例，cast_type=4）
 
@@ -301,7 +301,7 @@ end)
 #    确保有 attack_trajectory.effect / hit_effect.effect 配置
 
 # 2. 创建真·建造技能（ability_cast_type=4 + sight_type=4 指示器 + is_immediate=false）
-python3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py \
+python3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py \
     -map maps/EntryMap -type ability \
     -create "700001,箭塔建造,普通技能,906660,906660" \
     -ability_cast_type 4 \
@@ -313,7 +313,7 @@ python3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py \
 #    手动编辑 JSON 或使用后续脚本：ability.json → build_list.items: [[500001, 1]]
 
 # 4. 将建造技能绑定到基地的 common_ability_list
-python3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py \
+python3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py \
     -map maps/EntryMap -type unit -edit 500010 \
     -common_ability_list "700001:1,134236443:1,134283151:1,134231230:1"
 ```
@@ -510,7 +510,7 @@ send .rd（或 y3.reload.reload()）
   - 逻辑对象（路径航点数/区域数量/特殊对象）
     │
     ▼
-扫描模板库 .codemaker/skills/y3-terrain-template/library/
+扫描模板库 <agent>/skills/y3-terrain-template/library/
     │  对每个模板读取 template_meta.json + readme.md
     │
     ▼
@@ -576,7 +576,7 @@ Step 5  MCP y3editor.restart_editor               # 重启加载
 
 #### 现有模板库速查
 
-> 存放位置：`.codemaker/skills/y3-terrain-template/library/`
+> 存放位置：`<agent>/skills/y3-terrain-template/library/`
 
 | 模板名 | 尺寸 | 类型 | 区域 | 路径 | 
 |--------|------|------|------|------|
@@ -591,8 +591,8 @@ Step 5  MCP y3editor.restart_editor               # 重启加载
 
 | 约束项 | 强制要求 | 禁止行为 |
 |-------|---------|---------|
-| **模板来源** | 必须使用 `.codemaker/skills/y3-terrain-template/library/<template-name>/` 原始模板 | ❌ 禁用其他模板，禁用 `y3-gen-terrain-from-image` 重生成 |
-| **导入方式** | 必须通过 `y3-terrain-template` skill 的 `import_terrain_template.py` 一次性导入完整模板文件（8 文件 + 可选 `editor_decoration.zip`） | ❌ 禁止只导入部分文件，禁止 AI 手动摆放装饰物 |
+| **模板来源** | 必须使用 `<agent>/skills/y3-terrain-template/library/<template-name>/` 原始模板 | ❌ 禁用其他模板，禁用 `y3-gen-terrain-from-image` 重生成 |
+| **导入方式** | 必须通过 `y3-terrain-template` skill 的 `import_terrain_template.py` 一次性导入完整 9 文件 | ❌ 禁止只导入部分文件，禁止 AI 手动摆放装饰物 |
 | **装饰物** | 完全沿用模板 `decorationdata.data` + `editor_decoration.zip` | ❌ 禁止 AI 调用 `entity_create_block` 增删任何装饰物 |
 | **资源摆件** | 完全沿用模板 `resourceobjectdata.data` | ❌ 禁止增删资源摆件 |
 | **地形/纹理/植被** | 完全沿用模板 `terrain.json` / `texture.json` / `terrainedit.json` / `foliage.json` / `texturefoliage.json` | ❌ 禁止 AI 调用任何 `terrain_*` MCP 修改 |
@@ -600,12 +600,10 @@ Step 5  MCP y3editor.restart_editor               # 重启加载
 | **刷怪点/基地坐标** | 取路径首/末航点（`Config.PATH_POINTS[1]` / `[#PATH_POINTS]`），与模板自动对齐 | ❌ 禁止写死其它坐标 |
 | **地图尺寸** | 必须保留模板原尺寸 | ❌ 禁止 `resize_terrain` 改尺寸（改了路径会失配） |
 
-> ⚠️ **terrain-only 模板兼容**：模板若缺 `editor_decoration.zip`（体积过大被清理），`import_terrain_template.py` 返回 `decoration_zip: null` + warning，此时须**跳过** MCP `import_object_editor`；8 文件仍全量导入，但装饰物物编（模型 / 图标 / 属性）不还原，依赖物编还原的航点 / 脚本引用会失效。确需完整还原时，先按 `y3-terrain-template` §2 重跑 `export_object_editor` 补回 zip。
-
 **复现 SOP**：
 
 ```
-1. python .codemaker/skills/y3-terrain-template/scripts/import_terrain_template.py <template-name> EntryMap
+1. python <agent>/skills/y3-terrain-template/scripts/import_terrain_template.py <template-name> EntryMap
 2. MCP restart_editor 让模板生效
 3. 直接进入 Phase 1 物编生成，不做任何地形/装饰物/路径调整
 ```
@@ -1041,18 +1039,17 @@ Step 5  MCP y3editor.restart_editor               # 重启加载
 | 1 | `ori_speed` ×100 存储 | 编辑器值 280 → 单位瞬移 | Y3 物编 `ori_speed` 引擎内部 ×100 存储 | 编辑器填 `期望cm/s ÷ 100`，或 spawn 时 `set_attr('移动速度', 真实cm/s, '基础')` 归一化 |
 | 2 | 运行时改移速破坏动画 | `set_attr('移动速度', X)` 后动画卡帧/飞动 | 动画速率 = `当前速度 / (物编ori_speed × 100)`，改速度未改 ori_speed → 失配 | 长期速度调整必须改物编源值，禁止运行时 `set_attr('移动速度', ...)` |
 | 3 | 主动技能事件错位 | 监听 `施法-完成` 但技能释放无效果 | 该事件仅持续/通道施法触发，主动 `cast_type=2` 不触发 | 改监听 `单位-施放技能`，caster 通过 `ability:get_owner()` 取 |
-| 4 | HUD 血/蓝条不刷新 | `bar:bind_unit_attr('当前值', '生命', 0)` 初始不同步 | 部分进度条无属性回调；初始绑定时机未对齐 | 改 `ltimer.loop(0.3)` 手动 `set_max_progress_bar_value` + `set_current_progress_bar_value` + 百分比文字 |
-| 5 | AOE 技能未命中怪物 | 物编 `ability_damage_range=200`，Lua AOE 直读 200 但实际距离远超 | `ability_damage_range` 仅决定指示器/施法范围，AOE 实际命中范围在 Lua 独立判定 | 在 Lua 集中维护 `SKILL_EFFECT[skill_id].radius`，按地图尺寸定半径（中心防守 64×64 场景建议 600+） |
-| 6 | UI 路径不含中间 layout | `Panel.label_xxx` 报"UI 不存在" | UI 转换后 label 在中间 `block` / `status_bar` 层级下 | UI 生成后必跑 `gen_ui_tree.py`，按节点树写完整路径 |
-| 7 | `y3.ui.get_ui` UI 不存在时 throw | 直接报错而非返回 nil | 引擎行为 | 所有手写绑定加 `pcall` 包裹 |
-| 8 | `unit:damage(...)` 位置参数错误 | 报参数错误 | 实际签名是 table 参数 | 改 `unit:damage{target=..., type=..., damage=...}` |
-| 9 | `unit:add_buff(...)` 位置参数错误 | 同上 | 同上 | 改 `unit:add_buff{key=..., source=..., time=..., stacks=...}` |
-| 10 | `has_buff` 不存在 | API 不存在 | y3 用 `has_modifier(buff_key)` | 改名 |
-| 11 | UnitAttr 中文键写错 | `'生命值'/'魔法值'` 不合法 | `y3.const.UnitAttr` 中是 `'生命'/'魔法'/'最大生命'/'最大魔法'` | 替换为短名 |
-| 12 | UIAttr 中文键写错 | `'进度'/'进度最大值'` 不合法 | 实际是 `'当前值'/'最大值'/'文本'` | 替换 |
-| 13 | `y3.game.exit()` 不存在 | API 臆造 | 该 API 不存在 | 改用 `pcall + GameAPI['quit_game']` 兜底，或隐藏 UI/展示结算页 |
-| 14 | `init()` 被多次调用 → 事件回调叠加 | 按钮点一次触发两次 | 全局/UI 事件多次注册会叠加 | 加 `_events_registered` 防重复 + 4 项 init 清理（timer / 单位 / 状态 / 路径） |
-| 15 | `'单位-移动结束'` 事件不可靠 | `move_along_road` repeat-move 不触发 | 引擎事件机制限制 | 改 ltimer 0.5s 轮询单位坐标与终点距离，≤80 判到达 |
+| 4 | AOE 技能未命中怪物 | 物编 `ability_damage_range=200`，Lua AOE 直读 200 但实际距离远超 | `ability_damage_range` 仅决定指示器/施法范围，AOE 实际命中范围在 Lua 独立判定 | 在 Lua 集中维护 `SKILL_EFFECT[skill_id].radius`，按地图尺寸定半径（中心防守 64×64 场景建议 600+） |
+| 5 | UI 路径不含中间 layout | `Panel.label_xxx` 报"UI 不存在" | UI 转换后 label 在中间 `block` / `status_bar` 层级下 | UI 生成后必跑 `gen_ui_tree.py`，按节点树写完整路径 |
+| 6 | `y3.ui.get_ui` UI 不存在时 throw | 直接报错而非返回 nil | 引擎行为 | 所有手写绑定加 `pcall` 包裹 |
+| 7 | `unit:damage(...)` 位置参数错误 | 报参数错误 | 实际签名是 table 参数 | 改 `unit:damage{target=..., type=..., damage=...}` |
+| 8 | `unit:add_buff(...)` 位置参数错误 | 同上 | 同上 | 改 `unit:add_buff{key=..., source=..., time=..., stacks=...}` |
+| 9 | `has_buff` 不存在 | API 不存在 | y3 用 `has_modifier(buff_key)` | 改名 |
+| 10 | UnitAttr 中文键写错 | `'生命值'/'魔法值'` 不合法 | `y3.const.UnitAttr` 中是 `'生命'/'魔法'/'最大生命'/'最大魔法'` | 替换为短名 |
+| 11 | UIAttr 中文键写错 | `'进度'/'进度最大值'` 不合法 | 实际是 `'当前值'/'最大值'/'文本'` | 替换 |
+| 12 | `y3.game.exit()` 不存在 | API 臆造 | 该 API 不存在 | 改用 `pcall + GameAPI['quit_game']` 兜底，或隐藏 UI/展示结算页 |
+| 13 | `init()` 被多次调用 → 事件回调叠加 | 按钮点一次触发两次 | 全局/UI 事件多次注册会叠加 | 加 `_events_registered` 防重复 + 4 项 init 清理（timer / 单位 / 状态 / 路径） |
+| 14 | `'单位-移动结束'` 事件不可靠 | `move_along_road` repeat-move 不触发 | 引擎事件机制限制 | 改 ltimer 0.5s 轮询单位坐标与终点距离，≤80 判到达 |
 ```
 
 **填写规则**：
@@ -1235,11 +1232,8 @@ Step 5  MCP y3editor.restart_editor               # 重启加载
 
 ---
 
-*拆分自 SKILL.md 阶段 2 | 创建时间: 2026-04-15*
-*最后更新: 2026-09-23 — 场景模板匹配约束对齐 `y3-terrain-template`（装饰物 zip 改为可选）：*
-  - *🔓 「模板复用强制约束」表「导入方式」由「一次性导入完整 9 文件」改为「8 文件 + 可选 `editor_decoration.zip`」*
-  - *⚠️ 表下新增 terrain-only 模板兼容说明：缺 zip 时 `import_terrain_template.py` 返回 `decoration_zip: null`，须跳过 MCP `import_object_editor`；装饰物物编不还原，依赖物编还原的航点 / 脚本引用会失效*
-*2026-05-18 — 基于塔防/生存两组实战案沉淀经验，反哺流程文档：*
+*拆分自 SKILL.md 阶段 2*
+*最后更新：基于多个实战案沉淀经验，反哺流程文档：*
   - *🔧 修复尾部固定章节重复段落 bug（合并行 684/860 两份雷同章节为一份）*
   - *🔒 §🧩 场景模板匹配 新增「模板复用强制约束」子章节（8 项约束 + 复现 SOP）*
   - *🏗️ 修正 §🏗️ 建造技能小节：示例 `cast_type=1` → `cast_type=4` 真·建造（推荐）；加入「修正历史 / 编辑器预制系统信任原则」追溯，对齐根规则；保留 cast_type=1 作为备选并说明边界*
@@ -1250,7 +1244,7 @@ Step 5  MCP y3editor.restart_editor               # 重启加载
   - *📝 新增「修改记录」强制章节（4 列：时间/修改内容/触发原因/级联影响）*
   - *🐛 新增可选「实战沉淀附加表」（分类索引，复杂项目推荐）*
   - *🔄 Phase 3 强制必含模块清单新增 `M-reload`（初始化与热重载，三层触发 + init 幂等），点选驱动游戏追加 `M-lock-select`*
-*2026-05-15 — 建造技能 + 数值调整实战手册：*
+*建造技能 + 数值调整实战手册：*
   - *🏗️ 新增「建造技能物编配置与使用」：ability_cast_type 选型 / 物编字段 / build_list / common_ability_list / Lua 监听 + UI 绑定 / 已知陷阱*
   - *📊 新增「数值调整方法」：td_config 集中管理 / set_attr 正确用法 / 属性类型速查 / ori_speed 归一化 / 数值迭代工作流*
   - *🗺️ 「路径使用实战手册」：获取/移动/到达检测/陷阱*

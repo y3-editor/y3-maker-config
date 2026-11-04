@@ -1,9 +1,9 @@
 ﻿# 单位脚本参数参考（Unit）
 
-本文只说明 `.codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py` 当前对 `-type unit` 实际处理的脚本参数。
-完整单位物编字段、字段语义和更细枚举请参考：`.codemaker/knowledge/物编系统/08-单位.md`（相对链接：[`../../../knowledge/物编系统/08-单位.md`](../../../knowledge/物编系统/08-单位.md)）。
+本文只说明 `<agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py` 当前对 `-type unit` 实际处理的脚本参数。
+完整单位物编字段、字段语义和更细枚举请参考：`<agent>/knowledge/物编系统/08-单位.md`（相对链接：[`../../../knowledge/物编系统/08-单位.md`](../../../knowledge/物编系统/08-单位.md)）。
 
-- 对应脚本：`.codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py`
+- 对应脚本：`<agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py`
 - 对应类型：`-type unit`
 
 
@@ -58,6 +58,11 @@ y3editor.get_editor_unit_custom_data(
 2. 如果预设资源没有合适项，再通过 Y3 编辑器 MCP 查询官方模型/资源列表。
 3. 根据名称、标签和用途匹配最合适资源，再把资源 ID 填入 `-create` 或 `-model` / `-icon`。
 
+> **模型 ID ≠ 头像/图标 ID**：`-create` 的第 4 段是模型 ID，第 5 段才是头像 ID。
+> UI 的 `data-image` / 控件 `image`、技能 `ability_icon`、物品 `icon`、Buff `modifier_icon`
+> 都要填头像或图标资源 ID。把模型 ID 填进图片控件通常表现为空白图（实测）。
+> `resources.csv` 中“模型ID”和“头像ID”是两列，不要混用。
+
 ```text
 工具：y3editor.get_official_editor_model
 常用方式：
@@ -71,10 +76,10 @@ MCP 返回数据量较大时，可在临时结果文件中搜索名称、标签�
 
 ```bash
 # 创建单位
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type unit -create "200001,近战士兵,近战小怪,10001,10002" [字段参数...]
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type unit -create "200001,近战士兵,近战小怪,10001,10002" [字段参数...]
 
 # 编辑已有单位
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type unit -edit 200001 [字段参数...]
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type unit -edit 200001 [字段参数...]
 ```
 
 ## 创建参数格式
@@ -119,6 +124,38 @@ py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -t
 | `-common_ability_list` | `common_ability_list` | tuple | 普通技能列表，格式见下方。 |
 
 ## ⚠️ 数值填写规范（常见陷阱）
+
+### 长度类字段的单位是「米」，不是厘米
+
+`attack_range` / `simple_common_atk.attack_range` / `ori_speed` / `sight_range` /
+`alarm_range` 等长度字段，**单位是引擎世界单位（1 ≈ 1 米 ≈ 100 厘米）**。
+
+| 场地 | 口径 |
+|------|------|
+| 单位物编的 `attack_range`（本文件） | **米**（引擎自带「远程英雄」模板默认就是 `5.25`） |
+| MCP `add_point` / `add_rect_area` 入参 | **厘米** |
+| 逻辑资源 / 编辑器面板 / 镜头焦点 | **米** |
+| 运行时 `y3.point.create` / `unit:get_point()` | **厘米**（= 米 × 100） |
+
+> 策划案里的射程常写成厘米（如 `128 / 600`）→ 落到物编要 **÷100**（`1.28 / 6.0`）。
+> 把 `600` 直接填进去 = 600 米射程（整张图），表现为「远程单位隔着半张图打人」。
+
+### 普攻的实际生效字段在 `simple_common_atk` 里
+
+单位普攻用的是模板 `simple_common_atk`，因此：
+
+| 你想改的东西 | 真正生效的字段 |
+|-------------|--------------|
+| 攻击射程 | `simple_common_atk.attack_range`（根级 `attack_range` 只是镜像） |
+| 攻击间隔 | `simple_common_atk.attack_interval`（根级 `attack_interval` 只是镜像） |
+
+> **只写根级 = 改了没效果**（根级回读会变，但战斗行为不变）。
+> `y3_obj_edit.py` 现在对 `-common_atk_range` / `-attack_range` / `-attack_interval`
+> **自动同步到两处**，并在保存后打印「🔎 回读校验」表（请求值 vs 落盘值 vs 实际生效值），
+> 不一致会明确报警 —— 请务必看这张表，别只看"✅ 已保存"。
+
+> 历史坑（已修）：`common_atk_range` 原先**不在** `UNIT_ATTRIBUTES` 表里，导致 `-create`
+> 静默忽略它、只有 `-edit` 生效。现在 `-create` / `-edit` 走同一条同步逻辑。
 
 ### ori_speed — 移动速度
 
@@ -171,16 +208,54 @@ py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -t
 
 ```bash
 # 创建近战小怪并设置基础战斗属性
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type unit -create "200001,近战士兵,近战小怪,10001,10002" -hp_max 500 -attack_phy 35 -defense_phy 5 -ori_speed 2 -sight_range 1500
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type unit -create "200001,近战士兵,近战小怪,10001,10002" -hp_max 500 -attack_phy 35 -defense_phy 5 -ori_speed 2 -sight_range 1500
 
 # 创建英雄并绑定英雄技能
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type unit -create "100001,洛坦,近战英雄,10011,10012" -hp_max 1200 -mp_max 300 -hero_ability_list "100001001:1,100001002:2,100001003:3,100001004:4"
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type unit -create "100001,洛坦,近战英雄,10011,10012" -hp_max 1200 -mp_max 300 -hero_ability_list "100001001:1,100001002:2,100001003:3,100001004:4"
 
 # 编辑已有单位描述和成长属性
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type unit -edit 200001 -description "基础近战敌人" -hp_max_grow 20 -attack_phy_grow 2
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type unit -edit 200001 -description "基础近战敌人" -hp_max_grow 20 -attack_phy_grow 2
 ```
 
 
 
 
 
+
+## 建筑 / 碰撞字段（补充）
+
+| 参数 | 写入字段 | 类型 | 说明 |
+|------|---------|------|------|
+| `-unit_type` | `type` | int | 单位分类：`1`=英雄，`2`=建筑，`4`=小怪 |
+| `-build_time` | `build_time` | float | 建筑建造耗时（秒） |
+| `-build_ignore_dyn_collision` | `build_ignore_dyn_collision` | bool | 建造时是否忽略其他单位的动态碰撞；陷阱类可开 |
+| `-dynamic_collision_r` | `dynamic_collision_r` | float | **寻路碰撞网格边长**，每 50 为 1 个标准格；怪物要互相穿过时设 `0` |
+| `-collision_radius_2` | `collision_radius_2` | float | 动态碰撞半径，默认 `0.7` |
+| `-collision_points` | `collision_points` | JSON | **碰撞格点**（建筑建造占位）。格式见下 |
+| `-collision_box_turning_enable` | `collision_box_turning_enable` | bool | 静态碰撞是否跟随建筑朝向，仅建筑生效 |
+| `-path_finding_external_size` | `path_finding_external_size` | int | 寻路外部尺寸 |
+
+### `collision_points` 格式
+
+```bash
+-collision_points "[[-1,-1],[2,2],[256,256,256,256,256,256,256,256,256],1.5]"
+```
+
+落盘为：
+
+```json
+{"__tuple__": true, "items": [[min_x,min_y],[max_x,max_y],[格点...],高度]}
+```
+
+- `max` 为开区间，格点数量 = `(max_x-min_x)*(max_y-min_y)`
+- `256` 表示占用/碰撞层，`0` 表示空
+- 3×3 建筑用 `[[-1,-1],[2,2],[256×9],1.5]`
+
+### 删除物编
+
+```bash
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type unit -delete 299999
+```
+
+删除会备份到 `maps/<地图>/.deleted_object_backup/`。删完必须执行
+`restart_editor(save_before_restart=false)`，中间不要 `save_editor`，否则编辑器内存会把物编写回磁盘。

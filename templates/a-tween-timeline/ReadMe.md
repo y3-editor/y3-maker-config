@@ -11,7 +11,7 @@
 | 字段 | 内容 |
 |------|------|
 | 名称 | 通用补间动画时间线模板 |
-| 路径 | `.codemaker/templates/a-tween-timeline/` |
+| 路径 | `<agent>/templates/a-tween-timeline/` |
 | 状态 | `validated` |
 | 版本 | `v1.0.0` |
 | 能力标签 | `ui`, `animation`, `tween`, `easing`, `kikito-tween` |

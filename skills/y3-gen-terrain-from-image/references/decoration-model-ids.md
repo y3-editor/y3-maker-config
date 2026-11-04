@@ -164,16 +164,21 @@ decoration_entities.json 由脚本自动生成，格式：
 [
   {
     "type": 16777216,       // RESOURCE_MODEL = 2^24
-    "pos": [x, y, z],      // 世界坐标
+    "pos": [x, 0, z],      // 世界坐标；y 会被引擎覆盖，0 只是占位
     "model_id": <auto>,     // 由纹理组自动匹配
-    "yaw": <random>,        // 随机旋转
-    "pitch": 0,
-    "roll": 0,
+    "yaw": <radians>,       // 弧度，不是角度
+    "pitch": 0.0,           // 弧度
+    "roll": 0.0,            // 弧度
     "scale": [sx, sy, sz],  // 山脉自动 scale，树木 [1,1,1]
-    "stick_to_ground": true
+    "stick_to_ground": true,
+    "relative_height": 0.0  // 米，相对脚下地形的离地高度
   }
 ]
 ```
+
+> `stick_to_ground: true` 时高度 = 脚下地形高度 + `relative_height`；`relative_height` 单位是米，和 `pos` 同单位，不要乘 100。
+> `stick_to_ground: false` 时 `relative_height` 不生效，改用 `absolute_height`；未传时等价于 0。
+> `yaw/pitch/roll` 必须是弧度；90° 应写 `math.radians(90)` 或 `1.5708`。`rotation` 数组会被忽略。
 
 ### 植被绘制（vegetation_draw_block）
 ```

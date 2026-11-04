@@ -6,7 +6,7 @@
 |------|------|
 | 等级 | **A** |
 | 名称 | 加权随机池 |
-| 路径 | `.codemaker/templates/a-random-pool/` |
+| 路径 | `<agent>/templates/a-random-pool/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `random`, `weight`, `pool`, `gacha`, `drop`, `loot`, `weighted-random` |
@@ -43,7 +43,7 @@
 ## 集成指南
 
 ```lua
-local Pool = include '.codemaker.templates.a-random-pool.logic'
+local Pool = include '<agent>.templates.a-random-pool.logic'
 
 -- 创建池
 	local monsterPool = Pool.setup({

@@ -1,9 +1,9 @@
 ﻿# 技能脚本参数参考（Ability）
 
-本文只说明 `.codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py` 当前对 `-type ability` 实际处理的脚本参数。
-完整技能物编字段、字段语义和更细枚举请参考：`.codemaker/knowledge/物编系统/06-技能.md`（相对链接：[`../../../knowledge/物编系统/06-技能.md`](../../../knowledge/物编系统/06-技能.md)）。
+本文只说明 `<agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py` 当前对 `-type ability` 实际处理的脚本参数。
+完整技能物编字段、字段语义和更细枚举请参考：`<agent>/knowledge/物编系统/06-技能.md`（相对链接：[`../../../knowledge/物编系统/06-技能.md`](../../../knowledge/物编系统/06-技能.md)）。
 
-- 对应脚本：`.codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py`
+- 对应脚本：`<agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py`
 - 对应类型：`-type ability`
 
 
@@ -54,10 +54,10 @@
 
 ```bash
 # 创建技能
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type ability -create "100001001,火球术,100000" [字段参数...]
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type ability -create "100001001,火球术,100000" [字段参数...]
 
 # 编辑已有技能
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type ability -edit 100001001 [字段参数...]
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type ability -edit 100001001 [字段参数...]
 ```
 
 ## 创建参数格式
@@ -138,13 +138,13 @@ py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -t
 
 ```bash
 # 创建 5 级主动技能
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type ability -create "100001001,火球术,100000" -ability_max_level 5 -ability_cast_type 2 -sight_type 1 -circle_radius "3,3,3,3,3" -cold_down_time "8,7,6,5,4" -ability_cost "50,60,70,80,90" -ability_damage "100,150,200,250,300" -required_level "1,3,5,7,9"
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type ability -create "100001001,火球术,100000" -ability_max_level 5 -ability_cast_type 2 -sight_type 1 -circle_radius "3,3,3,3,3" -cold_down_time "8,7,6,5,4" -ability_cost "50,60,70,80,90" -ability_damage "100,150,200,250,300" -required_level "1,3,5,7,9"
 
 # 创建立即释放技能
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type ability -create "100001002,战吼,100001" -sight_type 0 -is_immediate true -ability_max_level 1 -cold_down_time "12"
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type ability -create "100001002,战吼,100001" -sight_type 0 -is_immediate true -ability_max_level 1 -cold_down_time "12"
 
 # 编辑已有技能描述和施法距离
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type ability -edit 100001001 -description "向目标区域发射火球" -ability_cast_range "10,10,11,11,12"
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type ability -edit 100001001 -description "向目标区域发射火球" -ability_cast_range "10,10,11,11,12"
 ```
 
 
@@ -152,3 +152,23 @@ py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -t
 
 
 
+
+
+## 建造技能字段（补充）
+
+| 参数 | 写入字段 | 类型 | 说明 |
+|------|---------|------|------|
+| `-ability_cast_type` | `ability_cast_type` | int | 建造技能设为 `4` |
+| `-build_list` | `build_list` | tuple-int | 可建造的建筑 UnitKey 列表，例如 `"200001"` |
+| `-ability_build_subtype` | `ability_build_subtype` | int | 建造方式；塔防/即时放置用 `1`（Default） |
+| `-ability_cast_range` | `ability_cast_range` | tuple-str | 建造施法距离等级数组 |
+| `-cold_down_time` | `cold_down_time` | tuple-str | 冷却等级数组，建造技能通常 `"0"` |
+| `-ability_cost` | `ability_cost` | tuple-str | 魔法消耗等级数组，建造技能通常 `"0"` |
+
+示例：
+
+```bash
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type ability   -create "300001,建造箭塔,906746"   -ability_cast_type 4 -ability_max_level 1   -build_list 200001 -ability_build_subtype 1   -cold_down_time "0" -ability_cost "0" -ability_cast_range "30"
+```
+
+> 建造技能不需要配置指示器类型，编辑器会自动使用 BUILD 指示器。

@@ -6,7 +6,7 @@
 |------|------|
 | 等级 | **B** |
 | 名称 | 优先级护盾栈 |
-| 路径 | `.codemaker/templates/b-shield-stack/` |
+| 路径 | `<agent>/templates/b-shield-stack/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `shield`, `damage`, `absorb`, `priority`, `stack`, `defense` |

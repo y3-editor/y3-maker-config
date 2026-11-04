@@ -9,8 +9,6 @@ description: >
   查询物编、获取物编、查看物编、物编信息。
   
   This skill handles querying, creating and editing objects.
-version: 5.0
-updated: 2026-04-20
 ---
 
 # Y3 物编编辑器 v5.0
@@ -114,6 +112,18 @@ y3editor.get_editor_unit_custom_data {"id_list": [134200001], "key_list": ["name
 
 ---
 
+## 🗑️ 删除物编
+
+```bash
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type unit -delete 299999
+```
+
+删除会备份到 `maps/<地图>/.deleted_object_backup/`。删完必须执行
+`restart_editor(save_before_restart=false)`，中间不要 `save_editor`，否则编辑器内存会把物编写回磁盘。
+
+建筑字段（`build_list` / `collision_points` / `dynamic_collision_r` / `collision_radius_2`）
+和碰撞格点格式见 `reference/unit.md`、`reference/ability.md`。
+
 ## 🔴 热更并保存（创建/修改后必须执行）
 
 ```
@@ -130,4 +140,47 @@ y3editor.save_editor
 
 ---
 
-*最后更新: 2026-04-20 v5.0 - 新增 MCP 查询功能*
+## 🔎 保存后必看「回读校验」表
+
+`y3_obj_edit.py` 在写盘后会**回读文件**并打印一张对照表：
+
+```
+🔎 回读校验（请求值 vs 落盘值）
+   ✅ attack_phy: 请求=210.0 落盘=210.0
+   ✅ common_atk_range: 请求=1.28 落盘=1.28｜实际生效 simple_common_atk.attack_range=1.28
+   ⚠️ attack_interval: 请求=1.2 落盘=1.2｜实际生效 simple_common_atk.attack_interval=1.0
+```
+
+**「✅ 已保存」只代表写盘成功，不代表值生效。** 出现 ⚠️ 时按提示排查：
+① 是否被模板默认值覆盖；② 真正生效的字段是否在 `simple_common_atk`（普攻）内。
+
+---
+
+## ⛔ 能力边界：没有「玩家属性定义」入口
+
+本技能只覆盖 `unit` / `ability` / `item` / `modifier` / `projectile` 五类物编。
+**工程根的 `attr.json`（玩家属性定义）没有脚本入口**，而项目约定又禁止手写该 JSON。
+
+因此需要「金币 / 木材」这类自定义**玩家属性（`ROLE_RES_KEY`）**时，只有两条路：
+
+| 方案 | 说明 |
+|------|------|
+| A. 在编辑器「物编 → 玩家属性定义」面板手工新增 | 唯一合规做法；改完走 `hotfix_object_editor` → 等 3 秒 → `save_editor` |
+| B. 改用 **ECA 全局变量** 存这些数值 | 纯 ECA 工程的常用替代（单人对局没问题；多人对局会串号，需先做 A） |
+
+> 选 B 时 `ROLE_CHANGE_RES` / `GET_ROLE_RES` / `SET_UI_COMP_BIND_PLAYER_PROP` 都用不上，
+> 改用 `SET_VARIABLE` / `MATH_OPERATION` 与 `SET_UI_COMP_BIND_VAR`
+> （详见 `skills/eca-json-builder/runtime_pitfalls.md`）。
+
+---
+
+## 📌 常见「改了没效果」速查
+
+| 现象 | 原因 | 处理 |
+|------|------|------|
+| `-create` 时射程没生效 | 历史 bug：`common_atk_range` 未被 create 路径处理 | 已修；若仍异常用 `-edit` 二次应用 |
+| 攻击间隔改了没效果 | 只改了根级，实际生效在 `simple_common_atk` | 已修（自动同步两处） |
+| 射程大得离谱（隔着半张图打人） | 把厘米值当米填了 | ÷100（128 → 1.28），见 `reference/unit.md` |
+| 远处怪物不主动扑过来 | `alarm_range`（警戒索敌）太小，模板默认约 8 米 | 调大 `-alarm_range` |
+| 编辑器里看不到刚改的值 | 只写了磁盘，没热更 | `hotfix_object_editor` → 等 3 秒 → `save_editor` |
+

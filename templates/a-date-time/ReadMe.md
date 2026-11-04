@@ -6,7 +6,7 @@
 |------|------|
 | 等级 | **A** |
 | 名称 | 时间格式化与判定工具集 |
-| 路径 | `.codemaker/templates/a-date-time/` |
+| 路径 | `<agent>/templates/a-date-time/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `time`, `timestamp`, `format`, `date`, `countdown`, `cross-day`, `cross-week`, `holiday` |

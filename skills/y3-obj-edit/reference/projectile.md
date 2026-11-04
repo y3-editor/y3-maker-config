@@ -1,9 +1,9 @@
 ﻿# 投射物脚本参数参考（Projectile）
 
-本文只说明 `.codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py` 当前对 `-type projectile` 实际处理的脚本参数。
-完整投射物物编字段、字段语义和更细枚举请参考：`.codemaker/knowledge/物编系统/03-投射物.md`（相对链接：[`../../../knowledge/物编系统/03-投射物.md`](../../../knowledge/物编系统/03-投射物.md)）。
+本文只说明 `<agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py` 当前对 `-type projectile` 实际处理的脚本参数。
+完整投射物物编字段、字段语义和更细枚举请参考：`<agent>/knowledge/物编系统/03-投射物.md`（相对链接：[`../../../knowledge/物编系统/03-投射物.md`](../../../knowledge/物编系统/03-投射物.md)）。
 
-- 对应脚本：`.codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py`
+- 对应脚本：`<agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py`
 - 对应类型：`-type projectile`
 
 
@@ -42,10 +42,10 @@
 
 ```bash
 # 创建投射物
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type projectile -create "100001201,火球,100000" [字段参数...]
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type projectile -create "100001201,火球,100000" [字段参数...]
 
 # 编辑已有投射物
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type projectile -edit 100001201 [字段参数...]
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type projectile -edit 100001201 [字段参数...]
 ```
 
 ## 创建参数格式
@@ -103,13 +103,13 @@ py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -t
 
 ```bash
 # 创建火球投射物
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type projectile -create "100001201,火球,100000" -max_duration 5.0 -sfx_loop true -effect_foes 102892
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type projectile -create "100001201,火球,100000" -max_duration 5.0 -sfx_loop true -effect_foes 102892
 
 # 创建短持续时间投射物并设置移动参数
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type projectile -create "100001202,冰锥,100001" -max_duration 3.0 -move_channel 1 -move_limitation 1
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type projectile -create "100001202,冰锥,100001" -max_duration 3.0 -move_channel 1 -move_limitation 1
 
 # 编辑已有投射物特效和描述
-py -3 .codemaker/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type projectile -edit 100001201 -description "向前飞行的火焰弹道" -effect_friend 102247
+py -3 <agent>/skills/y3-obj-edit/scripts/y3_obj_edit.py -map maps/EntryMap -type projectile -edit 100001201 -description "向前飞行的火焰弹道" -effect_friend 102247
 ```
 
 

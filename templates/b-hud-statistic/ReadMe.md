@@ -11,7 +11,7 @@
 |------|------|
 | 等级 | **B** |
 | 名称 | HUD 右侧统计面板模板 |
-| 路径 | `.codemaker/templates/b-hud-statistic/` |
+| 路径 | `<agent>/templates/b-hud-statistic/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.1` |
 | 能力标签 | `HUD`, `统计`, `伤害排行`, `技能统计`, `DPS` |

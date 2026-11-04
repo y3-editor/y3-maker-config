@@ -11,7 +11,7 @@
 |------|------|
 | 等级 | **B** |
 | 名称 | HUD 顶部信息栏模板 |
-| 路径 | `.codemaker/templates/b-hud-top-info/` |
+| 路径 | `<agent>/templates/b-hud-top-info/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.1` |
 | 能力标签 | `HUD`, `信息栏`, `货币`, `波次`, `倒计时`, `日夜` |

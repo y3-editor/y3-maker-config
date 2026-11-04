@@ -9,7 +9,7 @@
 
 本模板的进度条动画依赖 4 个序列帧资源包，**不会随 `.upui` 自动导入**，需要手动操作：
 
-**资源位置**：模板文件夹 `.codemaker/templates/b-hud-main-console/` 下的 4 个 `.package` 文件夹
+**资源位置**：模板文件夹 `<agent>/templates/b-hud-main-console/` 下的 4 个 `.package` 文件夹
 
 | 资源包 | 用途 |
 |--------|------|
@@ -35,7 +35,7 @@
 |------|------|
 | 等级 | **B** |
 | 名称 | HUD 底部控制台模板 |
-| 路径 | `.codemaker/templates/b-hud-main-console/` |
+| 路径 | `<agent>/templates/b-hud-main-console/` |
 | 状态 | `validated` |
 | 版本 | `v0.1.1` |
 | 能力标签 | `HUD`, `控制台`, `英雄状态`, `目标信息`, `物品栏`, `Buff` |
@@ -234,7 +234,7 @@ end
 |------|------|
 | 等级 | **B** |
 | 名称 | HUD 底部控制台模板 |
-| 路径 | `.codemaker/templates/b-hud-main-console/` |
+| 路径 | `<agent>/templates/b-hud-main-console/` |
 | 状态 | `draft` |
 | 版本 | `v0.1.0` |
 | 能力标签 | `HUD`, `控制台`, `英雄状态`, `目标信息`, `物品栏`, `Buff` |
