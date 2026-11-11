@@ -103,7 +103,7 @@ end)
 | `role_id` | 玩家相关事件或自定义事件的回调参数 | 局内玩家 ID，在对局开始时按槽位分配，一局内保持不变，但不保证连续；可直接传给 `MsGetPlayer*`、`MsGetScriptArchive`、`MsSendMlEvent` 等接口 |
 | `plat_aid` | `_playerjoin` 事件附加参数中的 JSON 字符串 `{"plat_aid":"<用户唯一 ID>"}` | 用户唯一 ID，跨对局保持稳定 |
 | `data.player:get_id()` | 客户端事件参数中的 `Player` 对象 | 客户端侧读取的局内玩家 ID，数值等于云脚本回调里的 `role_id`，只用于客户端过滤和自检 |
-| `player_guids` | `_roomloaded` 事件的附加参数 | 本局局内玩家 ID 序列（`userdata`），用于房间加载完成时遍历本局玩家 |
+| `player_roleids` | `_roomloaded` 事件的附加参数 | 本局局内玩家 ID 序列（`userdata`），用于房间加载完成时遍历本局玩家 |
 
 ### 两类存档如何选择
 

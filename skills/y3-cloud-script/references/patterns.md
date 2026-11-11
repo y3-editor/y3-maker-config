@@ -1,6 +1,6 @@
 # Y3 云脚本通用工程模式与代码模板
 
-> **版本兼容提示**：`v1.1.0` 新增接口（`MsBase64Encode/Decode`、`MsGetScriptRunStat`、`MlLuaErrorCode`、17 个新增 `MsGetPlayer*` 平台接口、以及 `Log.*` 变参格式化）**预计 2026.11.18 后才会外放**，此前环境无法调用。本文件中的模板均内置了存在性判断与向后兼容兜底。
+> **版本兼容提示**：`v1.1.0` 新增接口（`MsBase64Encode/Decode`、`MlLuaErrorCode`、17 个新增 `MsGetPlayer*` 平台接口）**预计 2026.11.18 后才会外放**，此前环境无法调用。本文件中的模板均内置了存在性判断与向后兼容兜底。
 
 ## 1. 环境判定与 Base64 兼容封装（`core/env.lua` & `util/base64.lua`）
 
@@ -97,10 +97,10 @@ local function hasRole(role_id)
     return false
 end
 
-function M.onRoomLoaded(player_guids)
+function M.onRoomLoaded(player_roleids)
     roleIds, aidByRole, nameByRole = {}, {}, {}
-    if player_guids ~= nil then
-        for _, role_id in ipairs(player_guids) do
+    if player_roleids ~= nil then
+        for _, role_id in ipairs(player_roleids) do
             if type(role_id) == 'number' and role_id >= 0 then
                 roleIds[#roleIds + 1] = role_id
             end
@@ -218,7 +218,8 @@ if type(json.encode_sparse_array) == "function" then json.encode_sparse_array(tr
 
 local function load_player_archive(role_id)
     local raw = MsGetScriptArchive(role_id)
-    if raw == nil or raw == "" then
+    if raw == nil then return nil, "player_unavailable" end
+    if raw == "" then
         return { schema_version = 1, visits = 0, unlocked = {} }, nil
     end
     local ok, decoded = pcall(json.decode, raw)

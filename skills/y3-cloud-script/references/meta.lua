@@ -1,7 +1,7 @@
 ---@meta
 --- [版本外放门禁说明]
---- v1.1.0 新增接口（MsBase64Encode/Decode、MsGetScriptRunStat、MlLuaErrorCode 全局表、
---- 17 个平台玩家信息查询 MsGetPlayer* 接口、Log.* 变参格式化）预计于 2026.11.18 后正式外放。
+--- v1.1.0 新增接口（MsBase64Encode/Decode、MlLuaErrorCode 全局表、
+--- 17 个平台玩家信息查询 MsGetPlayer* 接口）预计于 2026.11.18 后正式外放。
 --- 在 2026.11.18 之前运行时无法调用到上述新增接口，业务代码调用前请先用 type(fn) == "function" 判空并提供兼容兜底。
 
 --- 注册云脚本事件, 返回值为事件唯一id(配合 UnRegisterEvent 反注册使用)

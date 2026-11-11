@@ -17,7 +17,7 @@ description: >
 - **版本控制与打包卫生**：将本地运行产物 `dump/`、`mls_archive/`、`mls_log/`、`script_log/` 加入 `.gitignore` / `svn:ignore`，并在发布打包时排除。
 - **模块搜索边界**：使用 `require 'subdir.mod'` 加载模块（不带 `.lua` 后缀，区分大小写）。`package.path` 仅搜索 `cloud_script/` 内部（`?.lua` 与 `lua/?.lua`），无法向上读取 `maps/` 或 `global_script/`。若云脚本需要读取配表，由导表工具额外导出一份纯 Lua 表到 `cloud_script/excel/`。
 - **可用全局与标准库**：
-  - 仅提供 `RegisterEvent`、`UnRegisterEvent`、`Ms*`、`redis`、`Log`、`Timer` 与 `require("cjson")`（切勿在业务里写 `cjson = {}`、`Log = {}`、`Timer = {}` 覆盖宿主注入对象）。
+  - 提供 `RegisterEvent`、`UnRegisterEvent`、`Ms*`、`redis`、`Log`、`Timer` 与预注册的全局 `cjson`（也可 `require("cjson")`；切勿在业务里写 `cjson = {}`、`Log = {}`、`Timer = {}` 覆盖宿主注入对象）。
   - `os` 库仅保留 `clock`、`date`、`difftime`、`time`（线上无 `getenv`、`execute` 等）。
   - 动态加载源码使用 `load(src, name, 't')`（Lua 5.4 无 `loadstring`）。云端 VM 浮点格式与桌面 `lua54.exe` 不同，**云端只 `load` 文本源码 `'t'`**；若用 `string.dump(fn)` 产出字节码下发客户端执行，需将所有常量写在 `fn` 函数体内部（`string.dump` 不保留 upvalue 值）。
 
@@ -42,7 +42,7 @@ description: >
 - **权威玩家标识**：
   - **`role_id`**（回调第 2 参数）：局内玩家槽位 ID。处理请求始终以回调参数 `role_id` 为准，忽略客户端在 JSON 里自报的玩家 ID。房间级事件（`_roomloaded` / `_localmodeloaded` / `_roomover`）中 `role_id` 为 `-1`。
   - **`plat_aid`**：跨局稳定的**账号级唯一 ID**，仅从 `_playerjoin` 第 4 参数 JSON 字符串 `{"plat_aid":"<ID>"}` 解析获取。
-  - **`player_guids`**：`_roomloaded` 第 4 参数，类型为 `userdata`（非 table），使用 `ipairs(player_guids)` 遍历，转存为普通 Lua 数组后再参与 `json.encode`。
+  - **`player_roleids`**（旧称 `player_guids`）：`_roomloaded` 第 4 参数，本局局内玩家 `role_id` 序列，类型为 `userdata`（非 table），使用 `ipairs(player_roleids)` 遍历，转存为普通 Lua 数组后再参与 `json.encode`。
 - **客户端收包三大准则**：
   1. **直接按字段读取**：`data.mlscript_event_data` 已被引擎解码为 `py.Table`，直接写 `data.mlscript_event_data.xxx`（无需 `json.decode`，也不要用 `type(x) == "table"` 判断）。
   2. **按目标玩家过滤**：`MsSendMlEvent(role_id, ...)` 会**广播给房间内所有客户端**，仅针对单人的消息在客户端先判 `data.player`。
@@ -60,7 +60,7 @@ Lua 中 **`0` 与 `""` 均为真值（truthy）**，必须按接口类别精确�
 | 接口类别 | 代表 API | 成功判据与硬性约束 |
 |---|---|---|
 | 玩家 / 房间查询 | `MsGetPlayerName` / `MsGetPlayerMapLevel` / `MsGetPlayedTime` / `MsGetPlayedCount` / `MsGetPlayerItem` / `MsGetRoom*` | **`ret ~= nil`**（房间/玩家不存在或 `role_id` 越界返回 `nil`） |
-| 玩家脚本存档读 | `MsGetScriptArchive(role_id)` | 返回 `string \| nil`（首次无存档或玩家不存在均返 `nil`）。最早在 **`_playerjoin`** 触发后读取；若非空但 `pcall(json.decode, raw)` 失败，**保留原档并中止写档**，严禁用默认空档覆盖 |
+| 玩家脚本存档读 | `MsGetScriptArchive(role_id)` | 返回 `string \| nil`（**首次无存档返回空字符串 `""`，房间/玩家不存在返回 `nil`**）。最早在 **`_playerjoin`** 触发后读取；若非空但 `pcall(json.decode, raw)` 失败，**保留原档并中止写档**，严禁用默认空档覆盖 |
 | 玩家脚本存档写 | `MsSaveScriptArchive(role_id, str)` | 返回 **`boolean`**（上限 1 MB = 1,048,576 字节；同房间内保存成功后立即 `MsGetScriptArchive` 即可读到新值；退出房间约 3 秒或房间结束时落库） |
 | 下行消息 / 道具扣减 | `MsSendMlEvent` / `MsTryConsumeItem` | **`code == 0`**（下行 `event_name` > 32 字节返 `4`，`event_msg` > 10,240 字节返 `6`） |
 | 环境判断 | `MsIsProdEnv()` | 返回 **`boolean`**（**线上 `mlroom` 环境［含本地多开连接的线上测试服与正式服］均返回 `true`，仅本地 MockMls 返回 `false`**） |
@@ -77,20 +77,20 @@ Lua 中 **`0` 与 `""` 均为真值（truthy）**，必须按接口类别精确�
   - `key` 与 `value` 仅接受 `string|number`；不支持 `Del`（重置请用 `Set(key, 初始值)`）；单条 `IncrBy` 跨房间原子，多步读写无事务保证。
 - **定时器参数约束**：
   - `Timer.new_timer(ms, callback)` 的 `ms` 必须传入**整数毫秒**（`>= 1`，传浮点数会报参数错误且不创建）；`callback` 返回 `true` 继续下一轮，返回 `false` 停止。
+  - `Log.*(format, ...)` 底层无条件走 `string.format`，打印含 `%` 的动态字符串（如 JSON、玩家昵称）时请用 `Log.info("%s", text)`，避免直接单参传入触发格式化报错。
   - `MsEnd(role_id, reason)` 已废弃，切勿调用。
 
 ## 4. `v1.1.0` 新增接口与外放门禁（预计 2026.11.18 后外放）
 
 > **版本门禁警告（重要）**：以下 `v1.1.0` 新增 API 与运行时特性**预计在 2026.11.18 后才会正式外放**。在 **2026.11.18 之前**（或面对未更新的客户端/开发助手环境），运行时**无法直接调用到这些新增接口**（对应全局变量为 `nil`）。在此日期前编写代码时，**必须先做存在性判断并提供降级兜底**！
+> （注：`MsGetScriptRunStat()`、`Log.*(format, ...)` 变参格式化与 `cjson.null / new / encode_sparse_array` 早已在线上与本地运行时中导出，只是在 `v1.1.0` 才补齐到 `meta.lua` 类型提示中，可直接调用。）
 
 | `v1.1.0` 新增能力（预计 2026.11.18 后外放） | 用途与签名 | 2026.11.18 前兼容兜底写法 |
 |---|---|---|
 | `MsBase64Encode(data)` / `MsBase64Decode(data)` | 内置 SIMD Base64 编解码（RFC 4648 标准字母表，支持内嵌 `\0`；解码失败返 `nil, "invalid base64 input"`） | 先判 `if type(MsBase64Encode) == "function" then`，否则回退到 `cloud_script/util/base64.lua` 纯 Lua 实现 |
 | `MlLuaErrorCode` 全局错误码表 | 运行时全局导出 `{ OK=0, Unknown=1, RoomNotExist=2, PlayerNotExist=3, EventKeyLen=4, EventValueLen=6, ItemNotExisted=12, ItemNotEnough=13, ItemNotUse=14 }` | 用 `(type(MlLuaErrorCode) == "table" and MlLuaErrorCode.OK) or 0` 或直接比对整数常量 |
-| `MsGetScriptRunStat()` | 返回当前房间 `{ room_cur_max_tick_ms, room_max_tick_ms_limit, room_cur_tick_expired_count, room_tick_expired_limit, room_limit_ms_per_tick, room_cur_script_memory, room_script_memory_limit }` | 调用前先判 `if type(MsGetScriptRunStat) == "function" then` |
 | 17 个平台玩家信息查询 API | VIP（`MsGetPlayerPlusVipLevel` / `MapVipLevel` / `IsHonorVip`）、排名（`MsGetPlayerMapLevelRank`）、社区（`IsCommunityMaster` / `CommunityLikeCount` / `ElitePostCount` / `ReplyCount` / `JoyCount` / `Posted` / `SubjectCount`）、签到（`SigninDays` / `SigninMaxConsecutiveDays` / `SigninCurConsecutiveDays`）、身份（`IsAuthor` / `IsReturningPlayer` / `IsBookmarkCurrentMap`） | 调用前先判 `type(MsGetPlayerXxx) == "function"`，未外放或本地 Mock 下按默认值（`0` / `false`）处理 |
-| `Log.*(format, ...)` 变参格式化 | `Log.info("role=%d", role_id)` 直接支持 `string.format` 多参数 | 需兼容旧环境时使用单字符串 `Log.info(string.format("role=%d", role_id))` 或拼接 |
-| `cjson` 扩展字段与 `RedisClient` 二进制 `\0` | 导出 `cjson.null`、`cjson.new()`、`cjson.encode_sparse_array(...)`；`RedisClient:Get/Set` 支持内嵌 `\0` | 调用 `json.encode_sparse_array` 前先判 `type(json.encode_sparse_array) == "function"` |
+| `RedisClient:Get/Set` 二进制 `\0` 安全 | `RedisClient:Get/Set` 改为按长度读取字符串，支持内嵌 `\0` | 2026.11.18 前避免在 Redis key/value 中直接存裸 `\0`，二进制数据先做 Base64 编码 |
 
 ## 5. 运行配额、本地 Mock 差异与调试排错
 
@@ -102,7 +102,7 @@ Lua 中 **`0` 与 `""` 均为真值（truthy）**，必须按接口类别精确�
 - **本地模拟服务（MockMls）vs 线上环境**：
   - **启动时机判据**：本地 `MockMls` 由 Y3 开发助手随游戏进程拉起，**待地图资源加载完毕、客户端 Lua 开始执行时才同步启动**。排查服务是否启动时，先确认客户端 Lua 已在运行，再看 `cloud_script/mls_log/` 与 `script_log/` 是否有新增日志（切勿按进程启动秒数盲判）。
   - **日志转发差异**：本地调试时 **`Log.info` 会转发到客户端日志（`[mlscript]: ...`），但 `Log.warn` 和 `Log.error` 不会转发到客户端**，只会写入 `cloud_script/script_log/mls_local_mls_<日期>.txt`。排查报错或警告时必须直接读取 `script_log/`。
-  - **存储持久性差异**：本地玩家存档持久化在 `cloud_script/mls_archive/<role_id>.json`（`saved_at` + `script_data_b64`）；**本地 Mock 的 Redis 仅存于当前进程内存，重启游戏即清空**（线上测试服 Redis 1 天未访问过期，正式服永不过期）。
+  - **存储持久性差异**：本地玩家存档持久化在 `cloud_script/mls_archive/<plat_aid>.json`（`saved_at` + `script_data_b64`）；**本地 Mock 的 Redis 仅存于当前进程内存，重启游戏即清空**（线上测试服 Redis 1 天未访问过期，正式服永不过期）。
   - **模块热改缓存**：同一局内修改已加载的云脚本文件，需先执行 `package.loaded['mod'] = nil` 再 `require` 才会重读磁盘。
 
 ## 6. 按需加载参考文档（Context Pointers）

@@ -1,6 +1,6 @@
 # 云脚本 API 参考、运行配额与调试排错
 
-> **版本外放门禁说明**：`v1.1.0` 新增接口（`MsBase64Encode`、`MsBase64Decode`、`MsGetScriptRunStat`、`MlLuaErrorCode` 全局表、17 个平台玩家信息查询 API、`Log.*` 变参格式化）**预计 2026.11.18 后正式外放**，在此日期前运行时无法调用（对应全局变量为 `nil`），调用前需先用 `type(fn) == "function"` 判空并做兼容兜底。
+> **版本外放门禁说明**：`v1.1.0` 新增接口（`MsBase64Encode`、`MsBase64Decode`、`MlLuaErrorCode` 全局表、17 个平台玩家信息查询 API）**预计 2026.11.18 后正式外放**，在此日期前运行时无法调用（对应全局变量为 `nil`），调用前需先用 `type(fn) == "function"` 判空并做兼容兜底。
 
 ## 1. 事件系统
 
@@ -8,7 +8,7 @@
 
 | 事件 | 用途与触发说明 | 附加参数 |
 |---|---|---|
-| `_roomloaded` | 房间加载完成 | `player_guids`：本局局内玩家 ID 序列（`userdata`，用 `ipairs` 遍历）；`role_id` 为 `-1` |
+| `_roomloaded` | 房间加载完成 | `player_roleids`（旧称 `player_guids`）：本局局内玩家 ID 序列（`userdata`，用 `ipairs` 遍历）；`role_id` 为 `-1` |
 | `_roomover` | 房间结束；`role_id` 固定为 `-1` | `reason: string`：如 `UnsafeMemory`、`UnsafeCostTime`、`UnsafeTimeout`、`DeleteRoom` |
 | `_playerexit` | 玩家退出房间（主动退出、断线满 3 分钟、被服务端踢出） | `reason: string`：`CLIENT_GIVE_UP`、`CONNECTION_LOST`、`kick by server` |
 | `_playerleave` | 玩家断线时触发，早于同一次断线的 `_playerexit`（本地 Mock 不触发） | `reason: string`：固定为 `player disconnect` |
@@ -53,7 +53,7 @@
 
 ### 玩家脚本存档与道具消耗
 
-- `MsGetScriptArchive(role_id)` → `string | nil`（首次无存档和玩家不存在均返 `nil`）
+- `MsGetScriptArchive(role_id)` → `string | nil`（首次无存档返回空字符串 `""`，房间或玩家不存在返回 `nil`）
 - `MsSaveScriptArchive(role_id, script_save_data)` → `boolean`（上限 1 MB = `1,048,576` 字节）
 - `MsTryConsumeItem(role_id, item_store_id, cnt)` → 返回 `MlLuaErrorCode` 整数错误码，`0` 表示校验通过并已发起异步扣除请求，实际扣除结果通过 `_item_info_changed` / `_consume_item_notify` 带出。
 
@@ -78,7 +78,7 @@
 | `MsGetRoomLoadedTs()` | `integer \| nil` | 房间加载完成的时间戳（秒）；mock 环境未开始时返回 `0` |
 | `MsGetRoomGameTime()` | `integer \| nil` | 房间从加载完成到现在的运行时长（秒）；mock 环境未开始时返回 `0` |
 | `MsGetRoomPlayerCount()` | `integer \| nil` | 当前真实玩家数量 |
-| `MsGetScriptRunStat()` | `ScriptRunStat \| nil` | 当前房间脚本运行耗时与内存统计（2026.11.18 后外放） |
+| `MsGetScriptRunStat()` | `ScriptRunStat \| nil` | 当前房间脚本运行耗时与内存统计（房间不存在时返回 `nil`） |
 | `MsIsProdEnv()` | `boolean` | 判断当前是否运行在线上 `mlroom` 环境（线上测试服与正式服均为 `true`，本地 mock 为 `false`） |
 
 `ScriptRunStat` 字段：
@@ -92,12 +92,12 @@
 - **`MsBase64Encode(data)` / `MsBase64Decode(data)`（预计 2026.11.18 后外放）**：
   - `MsBase64Encode(data)`：RFC 4648 标准字母表，带 `=` padding，二进制安全（支持内嵌 `\0`）。
   - `MsBase64Decode(data)`：严格模式（不接受空白/换行、缺失 padding 及 URL-safe 字母表），成功返回 `string`，失败返回 `nil, "invalid base64 input"`。
-- **`cjson`**：通过 `local json = require("cjson")` 获取，提供 `encode`、`decode`、`null`（`lightuserdata`）、`new()`、`encode_sparse_array(convert, ratio, safe)`、`encode_max_depth`、`decode_max_depth`、`encode_number_precision` 等。
+- **`cjson`**：通过 `local json = require("cjson")`（或直接使用预注册的全局 `cjson`）获取，提供 `encode`、`decode`、`null`（`lightuserdata`）、`new()`、`encode_sparse_array(convert, ratio, safe)`、`encode_max_depth`、`decode_max_depth`、`encode_number_precision` 等。
 - **`redis.get_redis_client()`**：
   - `client:Get(key, callback)` / `client:Set(key, value, callback)` / `client:IncrBy(key, increment, callback)`。
-  - `key` 和 `value` 仅接受 `string|number`（支持内嵌 `\0`），传入其他类型直接抛 Lua 参数错误。
+  - `key` 和 `value` 仅接受 `string|number`（`v1.1.0` 起支持内嵌 `\0`），传入其他类型直接抛 Lua 参数错误。
   - 回调或协程接收 `(ok, res)`：连接失败为 `(false, err_str)`，协议错误为 `(true, err_str)`，正常响应为 `(true, result)`。协程外省略 `callback` 会报错。
-- **`Log`**：`Log.trace/debug/info/warn/error/critical(format, ...)`（变参格式化预计 2026.11.18 后外放）。
+- **`Log`**：`Log.trace/debug/info/warn/error/critical(format, ...)`（底层走 `string.format`，打印含 `%` 的动态文本请写 `Log.info("%s", text)`）。
 - **`Timer`**：`Timer.new_timer(ms, callback)`（`ms` 为整数毫秒，`>= 1`；回调返 `true` 继续，`false` 停止）；`Timer.cancel_timer(timer_id)` 返回 `boolean`。
 
 ## 5. 运行限制、配额与 LuaDebug 断点调试
