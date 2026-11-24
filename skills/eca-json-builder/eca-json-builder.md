@@ -153,7 +153,7 @@ py -3 <agent>\skills\eca-json-builder\lookup.py --global-events
 2. 处理器里用 `TRIGGER_PLAYER` 取触发玩家、`GET_UI_COMP_FROM_EVENT` 取控件、`GET_UI_COMP_NAME(玩家, 控件)` 判断是哪个控件。
 3. 含 `sub_trigger` 的文件**同样用 `import_eca` 加载** —— 实测当前编辑器版本 `新建`/`覆盖` 都不会丢子触发器与裸整数注册 ID（见「子触发器加载实测」一节），加载后等 3 秒 `save_editor` 再用 `diff` 校验即可。
    （若某版本上确实出现「`success=true` 但保存后子触发器消失」，才退回 `restart_editor(save_before_restart=false)` 加载；注意该重启会打脏编辑器会话，必须再补一次默认的 `restart_editor(save_before_restart=true)`，否则 `y3helper` 启动游戏会卡在 loading 30%。）
-4. `y3runtime.trigger_ui_touch_event_by_path` **驱动不了 ECA 的 UI 事件**（只能触发 Lua 监听），所以 UI 用例不能靠它自动验证，必须人工点击。
+4. `y3helper.trigger_ui_touch_event_by_path` **驱动不了 ECA 的 UI 事件**（只能触发 Lua 监听），所以 UI 用例不能靠它自动验证，必须人工点击。
 
 ### 子触发器加载实测
 
@@ -1132,7 +1132,7 @@ py -3 <agent>\skills\eca-json-builder\lookup.py CREATE_UNIT
 | `END_GAME_FOR_ROLE` 参数被清空 | 曾以为 `WIN_OR_LOSE`/`ON_OR_OFF` 无 ID 可用 | 二者实为 **100047 / 100048**（源码派生），且需**填满 6 个参数**才 `valid=true`（实测） |
 | UI 点击没反应 | 事件处理器写成普通顶层触发器 | 必须用「`INIT_FINISHED` 父触发器 + 子触发器 + 裸整数注册」结构，事件参数用 `STR_TO_UI_EVENT("名字")` |
 | `import_eca` 返回成功但子触发器丢了 | 旧文档误标「含 `sub_trigger` 不能走 `import_eca`」；**实测当前版本可直接导入**（新建/覆盖均保留） | 先 `import_eca` + `save_editor` + `diff` 校验；只有 `diff` 真的报丢子触发器时，才退回 `restart_editor(save_before_restart=false)`，并补一次 `save_before_restart=true` 恢复会话 |
-| 自动化点击验证 UI 结论是「收不到事件」 | `y3runtime.trigger_ui_touch_event_by_path` 只驱动 Lua 监听 | UI 用例必须人工点击验证 |
+| 自动化点击验证 UI 结论是「收不到事件」 | `y3helper.trigger_ui_touch_event_by_path` 只驱动 Lua 监听 | UI 用例必须人工点击验证 |
 
 ---
 

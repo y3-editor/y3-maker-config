@@ -16,30 +16,25 @@ alwaysApply: false
 
 ---
 
-## 🔄 游戏启动后刷新 y3runtime MCP 连接（强制）
+## 🎮 游戏启动与运行态就绪检查（Gate 0）
 
-**y3runtime 的 MCP Server 运行在游戏进程内，启动游戏后必须刷新连接才能使用。**
+**运行态 UI 工具（`get_ui_center_by_path` / `trigger_ui_touch_event_by_path`）已内置于常驻的 `y3-helper` MCP，启动或重启游戏后无需刷新 MCP 连接，只需确保游戏运行且客户端已连接。**
 
 ### 启动游戏后的必须步骤
 
 ```
 1. 调用 helper.launch_game 启动游戏
-2. 等待游戏进程就绪（轮询 helper.get_game_status 直到返回 running）
-3. 🔴 提示用户刷新 MCP 连接
-4. 等待用户确认「已刷新」
-5. 🔴 验证 y3runtime 可用（调用 get_ui_center_by_path 或 trigger_ui_touch_event_by_path 测试）
-6. ✅ 验证通过后，才能开启自动测试流程
+2. 等待游戏进程与客户端就绪（轮询 helper.get_game_status 直到返回 running）
+3. ✅ 就绪后即可直接调用 helper 运行态工具（execute_lua / get_ui_center_by_path / trigger_ui_touch_event_by_path），开启自动测试流程
 ```
 
 ### AI 行为规范
 
 当 AI 使用 `helper.launch_game` 或 `helper.quick_restart` 启动/重启游戏后：
 
-1. **必须提醒用户**：「游戏已启动，请刷新 y3runtime MCP 连接后告诉我『已刷新』」
-2. **等待用户确认**：在用户确认 MCP 已刷新前，不要调用 y3runtime 的任何工具
-3. **验证连接可用**：用户确认后，必须调用 y3runtime 工具验证连接正常（如 `get_ui_center_by_path`）
-4. **验证通过才能继续**：只有 y3runtime 验证成功后，才能开启自动测试流程
-5. **连接失败处理**：如果验证失败，提示用户重新刷新 MCP 连接
+1. **无需提醒用户刷新 MCP 连接**：`y3-helper` MCP 随 VS Code 常驻，不随游戏进程启停
+2. **确认客户端已连接**：先调用 `helper.get_game_status` 确认状态为 `running`（未就绪时不要直接调用运行态工具，否则会返回 `GAME_NOT_RUNNING` / `CLIENT_NOT_CONNECTED`）
+3. **多开选窗**：若存在多个游戏窗口，通过 `helper.get_game_status` 获取 `clientSlot` 或 `roleId` 传入运行态工具定位目标窗口
 
 ### 自动测试启动前置条件（Gate 0）
 
@@ -47,15 +42,14 @@ alwaysApply: false
 ┌─────────────────────────────────────────────────────────────────────┐
 │  自动测试启动前置条件（必须全部满足）：                                │
 │                                                                     │
+│  ✅ y3-helper MCP 服务可用                                           │
 │  ✅ 游戏状态 = running（helper.get_game_status 返回 running）        │
-│  ✅ 用户已确认刷新 y3runtime MCP 连接                                │
-│  ✅ y3runtime 验证通过（调用任一 y3runtime 工具成功返回）             │
 │                                                                     │
 │  ❌ 任一条件不满足 → 禁止开启自动测试流程                             │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-> ⚠️ **quick_restart / stop_game 后也需要刷新**：游戏进程重启意味着新的 MCP Server 实例，需要重新连接并重新验证。
+> ⚠️ **`quick_restart` / `stop_game` 后**：无需刷新 MCP 连接，但重启或重新启动后仍需通过 `helper.get_game_status` 确认新客户端已重新连接（`running`）再调用运行态工具。
 
 ---
 
@@ -112,7 +106,7 @@ alwaysApply: false
 | ❌ 禁止 | 原因 |
 |---------|------|
 | 🔲 NOT_TESTED | 不存在"未测试"，要么测要么 BLOCKED |
-| "需要 trigger_ui_touch_event_by_path" | 你有 y3runtime 工具，直接用 |
+| "需要 trigger_ui_touch_event_by_path" | 你有 y3-helper 工具，直接用 |
 | "需要截图对比" | 你有 capture_screenshot，直接截 |
 | "依赖 T-XX" | 先去执行 T-XX，然后回来继续 |
 

@@ -16,7 +16,7 @@ import re
 import urllib.error
 import urllib.request
 
-DEFAULT_PORTS = {"y3editor": 8765, "y3-helper": 8766, "y3runtime": 8767}
+DEFAULT_PORTS = {"y3editor": 8765, "y3-helper": 8766}
 
 
 def find_project_root(start=None):

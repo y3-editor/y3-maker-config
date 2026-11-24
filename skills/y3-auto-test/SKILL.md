@@ -8,7 +8,7 @@ description: >
   开始测试、执行测试计划、跑测试、继续执行测试。
   
   This skill handles automated testing using MCP tool chain:
-  helper for game control + y3runtime for UI interaction.
+  y3-helper for game control and UI interaction.
 ---
 
 # Y3 Auto Test Skill
@@ -51,7 +51,7 @@ description: >
 | UI 控件验证 | `helper.get_ui_canvas` |
 | Lua 语法检查 | `helper.read_problems_lua` |
 | 冒烟 / 运行时数据 | `helper.launch_game` + `helper.execute_lua` + `helper.get_logs` |
-| UI 点击交互 | `y3runtime.trigger_ui_touch_event_by_path` |
+| UI 点击交互 | `helper.trigger_ui_touch_event_by_path` |
 | 截图存证 | `helper.capture_screenshot` |
 
 > ⚠️ 静态数据（物编/UI结构）用静态工具；运行时行为才用 `execute_lua`。
@@ -64,7 +64,7 @@ description: >
 ```
 helper.get_game_status → 未运行则 helper.launch_game
 ```
-> 启动后提醒用户刷新 y3runtime MCP 连接，等用户确认后再继续。
+> 启动后轮询 `helper.get_game_status` 直到返回 `running`（`y3-helper` MCP 常驻，无需刷新连接）。
 
 **2. （可选）获取控件路径**
 ```
@@ -73,7 +73,7 @@ helper.get_ui_canvas  depth:-1  nodePath:"画板名"
 
 **3. 触发 UI 点击**
 ```
-y3runtime.trigger_ui_touch_event_by_path
+helper.trigger_ui_touch_event_by_path
   ui_path: "panel_1.button_1"   ← 画板名.控件路径
   touch:   "左键"
 ```

@@ -105,16 +105,13 @@ GameAPI.trigger_ui_event(player, ui_obj, "name")   -- 实测：之后 execute_lu
 
 ## 4. 会话/环境前置（会伪装成"功能坏了"）
 
-### 4.1 y3runtime MCP 随游戏进程启停
+### 4.1 运行态 UI 工具已合并入 `y3-helper` MCP（不再使用 y3runtime）
 
-MCP 配置（`.codemaker/mcp_settings.json`，Codex 侧为 `.codex/config.toml`）里 y3runtime 指向 `127.0.0.1:8767`，**它只在游戏运行时监听**。
-而 Codex 的可调用工具清单在**会话开始时快照**，因此：
+`get_ui_center_by_path` 与 `trigger_ui_touch_event_by_path` 已内置到常驻的 `y3-helper` MCP（`127.0.0.1:8766`，随 VS Code 扩展启停），不再依赖随游戏进程启停的旧 `y3runtime`（`8767`）。
 
-> **若会话开始时游戏没跑 → 整个会话都没有 y3runtime 工具**（表现为"无法做 UI 自动化"），
-> 且中途启动游戏也**不会**补上工具。
-
-**建议流程**：需要 UI/运行时自动化时，**先启动游戏确认 8767 在听，再开新会话**。
-快速自检：`Test-NetConnection 127.0.0.1 -Port 8767`。
+- 会话启动时即使游戏未运行，Agent 也能发现这两个工具，**启动或重启游戏后无需刷新 MCP 连接或重开会话**。
+- 实际调用前仍需确保游戏运行且客户端已连接（`launch_game` + `get_game_status` 返回 `running`），否则会返回 `GAME_NOT_RUNNING` / `CLIENT_NOT_CONNECTED`。
+- 快速自检：`Test-NetConnection 127.0.0.1 -Port 8766`。
 
 ### 4.2 新增全局变量会被 `save_editor` 裁剪
 

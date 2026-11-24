@@ -171,11 +171,11 @@ y3.const.KeyboardKey['1']
 
 ## 🖱️ UI 控件交互
 
-**使用 y3runtime 直接事件触发：**
+**使用 y3-helper 直接事件触发：**
 
 ```
-1. 获取控件树 → helper.get_ui_canvas（可选，已知路径时跳过）
-2. 触发点击 → y3runtime.trigger_ui_touch_event_by_path（需游戏运行）
+1. 获取控件树 → y3-helper.get_ui_canvas（可选，已知路径时跳过）
+2. 触发点击 → y3-helper.trigger_ui_touch_event_by_path（需游戏运行）
 ```
 
 > 详细流程见 `skills/y3-auto-test/SKILL.md`

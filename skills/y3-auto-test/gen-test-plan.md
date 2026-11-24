@@ -33,7 +33,7 @@
 
 | 编号 | 方法名称 | 使用工具 | 适用场景 |
 |------|---------|---------|---------|
-| M1 | UI 点击触发 | `trigger_ui_touch_event_by_path`（y3runtime MCP） | UI 按钮/控件点击后的响应验证 |
+| M1 | UI 点击触发 | `trigger_ui_touch_event_by_path`（y3helper MCP） | UI 按钮/控件点击后的响应验证 |
 | M2 | 执行 Lua | `execute_lua`（y3helper MCP） | 游戏逻辑、数值、状态、对象存在性验证 |
 | M3 | 截图验证 | `capture_screenshot`（y3helper MCP） | 视觉效果、UI 渲染正确性存证 |
 | M4 | 查看日志 | `get_logs`（y3helper MCP） | 事件触发、逻辑执行路径、错误信息验证 |

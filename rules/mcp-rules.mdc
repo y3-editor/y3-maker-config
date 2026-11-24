@@ -1,6 +1,6 @@
 # MCP 调用规则
 
-> Y3 Editor MCP 和 Y3 Runtime MCP 的安全调用规范
+> Y3 Editor MCP 和 Y3 Helper MCP 的安全调用规范
 
 ## 🔴 熔断规则（最高优先级）
 
@@ -146,26 +146,26 @@ IndexError: list index out of range
 | `get_model_animations` | 查模型动作列表与时长 | `model_id`（必填）+ `remove_after`（可选）：返回动作名 → 时长（毫秒）。⚠️ 动作信息不在模型表里，工具会把模型加载进资产预览控件再读引擎实例（**约 0.6~1s/次，无批量接口**），模型资源需已下载（商店模型先用 `download_editor_model_resource`），静态模型返回空表。`ok:false` = 加载失败（超时/控件未切到目标模型，看 `errors`），**不会返回别的模型的动作**；模型 id 不存在会兜底成空模型（`ok:true` + `count:0`），用前核对 id |
 | `get_model_import_materials` | 查询内置材质球 | 无参；返回 FBX 导入可选材质球清单，配合 resource_map_json 的 `material` 字段使用 |
 
-## 🔄 游戏启动后刷新 y3runtime MCP 连接
+## 🎮 运行态 UI 工具前置条件（y3-helper）
 
-> 详细规则见 `auto-test.mdc`「游戏启动后刷新 y3runtime MCP 连接」章节。
+> 详细规则见 `auto-test.mdc`「游戏启动与运行态就绪检查（Gate 0）」章节。
 
-**简要说明**：y3runtime MCP Server 运行在游戏进程内，启动游戏后需提醒用户刷新 MCP 连接。
+**简要说明**：运行态 UI 工具（`get_ui_center_by_path` / `trigger_ui_touch_event_by_path`）已内置于常驻的 `y3-helper` MCP（`http://127.0.0.1:8766/mcp`），启动或重启游戏后**无需刷新 MCP 连接**，只需确认游戏已运行且客户端已连接（`get_game_status` 返回 `running`）。
 
 ## 🖱️ UI 控件交互
 
-### y3runtime 直接事件触发
+### y3-helper 直接事件触发
 
 ```
-1. get_ui_canvas(可选)                        → 确认控件路径
-2. trigger_ui_touch_event_by_path(path, touch) → 直接触发点击事件
+1. get_ui_canvas(可选)                           → 确认控件路径
+2. trigger_ui_touch_event_by_path(ui_path, touch) → 直接触发点击事件
 ```
 
 | 工具 | 服务 | 功能 |
 |------|------|------|
-| `get_ui_canvas` | helper | 获取 UI 控件树结构 |
-| `trigger_ui_touch_event_by_path` | y3runtime | **直接触发 UI 控件点击事件**（⚠️ 需游戏运行） |
-| `get_ui_center_by_path` | y3runtime | 获取 UI 控件中心点屏幕坐标（⚠️ 需游戏运行） |
+| `get_ui_canvas` | y3-helper | 获取 UI 控件树结构 |
+| `trigger_ui_touch_event_by_path` | y3-helper | **直接触发 UI 控件点击事件**（⚠️ 需游戏运行；多开支持 `clientSlot`/`roleId` 选窗） |
+| `get_ui_center_by_path` | y3-helper | 获取 UI 控件中心点屏幕坐标（⚠️ 需游戏运行；多开支持 `clientSlot`/`roleId` 选窗） |
 
 > **优势**：无需获取屏幕坐标，不受窗口位置/缩放/遮挡影响，1 步完成 UI 点击。
 
