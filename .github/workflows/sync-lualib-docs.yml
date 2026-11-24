@@ -1,0 +1,136 @@
+# 自动将 Lua 相关参考文档单向同步到 y3-editor/y3-lualib 的 doc/guide/。
+#
+# 配置要求：
+#   需要在 y3-editor/y3-maker-config 仓库 Settings -> Secrets and variables -> Actions 中
+#   配置名为 LUALIB_SYNC_TOKEN 的 Fine-grained PAT，目标仓库为 y3-editor/y3-lualib，权限需包含：
+#     - Contents: Read and write
+#     - Pull requests: Read and write
+name: Sync Lua Docs to y3-lualib
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'knowledge/核心系统/**'
+      - 'knowledge/UI系统/**'
+      - 'knowledge/物编系统/**'
+      - 'knowledge/其他/01-镜头动画.md'
+      - 'skills/y3-lua-pipeline/references/**'
+      - 'memory/lua-issues/**'
+      - '.github/sync-lualib/**'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: '仅试跑同步与校验，不推送分支或创建 PR'
+        required: false
+        type: boolean
+        default: false
+      force_sha_refresh:
+        description: '即使仅源提交 SHA 变化也强制刷新 README.md 并更新 PR'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: sync-lualib-docs
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout y3-maker-config
+        uses: actions/checkout@v4
+        with:
+          path: source
+
+      - name: Verify LUALIB_SYNC_TOKEN
+        if: ${{ inputs.dry_run != true }}
+        env:
+          SYNC_TOKEN: ${{ secrets.LUALIB_SYNC_TOKEN }}
+        run: |
+          if [ -z "$SYNC_TOKEN" ]; then
+            echo "::error::缺少 LUALIB_SYNC_TOKEN secret（需对 y3-editor/y3-lualib 拥有 Contents RW 与 Pull requests RW 权限）。"
+            exit 1
+          fi
+
+      - name: Checkout y3-lualib
+        uses: actions/checkout@v4
+        with:
+          repository: y3-editor/y3-lualib
+          ref: main
+          token: ${{ secrets.LUALIB_SYNC_TOKEN || github.token }}
+          path: target
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run sync script unit tests
+        run: python3 -m unittest discover -s source/.github/sync-lualib -p "test_*.py" -v
+
+      - name: Run doc sync and validation
+        id: sync
+        run: |
+          extra_args=()
+          if [ "${{ inputs.force_sha_refresh }}" != "true" ]; then
+            extra_args+=(--skip-if-sha-only)
+          fi
+          python3 source/.github/sync-lualib/sync_lualib_docs.py \
+            --source source \
+            --target target \
+            --source-sha "$GITHUB_SHA" \
+            "${extra_args[@]}"
+
+          cd target
+          changed_files=$(git status --porcelain -- doc/guide)
+          echo "=== git status doc/guide ==="
+          echo "$changed_files"
+          if [ -n "$changed_files" ]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Push sync branch and open/update PR
+        if: ${{ steps.sync.outputs.has_changes == 'true' && inputs.dry_run != true }}
+        env:
+          GH_TOKEN: ${{ secrets.LUALIB_SYNC_TOKEN }}
+        run: |
+          cd target
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git checkout -B docs/sync-maker-config
+          git add doc/guide
+          short_sha="${GITHUB_SHA:0:7}"
+          git commit -m "docs(guide): 同步 y3-maker-config (${short_sha})"
+          git push --force origin docs/sync-maker-config
+
+          pr_body=$(printf '%s\n' \
+            "自动同步来自 \`y3-editor/y3-maker-config\` 的 Lua 开发参考文档。" \
+            "" \
+            "- 源提交：https://github.com/y3-editor/y3-maker-config/commit/${GITHUB_SHA}" \
+            "- 目标目录：\`doc/guide/\`（请勿在 \`y3-lualib\` 侧直接修改该目录内文件）")
+
+          existing_pr=$(gh pr list \
+            --repo y3-editor/y3-lualib \
+            --head docs/sync-maker-config \
+            --state open \
+            --json number \
+            --jq '.[0].number // empty')
+
+          if [ -n "$existing_pr" ]; then
+            gh pr edit "$existing_pr" \
+              --repo y3-editor/y3-lualib \
+              --body "$pr_body"
+          else
+            gh pr create \
+              --repo y3-editor/y3-lualib \
+              --base main \
+              --head docs/sync-maker-config \
+              --title "docs(guide): 同步 y3-maker-config Lua 开发文档" \
+              --body "$pr_body"
+          fi

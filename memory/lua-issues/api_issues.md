@@ -99,8 +99,8 @@
 |---|---|
 | **错误用法** | `slot:get_child('bg')` 或 `slot:get_child('bg.descr_TEXT')` |
 | **正确用法** | `slot:get_child('root.bg')` 或 `slot:get_child('root.bg.descr_TEXT')` |
-| **原因** | `UIPrefab:get_child(path)` 先获取 prefab 根 UI 节点，再从该节点用 `path` 查找；`artifactPickCmp` 内有一层隐含 `root`，需带 `root.` 前缀 |
-| **来源** | DM42 `gamePlay/ui/hudPopup/artifact/ArtifactPickCmp.lua:25` `self._bg = self._ui:get_child("root.bg")` |
+| **原因** | `UIPrefab:get_child(path)` 先获取 prefab 根 UI 节点，再从该节点用 `path` 查找；若元件内有一层隐含 `root` 容器节点，路径需带 `root.` 前缀 |
+| **示例** | `self._bg = self._ui:get_child("root.bg")` |
 
 ## 键盘事件相关
 
