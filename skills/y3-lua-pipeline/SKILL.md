@@ -150,12 +150,12 @@ description: >
 - [ ] **路由确认**：当前任务已进入 `y3-lua-pipeline`（UI Lua 场景由 `y3-ui-pipeline` 子路由；模板 Lua 场景由 `y3-game-spec` 模板分支路由）
 - [ ] **模板来源确认**：若为 `template-backed` 模块，已记录模板 ID、模板路径、`logic.lua`、`.upui`、项目级适配点
 - [ ] **脚本目录确认**：已确认实际脚本根目录（`maps/EntryMap/script` 或 `global_script`）
-- [ ] **前置阅读完成**：已阅读 `memory/lua-issues/`（`api_issues.md`、`trace_issues.md`）与对应 `references/`
+- [ ] **前置阅读完成**：已阅读 `memory/lua-issues/`（`api_issues.md`、`trace_issues.md`，如存在）与对应 `references/`
 - [ ] **API 合规验证**：新增/修改的每个 API 调用均已在 `y3/` 源码或 references 中验证存在性与参数
 - [ ] **代码实现完成**：Lua 文件已按规范修改并放置在正确目录
 - [ ] **静态检查通过**：已执行 Lua 问题检查（如 `read_problems_lua`）且无阻断错误
 - [ ] **运行时验证通过**：已完成至少 1 轮标准测试循环（状态检查 → 启动/重启 → 等待日志 → trace 检查）
-- [ ] **记忆归档完成**：若出现 Lua 相关问题，已按类别归档至 `lua-issues`（API/Trace）
+- [ ] **记忆归档完成**：若出现 Lua 相关问题且存在 `memory/lua-issues/`，已按类别归档至 `lua-issues`（API/Trace）
 - [ ] **交付报告已输出**：已按下方 Completion Report 模板输出交付信息
 
 ## 📋 交付报告模板（Completion Report, MUST）
