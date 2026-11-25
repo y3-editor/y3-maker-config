@@ -126,6 +126,6 @@ Y3 JSON 使用 **特殊的 tuple 嵌套格式**：
 
 ## 📚 参考资源
 
-- API 错题集：`../memory/lua-issues/api_issues.md`
+- API 错题集：`../memory/lua-issues/api_issues.md`（如存在）
 - Lua 参考：`../skills/y3-lua-pipeline/references/`
 - Y3 源码：`maps/EntryMap/script/y3/` 或 `global_script/y3/`

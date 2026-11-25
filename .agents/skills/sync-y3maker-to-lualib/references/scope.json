@@ -1,0 +1,75 @@
+{
+  "knowledge": {
+    "source_dir": "knowledge",
+    "target_dir": "knowledge",
+    "exclude_files": [
+      "核心系统/12-ECA系统.md"
+    ],
+    "readme_strip_patterns": [
+      "12-ECA系统.md"
+    ]
+  },
+  "rules": {
+    "source_dir": "rules",
+    "target_dir": "rules",
+    "include_files": [
+      "api-safety.mdc",
+      "ui-rules.mdc",
+      "mcp-rules.mdc",
+      "auto-test.mdc",
+      "doc-consistency.mdc"
+    ]
+  },
+  "skills": {
+    "source_dir": "skills",
+    "target_dir": "skills",
+    "include_dirs": [
+      "y3-cloud-script",
+      "y3-lua-pipeline",
+      "y3-lua-review",
+      "y3-ui-pipeline",
+      "y3-ui-generator",
+      "y3-obj-edit",
+      "y3-auto-test",
+      "y3-game-spec",
+      "y3-resource-import"
+    ],
+    "exclude_globs": [
+      "y3-game-spec/roadmaps/*-ECA-基准版.md",
+      "y3-resource-import/temp/**",
+      "y3-auto-test/.queue/**",
+      "**/__pycache__/**",
+      "**/*.pyc",
+      "**/*.pyo"
+    ]
+  },
+  "known_excluded_skills": [
+    "y3-eca-pipeline",
+    "eca-json-builder",
+    "y3-gen-terrain-from-image",
+    "y3-terrain-template",
+    "y3-env-setup",
+    "y3-template-export",
+    "y3-memory-distill"
+  ],
+  "known_excluded_rules": [
+    "rules.mdc",
+    "memory.mdc"
+  ],
+  "protected_native_paths": [
+    "API.md",
+    "API",
+    "Lua虚拟机.md",
+    "skills/y3-lib",
+    "skills/y3-lua-vm"
+  ],
+  "forbidden_patterns": [
+    "DM42",
+    "DM32",
+    "test321321",
+    "爆战兄弟",
+    "射手大师",
+    "svn-dm58",
+    "E:\\\\map\\\\"
+  ]
+}

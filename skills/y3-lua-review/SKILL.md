@@ -22,9 +22,8 @@ description: >
 
 ```
 1. <agent>/rules/api-safety.mdc          ← API 安全规则 + 常见错误速查
-2. <agent>/memory/lua-issues/api_issues.md ← 已知 API 错误模式
+2. <agent>/memory/lua-issues/api_issues.md ← 已知 API 错误模式（如存在）
 3. <agent>/memory/lua-issues/trace_issues.md ← 运行时 trace 错误（如存在）
-4. <agent>/memory/lua-issues/api_blacklist.json ← API 黑名单（正则匹配，自动命中报警）
 ```
 
 > 这些文件是审查的**核心知识库**，包含所有已知错误模式，必须在 Phase 3 中逐一比对。
@@ -55,14 +54,14 @@ description: >
 │  ├── 事件名验证（对照 meta/event.lua）                         │
 │  ├── 事件参数名验证（data.xxx 对照 lua_name）                  │
 │  ├── 参数类型检查（已知类型陷阱）                              │
-│  └── 已知错误模式匹配（api_issues.md + api_blacklist.json）    │
+│  └── 已知错误模式匹配（api_issues.md 与常见错误表）            │
 │           │                                                     │
 │           ▼                                                     │
 │  Phase 4: 汇总报告 + 修复                                      │
 │  ├── CRITICAL / WARNING / INFO 分级                            │
 │  ├── 确定性修复 → 自动应用（用户确认后）                       │
 │  ├── 非确定性修复 → 输出建议                                   │
-│  └── 新问题归档 → lua-issues                                   │
+│  └── 新问题归档 → lua-issues（如存在）                         │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -248,18 +247,15 @@ description: >
 
 ### 3.5 已知错误模式匹配
 
-**A. 黑名单正则扫描（自动，api_blacklist.json）**
+**A. 已知常见错误模式匹配（下方匹配表）**
 
-加载 `<agent>/memory/lua-issues/api_blacklist.json`，对每个审查文件逐行正则匹配：
-- 命中 `severity=error` → CRITICAL
-- 命中 `severity=warn` → WARNING
-- 输出时附带 `fix` 建议
+对照下方高频错误模式表逐一排查，并结合上下文判断分级（CRITICAL / WARNING）。
 
-**B. 语义模式匹配（人工辅助，api_issues.md）**
+**B. 语义模式匹配（人工辅助，api_issues.md，如存在）**
 
-对 api_issues.md 中不适合正则化的条目（如"调用时机不对""需要 wait_frame"），由审查者读代码上下文判断
+若当前环境存在 `<agent>/memory/lua-issues/api_issues.md`，对照其中不适合直接模式匹配的条目（如"调用时机不对""需要 wait_frame"），由审查者读代码上下文判断。
 
-**完整匹配表**（基于 blacklist 15 条 + md 补充）：
+**完整匹配表**：
 
 | # | 搜索模式 | 分级 |
 |---|----------|------|
@@ -374,6 +370,8 @@ description: >
 
 ### 4.5 lua-issues 归档规则
 
+> 仅当当前环境存在 `memory/lua-issues/` 目录时执行以下归档；未配置记忆目录的环境跳过。
+
 ```
 审查完成后：
     │
@@ -409,8 +407,8 @@ description: >
 |--------|------|------|
 | API 白名单 | `skills/y3-lua-pipeline/references/*.md` (22 文件) | API 存在性校验 |
 | API 快速参考 | `skills/y3-lua-pipeline/SKILL.md` Part 3 | API 签名速查 |
-| 已知错误库 | `memory/lua-issues/api_issues.md` | 错误模式匹配 |
-| Trace 错误库 | `memory/lua-issues/trace_issues.md` | Trace 模式匹配 |
+| 已知错误库 | `memory/lua-issues/api_issues.md`（如存在） | 错误模式匹配 |
+| Trace 错误库 | `memory/lua-issues/trace_issues.md`（如存在） | Trace 模式匹配 |
 | 事件参数大全 | `y3/meta/event.lua` | 事件名+参数名校验 |
 | 常量枚举 | `y3/game/const.lua` | 枚举值校验 |
 | API 安全规则 | `rules/api-safety.mdc` | 常见错误速查 |
